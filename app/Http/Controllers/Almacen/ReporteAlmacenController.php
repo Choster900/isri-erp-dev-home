@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
 use App\Models\CatalogoCtaPresupuestal;
+use App\Models\DetDocumentoAdquisicion;
+use App\Models\DocumentoAdquisicion;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -1343,4 +1345,52 @@ class ReporteAlmacenController extends Controller
         $writer->save('php://output');
     }
 
+
+    public function getContractsInfo(Request $request){
+        $itemCtr = DetDocumentoAdquisicion::with('documento_adquisicion')
+        ->whereHas('documento_adquisicion', function ($query) {
+            $query->where('id_tipo_doc_adquisicion', 1);
+        })
+        ->where('estado_det_doc_adquisicion',1)
+        ->where('id_estado_doc_adquisicion','!=',1)
+        ->get();
+
+        $contracts = $itemCtr->map(function($item) {
+            return [
+                'value'         => $item->documento_adquisicion->id_doc_adquisicion,
+                'label'        => $item->documento_adquisicion->numero_doc_adquisicion,
+            ];
+        })->unique('value')->values(); // Eliminamos duplicados y reindexamos la colección
+        
+        $itemContracts = $itemCtr->map(function($item) {
+            return [
+                'value'         => $item->id_det_doc_adquisicion,
+                'label'        => $item->nombre_det_doc_adquisicion,
+                'id_doc'        => $item->id_doc_adquisicion
+            ];
+        });
+
+        return response()->json([
+            'contracts'                     => $contracts,
+            'itemContracts'                 => $itemContracts,
+        ]);
+    }
+
+    public function getContractTrackingReport(Request $request){
+        $doc = DocumentoAdquisicion::find($request->contractId);
+        if($doc->id_proceso_compra == 5){
+            $procedure = DB::select(
+                'CALL PR_RPT_SEGUIMIENTO_CNTR_PC5(?, ?, ?)',
+                array($request->itemContractId, date('Y-m-d', strtotime($request->startDate)) , date('Y-m-d', strtotime($request->endDate)))
+            );
+        }else{
+            $procedure = DB::select(
+                'CALL PR_RPT_SEGUIMIENTO_CNTR(?, ?, ?)',
+                array($request->itemContractId, date('Y-m-d', strtotime($request->startDate)) , date('Y-m-d', strtotime($request->endDate)))
+            );
+        }
+        return response()->json([
+            'products'                     => $procedure,
+        ]);
+    }
 }

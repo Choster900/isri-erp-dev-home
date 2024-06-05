@@ -1,4 +1,4 @@
-import { ref, inject, computed } from "vue";
+import { ref, onMounted, inject, computed } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
@@ -8,10 +8,13 @@ import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
 
 export const useReporteSeguimientoContrato = (context) => {
-    const isLoadingExport = ref(false)
+    const swal = inject("$swal");
+    const isLoadingReport = ref(false)
     const errors = ref([])
     const contracts = ref([])
     const itemContracts = ref([])
+    const filterItems = ref([])
+    const products = ref([])
 
     const reportInfo = ref({
         startDate: '',
@@ -21,32 +24,51 @@ export const useReporteSeguimientoContrato = (context) => {
     })
 
     const getOption = (e) => {
+        const dateFormat = 'ddd MMM DD YYYY HH:mm:ss [GMT]ZZ';
         moment.locale('en');
+
+        const now = moment();
+        let startDate, endDate;
+
         switch (e) {
             case 0:
-                reportInfo.value.startDate = moment().startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                reportInfo.value.endDate = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                startDate = now.clone().startOf('month').format(dateFormat);
+                endDate = now.format(dateFormat);
                 break;
             case 1:
-                reportInfo.value.startDate = moment().subtract(1, 'month').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                reportInfo.value.endDate = moment().subtract(1, 'month').endOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                startDate = now.clone().subtract(1, 'month').startOf('month').format(dateFormat);
+                endDate = now.clone().subtract(1, 'month').endOf('month').format(dateFormat);
                 break;
             case 2:
-                reportInfo.value.startDate = moment().startOf('year').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                reportInfo.value.endDate = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                startDate = now.clone().startOf('year').format(dateFormat);
+                endDate = now.format(dateFormat);
                 break;
             case 3:
-                reportInfo.value.startDate = moment().subtract(6, 'months').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                reportInfo.value.endDate = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                break;
-            case 4:
-                reportInfo.value.startDate = ''; // Asigna el primer día de tu rango de datos
-                reportInfo.value.endDate = ''; // Asigna el último día de tu rango de datos
+                startDate = now.clone().subtract(6, 'months').startOf('month').format(dateFormat);
+                endDate = now.format(dateFormat);
                 break;
             default:
+                startDate = '';
+                endDate = '';
                 break;
         }
+
+        reportInfo.value.startDate = startDate;
+        reportInfo.value.endDate = endDate;
+
         moment.locale('es');
+    }
+
+    const changeContract = (id) => {
+        if (!id) {
+            reportInfo.value.contractId = ''
+            reportInfo.value.itemContractId = ''
+            filterItems.value = []
+        } else {
+            reportInfo.value.itemContractId = ''
+            const selectedCntr = contracts.value.find((e) => e.value === id)
+            filterItems.value = itemContracts.value.filter((e) => e.id_doc === selectedCntr.value)
+        }
     }
 
     const showErrorMessage = (err) => {
@@ -71,11 +93,28 @@ export const useReporteSeguimientoContrato = (context) => {
         }
     }
 
+    const getContractTrackingReport = async () => {
+        try {
+            isLoadingReport.value = true;
+            const response = await axios.post(`/get-contract-tracking-report`,reportInfo.value);
+            products.value = response.data.products
+        } catch (err) {
+            if (err.response && err.response.data.logical_error) {
+                useShowToast(toast.error, err.response.data.logical_error);
+            } else {
+                showErrorMessage(err);
+            }
+        } finally {
+            isLoadingReport.value = false;
+        }
+    }
+
     onMounted(async () => {
-        getContractsInfo()
+        await getContractsInfo()
     })
 
     return {
-        isLoadingExport, reportInfo, errors, contracts, itemContracts, getOption
+        isLoadingReport, reportInfo, errors, contracts, filterItems, products,
+        getOption, changeContract, getContractTrackingReport
     }
 }
