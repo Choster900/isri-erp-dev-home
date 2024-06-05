@@ -2,7 +2,7 @@
 
     <Head title="Reporte - Seguimiento contratos" />
     <AppLayoutVue nameSubModule="Almacen - Seguimiento contratos" :autoPadding="false" :class="'bg-gray-200'">
-        <div v-if="isLoadingTop"
+        <div v-if="isLoadingReport"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">
                 <img src="../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
@@ -34,7 +34,9 @@
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="reportInfo.contractId" :options="contracts"
-                            :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"/>
+                            :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
+                            @change="changeContract($event)"
+                            :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-80', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.contractId" :key="index" class="mt-2"
                         :message="item" />
@@ -45,15 +47,16 @@
                         Item de contrato
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative font-semibold flex h-[30px] w-full">
-                        <Multiselect v-model="reportInfo.itemContractId" :options="itemContracts"
-                            :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"/>
+                        <Multiselect v-model="reportInfo.itemContractId" :options="filterItems"
+                            :searchable="true" :noOptionsText="'Seleccione un contrato.'" placeholder="Seleccione"
+                            :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-80', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.itemContractId" :key="index" class="mt-2"
                         :message="item" />
                 </div>
 
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[20%] flex items-end justify-center">
-                    <button
+                    <button @click="getContractTrackingReport()"
                         class="bg-blue-700 hover:bg-blue-800 flex items-center justify-center text-white font-medium text-[12px] px-2.5 py-0.5 rounded-lg mr-1.5">
                         <svg fill="#ffffff" width="28px" height="28px" viewBox="0 0 1024 1024"
                             xmlns="http://www.w3.org/2000/svg">
@@ -86,6 +89,9 @@
                 </div>
                 <div>
                     <p class="font-[Roboto] text-[12px] font-bold border-b border-gray-600 mb-1 pb-2">N° CONTRATO: {{  }}</p>
+                </div>
+                <div class="pt-4">
+                    <pre>{{ products }}</pre>
                 </div>
             </div>
         </div>
@@ -120,11 +126,14 @@ export default {
 
 
         const {
-            isLoadingExport, reportInfo, errors, contracts, itemContracts, getOption
+            isLoadingReport, reportInfo, errors, contracts, filterItems, products,
+            getOption, changeContract, getContractTrackingReport
         } = useReporteSeguimientoContrato(context);
 
         return {
-            permits, isLoadingExport, reportInfo, errors, contracts, itemContracts, getOption, moment
+            permits, isLoadingReport, reportInfo, errors, contracts, filterItems, 
+            products, moment,
+            getOption, changeContract, getContractTrackingReport
         };
     },
 }

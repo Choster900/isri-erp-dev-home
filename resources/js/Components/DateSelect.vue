@@ -49,6 +49,7 @@ export default {
     name: 'DateSelect',
     setup() {
 
+        moment.locale('es');
         const dropdownOpen = ref(false)
         const trigger = ref(null)
         const dropdown = ref(null)
