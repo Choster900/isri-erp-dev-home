@@ -1,6 +1,6 @@
 <template>
-    <Head title="Producto - Recepciones" />
-    <AppLayoutVue nameSubModule="Almacen - Recepcion de Productos">
+    <Head title="Kardex - Recepciones" />
+    <AppLayoutVue nameSubModule="Kardex - Recepcion de Productos">
         <div v-if="isLoadingTop || isLoadingSend"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">

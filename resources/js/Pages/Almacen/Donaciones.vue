@@ -1,7 +1,7 @@
 <template>
 
-    <Head title="Almacen - Donaciones" />
-    <AppLayoutVue nameSubModule="Almacen - Donaciones">
+    <Head title="Kardex - Donaciones" />
+    <AppLayoutVue nameSubModule="Kardex - Donaciones">
         <div v-if="isLoadingTop"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">

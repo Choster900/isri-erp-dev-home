@@ -193,7 +193,7 @@
                                 <p class="font-[MuseoSans] text-[12px] py-1.5 font-bold mr-2">PRODUCTOS: </p>
                                 <div class="w-[50%] flex items-center justify-center mr-2"
                                     :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
-                                    <Multiselect id="doc" v-model="recDocument.detStockId" :options="products"
+                                    <Multiselect id="doc" v-model="recDocument.detStockId" :options="filteredProds"
                                         class="h-[30px]" :disabled="infoToShow.status != 1" :searchable="true"
                                         :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
                                         :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
@@ -270,7 +270,7 @@
 
                         <template v-for="(prod, index) in lts.productos" :key="index"> <!-- Productos -->
                             <div class="min-w-[970px] grid grid-cols-[96%_4%] max-w-full"
-                                v-if="prod.deleted == false && lts.isOpen">
+                                v-show="prod.deleted == false && lts.isOpen">
                                 <div :id="'lt-' + indexLt + 'prod-' + index"
                                     class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-full border-b border-x border-gray-500 hover:bg-gray-200"
                                     :class="(lts.hover && lts.isOpen && !checkBlinkingClass(indexLt,index)) ? 'bg-gray-200' : 'bg-white'">

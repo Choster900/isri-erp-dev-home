@@ -117,7 +117,7 @@
                         placeholder="Escriba concepto adicional"
                         :class="prod.description != '' ? 'bg-gray-200' : ''"
                         class="w-full h-14 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
-                        @input="handleValidation('description', { limit: 290 })" style="border-radius: 4px;">
+                        @input="handleValidation('description', { limit: 290, upper:true })" style="border-radius: 4px;">
                     </textarea>
                     <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
                 </div>
