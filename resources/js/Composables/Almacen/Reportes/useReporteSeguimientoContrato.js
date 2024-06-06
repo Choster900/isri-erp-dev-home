@@ -15,6 +15,10 @@ export const useReporteSeguimientoContrato = (context) => {
     const itemContracts = ref([])
     const filterItems = ref([])
     const products = ref([])
+    const contractName = ref()
+    const purchaseProcess = ref()
+
+    const testMap = ref([])
 
     const reportInfo = ref({
         startDate: '',
@@ -63,10 +67,12 @@ export const useReporteSeguimientoContrato = (context) => {
         if (!id) {
             reportInfo.value.contractId = ''
             reportInfo.value.itemContractId = ''
+            contractName.value = ''
             filterItems.value = []
         } else {
             reportInfo.value.itemContractId = ''
             const selectedCntr = contracts.value.find((e) => e.value === id)
+            contractName.value = selectedCntr.label
             filterItems.value = itemContracts.value.filter((e) => e.id_doc === selectedCntr.value)
         }
     }
@@ -96,9 +102,37 @@ export const useReporteSeguimientoContrato = (context) => {
     const getContractTrackingReport = async () => {
         try {
             isLoadingReport.value = true;
-            const response = await axios.post(`/get-contract-tracking-report`,reportInfo.value);
-            products.value = response.data.products
+            const response = await axios.post(`/get-contract-tracking-report`, reportInfo.value);
+            //products.value = response.data.products
+            purchaseProcess.value = response.data.purchaseProcess
+
+            const mesesAbreviados = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            const mesesCompletos = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+            products.value = response.data.products.map(producto => {
+                const nuevoProducto = { id_prod_adquisicion: producto.id_prod_adquisicion, producto: producto.producto, meses: [] };
+
+                mesesAbreviados.forEach((mes, index) => {
+                    const cantPa = parseFloat(producto[`cant_pa_${mes}`]);
+                    const cantRec = parseFloat(producto[`cant_rec_${mes}`]);
+                    const saldo = parseFloat(producto[`saldo_${mes}`]);
+
+                    nuevoProducto.meses.push({
+                        mes: mesesCompletos[index],
+                        res: {
+                            cant_pa: purchaseProcess.value === 5 ? cantPa.toFixed(2) : floatToInt(cantPa),
+                            cant_rec: purchaseProcess.value === 5 ? cantRec.toFixed(2) : floatToInt(cantRec),
+                            saldo: purchaseProcess.value === 5 ? saldo.toFixed(2) : floatToInt(saldo)
+                        }
+                    });
+                });
+
+                return nuevoProducto;
+            });
+            
+
         } catch (err) {
+            console.log(err);
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
             } else {
@@ -109,12 +143,23 @@ export const useReporteSeguimientoContrato = (context) => {
         }
     }
 
+    // Método para convertir un valor flotante con dos decimales a entero
+    const floatToInt = (value) => {
+        // Primero, convertimos el valor a un número flotante
+        const floatValue = parseFloat(value);
+        // Luego, lo redondeamos al entero más cercano
+        const roundedValue = Math.round(floatValue);
+        // Devolvemos el resultado como un número entero
+        return roundedValue;
+    }
+
     onMounted(async () => {
         await getContractsInfo()
     })
 
     return {
         isLoadingReport, reportInfo, errors, contracts, filterItems, products,
+        contractName, purchaseProcess, testMap,
         getOption, changeContract, getContractTrackingReport
     }
 }
