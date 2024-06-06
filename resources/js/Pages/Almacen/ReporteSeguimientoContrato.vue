@@ -55,7 +55,7 @@
 
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[20%] flex items-end justify-end">
                     <button @click="getContractTrackingReport()"
-                        class="bg-blue-700 hover:bg-blue-800 flex items-center justify-center text-white font-medium text-[12px] px-2.5 rounded-lg mr-1.5">
+                        class="bg-[#001c48] bg-opacity-80 hover:bg-opacity-90 flex items-center justify-center text-white font-medium text-[12px] px-2.5 rounded-lg mr-1.5">
                         <svg fill="#ffffff" width="28px" height="28px" viewBox="0 0 1024 1024"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -136,7 +136,7 @@
                             </svg>
                             <span class="ml-2 font-semibold text-[13px]">EXCEL</span>
                         </div>
-                        <div class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600">
+                        <div @click="generatePDF()" class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600">
                             <svg class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -302,14 +302,14 @@ export default {
         const {
             isLoadingReport, reportInfo, errors, contracts, filterItems, products,
             contractName, purchaseProcess, load,
-            getOption, changeContract, getContractTrackingReport
+            getOption, changeContract, getContractTrackingReport, generatePDF
         } = useReporteSeguimientoContrato(context);
 
         return {
             permits, isLoadingReport, reportInfo, errors, contracts, filterItems,
             products, moment, contractName, purchaseProcess,
             load,
-            getOption, changeContract, getContractTrackingReport
+            getOption, changeContract, getContractTrackingReport, generatePDF
         };
     },
 }
