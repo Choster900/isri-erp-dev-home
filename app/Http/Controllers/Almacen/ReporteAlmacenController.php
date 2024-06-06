@@ -1602,4 +1602,44 @@ class ReporteAlmacenController extends Controller
             'products'                     => $procedure,
         ]);
     }
+
+
+    function getReportePerc(Request $request)
+    {
+
+        $rules = [
+            "idCentro"       => "required",
+            "idTipoPerc"     => "required",
+            "fechaInicial" => "required",
+            "fechaFinal"   => "required",
+        ];
+
+        $customMessages = [
+            "idProy.required"       => "El campo Centro es obligatorio.",
+            "inProd.required"     => "El campo Estado es obligatorio.",
+            "fechaInicial.required" => "El campo Fecha es obligatorio.",
+            "fechaFinal.required"   => "El campo Fecha es obligatorio.",
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $customMessages);
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+            $message = 'The given data was invalid.';
+            return response()->json(['message' => $message, 'errors' => $errors], 422);
+        }
+
+
+        $fechaInicial = $request->fechaInicial != '' ? date('Y-m-d', strtotime($request->fechaInicial)) : null;
+        $fechaFinal = $request->fechaFinal != '' ? date('Y-m-d', strtotime($request->fechaFinal)) : null;
+
+
+        $params = [
+            'idtipoperc'    => $request->idTipoPerc,
+            'idcentro'    => $request->idCentro,
+            'fecha_inicial'  => $fechaInicial,
+            'fecha_final' =>  $fechaFinal
+        ];
+
+        return DB::select("CALL PR_RPT_PERC_INSUMO_GASTO(:idtipoperc, :idcentro, :fecha_inicial, :fecha_final)", $params);
+    }
 }
