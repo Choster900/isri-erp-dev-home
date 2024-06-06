@@ -213,7 +213,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/alm/reporte-perc',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-perc', 'Almacen/ReporteKardex');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-perc', 'Almacen/ReportePERC');
         }
     )->name('alm.reportePerc');
+    Route::post('get-reporte-perc-report', [ReporteAlmacenController::class, 'getReportePerc'])->name('reporte.get-perc-report');
+
 });
