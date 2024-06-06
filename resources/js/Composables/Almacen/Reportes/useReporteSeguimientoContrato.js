@@ -17,8 +17,7 @@ export const useReporteSeguimientoContrato = (context) => {
     const products = ref([])
     const contractName = ref()
     const purchaseProcess = ref()
-
-    const testMap = ref([])
+    const load = ref(0)
 
     const reportInfo = ref({
         startDate: '',
@@ -67,12 +66,10 @@ export const useReporteSeguimientoContrato = (context) => {
         if (!id) {
             reportInfo.value.contractId = ''
             reportInfo.value.itemContractId = ''
-            contractName.value = ''
             filterItems.value = []
         } else {
             reportInfo.value.itemContractId = ''
             const selectedCntr = contracts.value.find((e) => e.value === id)
-            contractName.value = selectedCntr.label
             filterItems.value = itemContracts.value.filter((e) => e.id_doc === selectedCntr.value)
         }
     }
@@ -103,7 +100,7 @@ export const useReporteSeguimientoContrato = (context) => {
         try {
             isLoadingReport.value = true;
             const response = await axios.post(`/get-contract-tracking-report`, reportInfo.value);
-            //products.value = response.data.products
+            contractName.value = response.data.contractName
             purchaseProcess.value = response.data.purchaseProcess
 
             const mesesAbreviados = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -132,7 +129,6 @@ export const useReporteSeguimientoContrato = (context) => {
             
 
         } catch (err) {
-            console.log(err);
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
             } else {
@@ -140,6 +136,7 @@ export const useReporteSeguimientoContrato = (context) => {
             }
         } finally {
             isLoadingReport.value = false;
+            load.value++
         }
     }
 
@@ -159,7 +156,7 @@ export const useReporteSeguimientoContrato = (context) => {
 
     return {
         isLoadingReport, reportInfo, errors, contracts, filterItems, products,
-        contractName, purchaseProcess, testMap,
+        contractName, purchaseProcess, load,
         getOption, changeContract, getContractTrackingReport
     }
 }

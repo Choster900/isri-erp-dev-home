@@ -12,6 +12,7 @@
         <!-- Fonts -->
         <!-- <link rel="stylesheet" href="{{ asset("css/font_nunito.css") }}">-->
         <link rel="stylesheet" type="text/css" href="{{ url('../css/font_nunito.css') }}" >
+        <link rel="stylesheet" type="text/css" href="{{ url('../css/font_roboto.css') }}" >
         <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
         <!-- Scripts -->
         @routes

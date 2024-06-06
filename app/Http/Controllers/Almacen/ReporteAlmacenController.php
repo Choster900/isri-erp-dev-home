@@ -1587,6 +1587,7 @@ class ReporteAlmacenController extends Controller
     public function getContractTrackingReport(Request $request)
     {
         $doc = DocumentoAdquisicion::find($request->contractId);
+        $detDoc = DetDocumentoAdquisicion::find($request->itemContractId);
         if ($doc->id_proceso_compra == 5) {
             $procedure = DB::select(
                 'CALL PR_RPT_SEGUIMIENTO_CNTR_PC5(?, ?, ?)',
@@ -1600,7 +1601,8 @@ class ReporteAlmacenController extends Controller
         }
         return response()->json([
             'products'                      => $procedure,
-            'purchaseProcess'               => $doc->id_proceso_compra
+            'purchaseProcess'               => $doc->id_proceso_compra,
+            'contractName'                  => $doc->numero_doc_adquisicion." - ".$detDoc->nombre_det_doc_adquisicion
         ]);
     }
 }
