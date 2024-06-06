@@ -1599,7 +1599,8 @@ class ReporteAlmacenController extends Controller
             );
         }
         return response()->json([
-            'products'                     => $procedure,
+            'products'                      => $procedure,
+            'purchaseProcess'               => $doc->id_proceso_compra
         ]);
     }
 }
