@@ -175,20 +175,28 @@
 
                 <div class="w-full overflow-y-auto">
                     <div
-                        class="grid grid-cols-[18%_82%] max-w-full w-full bg-[#001c48] text-white border border-gray-600 bg-opacity-80 min-w-[900px]">
+                        class="w-[3500px] flex bg-[#001c48] text-white border border-gray-600 bg-opacity-80 min-w-[900px]">
                         <!-- Table header -->
-                        <div class="w-full flex items-center justify-center border-r border-gray-600 h-[30px]">
+                        <div class="w-[350px] flex items-center justify-center border-r h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[11px]">PRODUCTO
                             </p>
                         </div>
-                        <div class="w-full flex items-center justify-center  h-[30px]">
-                            <p class="text-center font-[MuseoSans] text-[11px] ">RECEPCIONES MENSUALES
-                                {{ purchaseProcess === 5 ? '(EN DÓLARES)' : '' }}
-                            </p>
+                        <div class="w-[3150px] grid grid-cols-12 h-[30px]">
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">ENERO</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">FEBRERO</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">MARZO</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">ABRIL</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">MAYO</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">JUNIO</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">JULIO</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">AGOSTO</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">SEPTIEMBRE</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">OCTUBRE</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">NOVIEMBRE</p>
+                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center">DICIEMBRE</p>
                         </div>
                     </div>
-                    <template v-for="(prod, index) in products" :key="index">
-                        <!-- Table content -->
+                    <!-- <template v-for="(prod, index) in products" :key="index">
                         <div class="grid grid-cols-[18%_82%] hover:bg-gray-300 max-w-full w-full border-l border-gray-600 bg-opacity-80 min-w-[900px]"
                             :class="index % 2 === 0 ? 'bg-slate-200' : 'bg-white'">
                             <div
@@ -268,7 +276,7 @@
                                 </div>
                             </div>
                         </div>
-                    </template>
+                    </template> -->
                 </div>
 
             </div>
