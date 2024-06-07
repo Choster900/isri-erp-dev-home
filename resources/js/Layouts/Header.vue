@@ -15,7 +15,7 @@ const stateLocal = ref(false);
 const props = defineProps({
     nameSubModule: {
         type: String,
-        default: 'nombre modulo',
+        default: '',
         required: true,
     }
 });
@@ -38,7 +38,7 @@ const props = defineProps({
                     </button>
 
                     <h1 class="font-semibold text-base text-slate-800 pt-1">
-                        <span id="text-submodule">{{ props.nameSubModule }}</span>
+                        <span id="text-submodule">{{ props.nameSubModule  }}</span>
                     </h1>
                 </div>
 

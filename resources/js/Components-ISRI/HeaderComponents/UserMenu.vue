@@ -34,7 +34,7 @@
                 class="origin-top-right z-10 absolute top-full min-w-44 w-52 bg-white border border-slate-200 py-1.5 rounded shadow-lg  mt-1 right-0">
                 <div class="pt-0.5 pb-1 px-3 mb-1 border-slate-200">
                     <div class="font-bold text-slate-800">{{ $page.props.auth.user.name }}</div>
-                    <div class="text-xs text-slate-500">{{
+                    <div class="text-xs text-slate-500"><span class="font-bold pr-1">Rol</span>{{
                 $page.props.menu ? $page.props.menu.rol : 'Bienvenido al sistema ISRI'
             }}</div>
 

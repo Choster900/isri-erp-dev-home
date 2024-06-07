@@ -9,7 +9,7 @@ import Sidebar from "@/Layouts/Sidebar.vue";
 const props = defineProps({
     nameSubModule: {
         type: String,
-        default: 'nombre modulo',
+        default: '',
         required: true,
     },
     autoPadding: {
