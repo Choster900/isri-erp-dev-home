@@ -88,7 +88,7 @@
                             <td>{{ item.col_6_rpt_perc }}</td>
                             <td>{{ item.col_7_rpt_perc }}</td>
                             <td>{{ item.col_8_rpt_perc }}</td>
-                            <td>{{ item.col_9_rpt_perc }}</td>
+                            <td>{{ item.col_9_rpt_perc }}</td> 
                             <td>{{ item.col_10_rpt_perc }}</td>
                             <td>{{ item.col_11_rpt_perc }}</td>
                             <td>{{ item.col_12_rpt_perc }}</td>

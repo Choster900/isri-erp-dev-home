@@ -1618,7 +1618,7 @@ class ReporteAlmacenController extends Controller
         return response()->json([
             'products'                      => $procedure,
             'purchaseProcess'               => $doc->id_proceso_compra,
-            'contractName'                  => $doc->numero_doc_adquisicion." - ".$detDoc->nombre_det_doc_adquisicion
+            'contractName'                  => $doc->numero_doc_adquisicion . " - " . $detDoc->nombre_det_doc_adquisicion
         ]);
     }
 
@@ -1629,16 +1629,17 @@ class ReporteAlmacenController extends Controller
         $rules = [
             "idCentro"       => "required",
             "idTipoPerc"     => "required",
-            "fechaInicial" => "required",
-            "fechaFinal"   => "required",
+            "fechaInicial"   => "required",
+            "fechaFinal"     => "required",
         ];
 
         $customMessages = [
-            "idProy.required"       => "El campo Centro es obligatorio.",
-            "inProd.required"     => "El campo Estado es obligatorio.",
-            "fechaInicial.required" => "El campo Fecha es obligatorio.",
-            "fechaFinal.required"   => "El campo Fecha es obligatorio.",
+            "idCentro.required"      => "El campo Centro es obligatorio.",
+            "idTipoPerc.required"    => "El campo Tipo de PERC es obligatorio.",
+            "fechaInicial.required"  => "El campo Fecha Inicial es obligatorio.",
+            "fechaFinal.required"    => "El campo Fecha Final es obligatorio.",
         ];
+
 
         $validator = Validator::make($request->all(), $rules, $customMessages);
         if ($validator->fails()) {
@@ -1660,5 +1661,173 @@ class ReporteAlmacenController extends Controller
         ];
 
         return DB::select("CALL PR_RPT_PERC_INSUMO_GASTO(:idtipoperc, :idcentro, :fecha_inicial, :fecha_final)", $params);
+    }
+
+    public function getPercExcelReport(Request $request)
+    {
+
+        $fechaInicial = $request->fechaInicial != '' ? date('Y-m-d', strtotime($request->fechaInicial)) : null;
+        $fechaFinal = $request->fechaFinal != '' ? date('Y-m-d', strtotime($request->fechaFinal)) : null;
+
+
+        $params = [
+            'idtipoperc'    => $request->idTipoPerc,
+            'idcentro'    => $request->idCentro,
+            'fecha_inicial'  => $fechaInicial,
+            'fecha_final' =>  $fechaFinal
+        ];
+
+
+        $result = DB::select("CALL PR_RPT_PERC_INSUMO_GASTO(:idtipoperc, :idcentro, :fecha_inicial, :fecha_final)", $params);
+
+
+        // Crear una instancia de Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('A1:D1');
+        $sheet->setCellValue('A1', 'SISTEMA DE ALMACEN PARA EL CONTROL DE BIENES EN EXISTENCIA - ISRI');
+        $sheet->getStyle('A1')->getFont()->setSize(8);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $tipo = $request->idTipoPerc == 1 ? 'INSUMO' : 'GASTOS';
+        $sheet->mergeCells('B2:F2');
+        $sheet->setCellValue('B2', 'REPORTE DE ' . $tipo . ' DETALLADO PERC');
+        $sheet->getStyle('B2')->getFont()->setBold(true)->setSize(18);
+        $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+
+        $sheet->mergeCells('L3:M3');
+        $sheet->setCellValue('L3', 'DEL ' . date_format(date_create($fechaInicial), 'd, F, Y'));
+        #$sheet->setCellValue('H3', 'DEL 12 , ABRIL, 2023');
+        $sheet->getStyle('L3')->getFont()->setSize(9);
+        $sheet->getStyle('L3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $sheet->mergeCells('A4:B4');
+        #$sheet->setCellValue('H4', 'DEL ' . date_format(date_create($fechaFinal), 'd, F, Y'));
+        $sheet->setCellValue('A4', 'ALMACEN GENERAL');
+        $sheet->getStyle('A4')->getFont()->setSize(9);
+        $sheet->getStyle('B4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+        $sheet->mergeCells('L4:M4');
+        $sheet->setCellValue('L4', 'DEL ' . date_format(date_create($fechaFinal), 'd, F, Y'));
+        #$sheet->setCellValue('H4', 'AL 16. ABRIL, 2024');
+        $sheet->getStyle('L4')->getFont()->setSize(9);
+        $sheet->getStyle('L4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+
+        $row = 5; // Comenzar desde la fila 2 para dejar espacio para los encabezados
+
+        foreach ($result as $data) {
+
+
+            $sheet->setCellValue('A' . $row, $data->codigo_centro_prod_rpt_perc);
+            $sheet->setCellValue('B' . $row, $data->nombre_centro_prod_rpt_perc);
+            $sheet->setCellValue('C' . $row, $data->tipo_rpt_perc);
+            $sheet->setCellValue('D' . $row, $data->total_rpt_perc);
+            $sheet->setCellValue('E' . $row, $data->col_1_rpt_perc);
+            $sheet->setCellValue('F' . $row, $data->col_2_rpt_perc);
+            $sheet->setCellValue('G' . $row, $data->col_3_rpt_perc);
+            $sheet->setCellValue('H' . $row, $data->col_4_rpt_perc);
+
+            if ($request->idTipoPerc == 1) {
+                $sheet->setCellValue('I' . $row, $data->col_5_rpt_perc);
+                $sheet->setCellValue('J' . $row, $data->col_6_rpt_perc);
+                $sheet->setCellValue('K' . $row, $data->col_7_rpt_perc);
+                $sheet->setCellValue('L' . $row, $data->col_8_rpt_perc);
+                $sheet->setCellValue('M' . $row, $data->col_9_rpt_perc);
+                $sheet->setCellValue('N' . $row, $data->col_10_rpt_perc);
+                $sheet->setCellValue('O' . $row, $data->col_11_rpt_perc);
+                $sheet->setCellValue('P' . $row, $data->col_12_rpt_perc);
+                $sheet->setCellValue('Q' . $row, $data->col_13_rpt_perc);
+                $sheet->setCellValue('R' . $row, $data->col_14_rpt_perc);
+                $sheet->setCellValue('S' . $row, $data->col_15_rpt_perc);
+                $sheet->setCellValue('T' . $row, $data->col_16_rpt_perc);
+            }
+
+
+
+            /*  foreach (range('C', 'M') as $column) {
+
+                $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            } */
+
+            // Establecer la alineación centrada para todas las celdas excepto en la columna C
+
+            $sheet->getStyle('A' . $row . ':J' . $row)->getFont()->setName('Calibri')->setSize(9);
+            $row++;
+        }
+
+
+        $sheet->getRowDimension(5)->setRowHeight(97);
+        $sheet->getColumnDimension('B')->setWidth(45);
+        $sheet->getColumnDimension('C')->setWidth(11);
+        $sheet->getColumnDimension('E')->setWidth(11);
+
+        // Establecer estilo para encabezados
+        $styleHeader = [
+            'font' => ['bold' => true, 'size' => 9],
+        ];
+
+        if ($request->idTipoPerc == 1) {
+
+            $sheet->getStyle('A5:T5')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+
+            foreach (range('A', 'T') as $column) {
+                $sheet->getStyle($column . '5')->applyFromArray($styleHeader);
+                $sheet->getStyle($column . '5')->getAlignment()->setWrapText(true);
+            }
+
+            foreach (range('A', 'T') as $column) {
+                $sheet->getStyle($column . '5')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                $sheet->getStyle($column . '5')->getBorders()->getTop()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+                $sheet->getStyle($column . '5')->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                $sheet->getStyle($column . '5')->getBorders()->getBottom()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+            }
+        } else {
+
+            $sheet->getStyle('A5:H5')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+
+            foreach (range('A', 'H') as $column) {
+                $sheet->getStyle($column . '5')->applyFromArray($styleHeader);
+                $sheet->getStyle($column . '5')->getAlignment()->setWrapText(true);
+            }
+
+            foreach (range('A', 'H') as $column) {
+                $sheet->getStyle($column . '5')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                $sheet->getStyle($column . '5')->getBorders()->getTop()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+                $sheet->getStyle($column . '5')->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+                $sheet->getStyle($column . '5')->getBorders()->getBottom()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+            }
+        }
+
+
+        /* foreach (range('A', 'M') as $column) {
+            $sheet->getStyle($column . '5')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle($column . '5')->getBorders()->getTop()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+            $sheet->getStyle($column . '5')->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle($column . '5')->getBorders()->getBottom()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+        } */
+
+
+
+        // Guardar el archivo como XLSX
+        $writer = new Xlsx($spreadsheet);
+
+        // Establecer el nombre del archivo
+        $current_date = Carbon::now()->format('d_m_Y');
+        $filename = 'texto_excel_' . $current_date . '.xlsx';
+
+        // Establecer las cabeceras para descargar el archivo
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Guardar el archivo en la salida PHP
+        $writer->save('php://output');
     }
 }

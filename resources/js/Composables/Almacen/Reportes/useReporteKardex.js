@@ -1,5 +1,5 @@
 import { ref, inject, computed, onMounted } from "vue";
-import ReporteConsumoPdf from "@/pdf/Almacen/ReporteConsumoPdf.vue";
+import ReporteKardexPdf from "@/pdf/Almacen/ReporteKardexPdf.vue";
 import { createApp, h } from 'vue'
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
@@ -103,12 +103,12 @@ export const useReporteKardex = () => {
             jsPDF: { unit: "cm", format: "letter", orientation: "landscape" },
         };
         // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-        const app = createApp(ReporteConsumoPdf, {
-            dataConsumo: dataReporteKardex.value,
-            fecha: {
+        const app = createApp(ReporteKardexPdf, {
+            dataKardex: dataReporteKardex.value,
+            /* fecha: {
                 fechaDesde: fechaDesde.value,
                 fechaHasta: fechaHasta.value,
-            },
+            }, */
         });
         // Crear un elemento div y montar la instancia de la aplicación en él
         const div = document.createElement("div");
