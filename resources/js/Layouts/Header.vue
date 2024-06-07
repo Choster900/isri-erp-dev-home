@@ -1,9 +1,24 @@
 <script setup>
-import Targets from '@/Components-ISRI/Targets.vue';
-import HeaderVue from '@/Layouts/Header.vue';
-import DropdownLink from "@/Components/DropdownLink.vue";
-import { Head, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue';
+import DropdownLink from "@/Components/DropdownLink.vue";
+import SearchModal from '@/Components-ISRI/HeaderComponents/ModalSearch.vue';
+import UserMenuVue from '@/Components-ISRI/HeaderComponents/UserMenu.vue';
+import Notifications from '@/Components-ISRI/HeaderComponents/Notifications.vue';
+import Help from '@/Components-ISRI/HeaderComponents/Help.vue';
+
+// Estado local para el modal de búsqueda
+const stateLocal = ref(false);
+
+// Recibir props
+const props = defineProps({
+    nameSubModule: {
+        type: String,
+        default: 'nombre modulo',
+        required: true,
+    }
+});
 </script>
 <template>
     <header class="sticky top-0 bg-white border-b border-slate-200 z-30">
@@ -23,8 +38,7 @@ import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue'
                     </button>
 
                     <h1 class="font-semibold text-base text-slate-800 pt-1">
-
-                        <span id="text-submodule">{{ nameSubModule }}</span>
+                        <span id="text-submodule">{{ props.nameSubModule }}</span>
                     </h1>
                 </div>
 
@@ -47,7 +61,6 @@ import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue'
                     <Notifications />
 
                     <help /> -->
-
                     <hr class="w-px h-6 bg-slate-200">
                     <UserMenuVue />
                 </div>
@@ -56,32 +69,3 @@ import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue'
         <SearchModal :stateToModalSearch="stateLocal" />
     </header>
 </template>
-
-<script>
-import { ref } from 'vue'
-
-import SearchModal from '@/Components-ISRI/HeaderComponents/ModalSearch.vue'
-import UserMenuVue from '@/Components-ISRI/HeaderComponents/UserMenu.vue'
-import Notifications from '@/Components-ISRI/HeaderComponents/Notifications.vue';
-import Help from '@/Components-ISRI/HeaderComponents/Help.vue';
-
-
-export default {
-    data() {
-        return {
-            stateLocal: false,
-        }
-    },
-    components: {
-        SearchModal,
-        UserMenuVue,
-        Notifications,
-        Help
-    },
-    props: {
-        nameSubModule: {//prop muestra estado del modal para abrir y cerrar
-            type: String,
-        }
-    }
-}
-</script>
