@@ -179,6 +179,7 @@ export default {
             fechaInicial,
             idCentro,
             inProd,
+            printPdf,
             idProy,
             isLoadinRequest,
             dataReporteKardex,
@@ -190,7 +191,7 @@ export default {
         return {
             permits,
             menu,
-
+            printPdf,
 
             fechaFinal,
             fechaInicial,
