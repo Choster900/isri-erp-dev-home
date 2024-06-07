@@ -23,7 +23,7 @@ export const useReportePERC = () => {
     const getInformacionReport = async () => {
         try {
             isLoadinRequest.value = true;
-
+            dataReportePerc.value = [];
             const resp = await axios.post(
                 "/get-reporte-perc-report", {
                     idTipoPerc: idTipoPerc.value,
@@ -144,9 +144,12 @@ export const useReportePERC = () => {
                 document.body.style.cursor = 'wait';
 
                 const response = await axios.post(
-                    "/get-reporte-excel-kardex",
+                    "/get-report-excel-perc",
                     {
-
+                        idTipoPerc: idTipoPerc.value,
+                        idCentro: idCentro.value,
+                        fechaInicial: fechaInicial.value,
+                        fechaFinal: fechaFinal.value,
                     },
                     { responseType: "blob" }
                 );
@@ -157,7 +160,9 @@ export const useReportePERC = () => {
                 // Crear un enlace temporal y simular un clic para descargar el archivo
                 const link = document.createElement("a");
                 link.href = url;
-                link.setAttribute("download", "TARJETA_KARDEX" + moment().format('L') + ".xlsx"); // Nombre del archivo deseado
+
+                let titulo = idTipoPerc.value == 1 ? "INSUMO DETALLADO PERC" : "GASTOS DETALLADOS PERC";
+                link.setAttribute("download", titulo + moment().format('L') + ".xlsx"); // Nombre del archivo deseado
                 document.body.appendChild(link);
                 link.click();
 
@@ -179,6 +184,38 @@ export const useReportePERC = () => {
         }
     };
 
+
+    const getOption = (e) => {
+        moment.locale('en');
+        console.log(e);
+        switch (e) {
+            case 0:
+                fechaInicial.value = moment().startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaFinal.value = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                break;
+            case 1:
+                fechaInicial.value = moment().subtract(1, 'month').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaFinal.value = moment().subtract(1, 'month').endOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                break;
+            case 2:
+                fechaInicial.value = moment().startOf('year').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaFinal.value = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                break;
+            case 3:
+                fechaInicial.value = moment().subtract(6, 'months').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaFinal.value = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                break;
+            case 4:
+                fechaInicial.value = ''; // Asigna el primer día de tu rango de datos
+                fechaFinal.value = ''; // Asigna el último día de tu rango de datos
+                break;
+            default:
+                break;
+        }
+
+
+    }
+
     return {
         exportExcel,
         getInformacionReport,
@@ -188,6 +225,7 @@ export const useReportePERC = () => {
         printPdf,
         errors,
 
+        getOption,
         fechaFinal,
         fechaInicial,
         idCentro,

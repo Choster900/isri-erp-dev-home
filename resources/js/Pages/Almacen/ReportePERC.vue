@@ -25,7 +25,7 @@
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
                         <Multiselect v-model="idCentro" :options="[
-                               
+
                                 { value: 1, label: 'ADMINISTRACION SUPERIOR' },
                                 { value: 2, label: 'CENTRO DE ATENCION A ANCIANOS SARA ZALDIVAR' },
                                 { value: 3, label: 'CENTRO DEL APARATO LOCOMOTOR' },
@@ -177,6 +177,7 @@ export default {
             isLoadinRequest,
             dataReportePerc,
             errors,
+            getOption,
             getInformacionReport,
         } = useReportePERC();
 
@@ -184,7 +185,7 @@ export default {
             permits,
             menu,
 
-
+            getOption,
             fechaFinal,
             fechaInicial,
             idCentro,

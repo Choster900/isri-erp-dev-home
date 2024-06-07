@@ -217,5 +217,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.reportePerc');
     Route::post('get-reporte-perc-report', [ReporteAlmacenController::class, 'getReportePerc'])->name('reporte.get-perc-report');
+    Route::post('get-report-excel-perc', [ReporteAlmacenController::class, 'getPercExcelReport'])->name('reporte.get-perc-report');
 
 });
