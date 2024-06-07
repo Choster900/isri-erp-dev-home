@@ -183,7 +183,7 @@
                         </div>
                         <div class="w-full flex items-center justify-center  h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[11px] ">RECEPCIONES MENSUALES
-                                {{ purchaseProcess === 5 ? 'EN DÓLARES' : 'EN UNIDADES' }}
+                                {{ purchaseProcess === 5 ? '(EN DÓLARES)' : '' }}
                             </p>
                         </div>
                     </div>
