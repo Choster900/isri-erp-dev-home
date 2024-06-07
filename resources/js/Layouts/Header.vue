@@ -38,7 +38,7 @@ const props = defineProps({
                     </button>
 
                     <h1 class="font-semibold text-base text-slate-800 pt-1">
-                        <span id="text-submodule">{{ props.nameSubModule  }}</span>
+                        <span id="text-submodule" class="truncate">{{ nameSubModule }}</span>
                     </h1>
                 </div>
 
@@ -69,3 +69,34 @@ const props = defineProps({
         <SearchModal :stateToModalSearch="stateLocal" />
     </header>
 </template>
+<style>
+#text-submodule {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Para pantallas pequeñas (móviles) */
+@media (max-width: 639px) {
+    #text-submodule {
+        max-width: 100px; /* Ajusta este valor según tus necesidades */
+    }
+}
+
+/* Para pantallas medianas (tabletas) */
+@media (min-width: 640px) and (max-width: 1023px) {
+    #text-submodule {
+        max-width: 400px; /* Ajusta este valor según tus necesidades */
+    }
+}
+
+/* Para pantallas grandes (escritorios) */
+@media (min-width: 1024px) {
+    #text-submodule {
+        max-width: 400px; /* Ajusta este valor según tus necesidades */
+    }
+}
+
+
+</style>
