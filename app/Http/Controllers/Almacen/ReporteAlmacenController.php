@@ -1586,6 +1586,22 @@ class ReporteAlmacenController extends Controller
 
     public function getContractTrackingReport(Request $request)
     {
+        //Define the custom messages
+        $customMessages = [
+            'startDate.required'        => 'Debe seleccionar la fecha inicio.',
+            'endDate.required'          => 'Debe seleccionar la fecha fin.',
+            'contractId.required'       => 'Debe seleccionar contrato.',
+            'itemContractId.required'   => 'Debe seleccionar item de contrato.'
+        ];
+
+        // Validate the request data with custom error messages and custom rule
+        $validatedData = Validator::make($request->all(), [
+            'startDate'         => 'required',
+            'endDate'           => 'required',
+            'contractId'        => 'required',
+            'itemContractId'    => 'required',
+        ], $customMessages)->validate();
+
         $doc = DocumentoAdquisicion::find($request->contractId);
         $detDoc = DetDocumentoAdquisicion::find($request->itemContractId);
         if ($doc->id_proceso_compra == 5) {

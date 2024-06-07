@@ -2,8 +2,9 @@ import { ref, onMounted, inject, computed } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
+import { toast } from "vue3-toastify";
 import moment from 'moment';
-import EmpleadosPDF from '@/pdf/RRHH/EmpleadosPDF.vue';
+import ReporteSeguimientoContratoPDF from '@/pdf/Almacen/ReporteSeguimientoContratoPDF.vue';
 import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
 
@@ -126,13 +127,22 @@ export const useReporteSeguimientoContrato = (context) => {
 
                 return nuevoProducto;
             });
-            
 
         } catch (err) {
-            if (err.response && err.response.data.logical_error) {
-                useShowToast(toast.error, err.response.data.logical_error);
+            if (err.response && err.response.status === 422) {
+                if (err.response.data.logical_error) {
+                    useShowToast(toast.error, err.response.data.logical_error);
+                } else {
+                    useShowToast(toast.warning, "Tienes errores en tus datos, por favor verifica e intenta nuevamente.");
+                    errors.value = err.response.data.errors;
+                    // Limpiar los errores después de 5 segundos
+                    setTimeout(() => {
+                        errors.value = [];
+                    }, 5000);
+                }
             } else {
                 showErrorMessage(err);
+                context.emit("cerrar-modal")
             }
         } finally {
             isLoadingReport.value = false;
@@ -165,13 +175,13 @@ export const useReporteSeguimientoContrato = (context) => {
                 try {
                     isLoadingReport.value = true;
                     const data = {
-                        products:           products.value,
-                        contractName:       contractName.value,
-                        purchaseProcess:    purchaseProcess.value,
-                        startDate:          moment(reportInfo.startDate).format('DD,MMMM, YYYY') ,
-                        startDate:          moment(reportInfo.endDate).format('DD,MMMM, YYYY')
+                        products: products.value,
+                        contractName: contractName.value,
+                        purchaseProcess: purchaseProcess.value,
+                        startDate: moment(reportInfo.value.startDate).format('DD,MMMM, YYYY'),
+                        endDate: moment(reportInfo.value.endDate).format('DD,MMMM, YYYY')
                     };
-                    const app = createApp(EmpleadosPDF, data);
+                    const app = createApp(ReporteSeguimientoContratoPDF, data);
                     const div = document.createElement('div');
                     const pdfPrint = app.mount(div);
                     const html = div.outerHTML;
@@ -180,10 +190,9 @@ export const useReporteSeguimientoContrato = (context) => {
                     const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
                     let fecha = moment().format('DD-MM-YYYY');
 
-                    html2pdf()
+                    await html2pdf()
                         .set({
-                            margin: [0.2, 0.2, 0.7, 0.2],
-                            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                            margin: [0.3, 0.2, 0.5, 0.2],//top, left, buttom, right,
                             filename: 'RPT-SEGUIMIENTO-' + fecha,
                             image: {
                                 type: 'jpeg',
@@ -214,13 +223,13 @@ export const useReporteSeguimientoContrato = (context) => {
                                 //Get the middle position including the text width
                                 const textX = centerX - (textWidth1 / 2);
                                 //Write the text in the desired coordinates.
-                                pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.4), text);
+                                pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.3), text);
                                 //Text for the date and time.
                                 let date_text = 'Generado: ' + currentDateTime
                                 //Get the text width
                                 const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
                                 //Write the text in the desired coordinates.
-                                pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                                pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.4, pdf.internal.pageSize.getHeight() - 0.3, date_text);
                             }
 
                         })
