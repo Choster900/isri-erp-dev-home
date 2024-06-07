@@ -46,7 +46,7 @@
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="reportInfo.itemContractId" :options="filterItems" :searchable="true"
-                            :noOptionsText="'Seleccione un contrato.'" placeholder="Seleccione" 
+                            :noOptionsText="'Seleccione un contrato.'" placeholder="Seleccione"
                             :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-80', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                     </div>
                     <InputError v-for="(item, index) in errors.itemContractId" :key="index" class="mt-2"
@@ -92,8 +92,8 @@
             </div>
 
             <div v-else-if="products.length === 0" class="flex items-center justify-center py-10">
-                <div class="flex border border-gray-400 rounded-lg mt-1 mx-auto w-[50%] bg-orange-50">
-                    <div class="border-r border-gray-400 w-[15%] flex items-center justify-center py-2">
+                <div class="flex border border-gray-400 rounded-lg mt-1 mx-auto w-[50%] h-[100px]">
+                    <div class="border-r border-gray-400 w-[15%] flex items-center justify-center py-8">
                         <svg class="text-orange-400 animate-bounce-svg" fill="currentColor" width="40px" height="40px"
                             viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -107,12 +107,12 @@
                             </g>
                         </svg>
                     </div>
-                    <div class="w-[85%] rounded-r-lg text-[14px]">
-                        <h2 class="text-orange-500 text-center font-semibold font-[Roboto]">¡Sin resultados!</h2>
-                        <p class="mx-2 mb-1 font-[Roboto]">No se han encontrado productos disponibles con base a los
-                            criterios de
-                            busqueda
-                            proporcionados, por favor cambie los criterios e intente nuevamente.</p>
+                    <div
+                        class="w-[85%] rounded-r-lg text-[14px] flex flex-col items-center justify-center text-center">
+                        <h2 class="text-orange-500 font-semibold font-[Roboto]">¡Sin resultados!</h2>
+                        <p class="mx-2 mb-1 font-[Roboto]">No se han encontrado resultados en base a los
+                            criterios de búsqueda proporcionados, por favor cambie los criterios e intente nuevamente.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -136,7 +136,8 @@
                             </svg>
                             <span class="ml-2 font-semibold text-[13px]">EXCEL</span>
                         </div>
-                        <div @click="generatePDF()" class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600">
+                        <div @click="generatePDF()"
+                            class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600">
                             <svg class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -153,7 +154,8 @@
 
                 <div id="doc-header" class="py-1 flex justify-between items-center border-y-4 border-gray-600 mb-2">
                     <div class="text-left flex flex-col">
-                        <p class="font-[Roboto] text-[13px] font-bold">INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL</p>
+                        <p class="font-[Roboto] text-[13px] font-bold">INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL
+                        </p>
                         <p class="font-[Roboto] text-[13px] font-bold">ALMACEN GENERAL</p>
                         <p class="font-[Roboto] text-[13px] font-bold">SEGUIMIENTO DE PRODUCTOS POR CONTRATO</p>
                     </div>
@@ -167,7 +169,8 @@
                     </div>
                 </div>
                 <div>
-                    <p class="font-[Roboto] text-[12px] mb-1 pb-2">CONTRATO: <span class="font-[Roboto] text-[12px] font-bold">{{ contractName }}</span></p>
+                    <p class="font-[Roboto] text-[12px] mb-1 pb-2">CONTRATO: <span
+                            class="font-[Roboto] text-[12px] font-bold">{{ contractName }}</span></p>
                 </div>
 
                 <div class="w-full overflow-y-auto">
@@ -323,5 +326,26 @@ export default {
 
 .dp__input_wrap {
     height: 30px;
+}
+
+@keyframes bounce-svg {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-bounce-svg {
+    animation: bounce-svg 0.5s infinite alternate;
+}
+
+@media (max-width: 640px) {
+    .rotate-down {
+        transform: rotate(90deg);
+        /* Rotar la flecha 90 grados */
+    }
 }
 </style>
