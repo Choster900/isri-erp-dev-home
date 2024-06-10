@@ -201,18 +201,22 @@
                                 <td v-for="(month, index2) in prod.meses" :key="index2"
                                     class="min-w-[200px] border-r border-gray-600 h-[60px]">
                                     <div class="grid grid-cols-3 ">
-                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px]">
+                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px] text-gray-500">
                                             Contratado</div>
-                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px]">
+                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px] text-gray-500">
                                             Recibido</div>
-                                        <div class="text-center font-[MuseoSans] text-[10px]">Saldo</div>
+                                        <div class="text-center font-[MuseoSans] text-[10px] text-gray-500">Saldo</div>
                                     </div>
                                     <div class="grid grid-cols-3 ">
-                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px]">
+                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px] font-bold"
+                                        :class="month.res.cant_pa > 0 ? 'text-green-800 bg-green-200' : ''">
                                             {{ month.res.cant_pa }}</div>
-                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px]">
+                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px] font-bold"
+                                        :class="month.res.cant_pa > 0 ? (month.res.cant_rec > 0 ? 'text-blue-800 bg-blue-200' : 'text-red-800 bg-red-200') : ''">
                                             {{ month.res.cant_rec }}</div>
-                                        <div class="text-center font-[MuseoSans] text-[10px]">{{ month.res.saldo }}
+                                        <div class="text-center font-[MuseoSans] text-[10px] font-bold"
+                                        :class="month.res.cant_pa > 0 ? (month.res.saldo > 0 ? 'text-yellow-800 bg-yellow-200' : 'text-green-800 bg-green-200') : ''">
+                                        {{ month.res.saldo }}
                                         </div>
                                     </div>
                                 </td>
