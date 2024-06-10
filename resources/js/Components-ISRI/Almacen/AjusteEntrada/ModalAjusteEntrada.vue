@@ -356,7 +356,7 @@ export default {
 
 <style>
 .dp__input_wrap {
-    height: 35px;
+    height: 35px !important;
 }
 
 @keyframes blink {

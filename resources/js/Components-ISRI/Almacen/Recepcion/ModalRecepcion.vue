@@ -509,7 +509,7 @@ export default {
 }
 
 .dp__input_wrap {
-    height: 40px;
+    height: 35px !important;
 }
 
 .dp__theme_light {

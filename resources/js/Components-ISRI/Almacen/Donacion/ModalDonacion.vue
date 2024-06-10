@@ -349,7 +349,7 @@ export default {
 }
 
 .dp__input_wrap {
-    height: 35px;
+    height: 35px !important;
 }
 
 .select-err .multiselect-wrapper input {

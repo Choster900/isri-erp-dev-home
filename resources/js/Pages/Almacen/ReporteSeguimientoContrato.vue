@@ -283,7 +283,7 @@ export default {
 }
 
 .dp__input_wrap {
-    height: 30px;
+    height: 30px !important;
 }
 
 @keyframes bounce-svg {

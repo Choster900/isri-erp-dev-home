@@ -50,7 +50,7 @@
                             <template v-for="(month, index2) in prod.meses" :key="index2">
                                 <div v-if="index2 <= 5"
                                     class="flex-row items-center justify-center border-r border-b border-gray-600">
-                                    <p class="font-[MuseoSans] text-[12px] text-center underline">
+                                    <p class="font-[MuseoSans] text-[12px] text-center">
                                         {{
                                             month.mes }}</p>
                                     <div class="grid grid-cols-2">
@@ -82,7 +82,7 @@
                             <template v-for="(month, index2) in prod.meses" :key="index2">
                                 <div v-if="index2 >= 6"
                                     class="flex-row items-center justify-center border-r border-b border-gray-600">
-                                    <p class="font-[MuseoSans] text-[12px] text-center underline">
+                                    <p class="font-[MuseoSans] text-[12px] text-center">
                                         {{
                                             month.mes }}</p>
                                     <div class="grid grid-cols-2">
