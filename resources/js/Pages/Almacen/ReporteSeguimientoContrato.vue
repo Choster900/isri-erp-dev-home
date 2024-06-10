@@ -107,8 +107,7 @@
                             </g>
                         </svg>
                     </div>
-                    <div
-                        class="w-[85%] rounded-r-lg text-[14px] flex flex-col items-center justify-center text-center">
+                    <div class="w-[85%] rounded-r-lg text-[14px] flex flex-col items-center justify-center text-center">
                         <h2 class="text-orange-500 font-semibold font-[Roboto]">¡Sin resultados!</h2>
                         <p class="mx-2 mb-1 font-[Roboto]">No se han encontrado resultados en base a los
                             criterios de búsqueda proporcionados, por favor cambie los criterios e intente nuevamente.
@@ -168,115 +167,58 @@
                         </p>
                     </div>
                 </div>
-                <div>
+                <div class="flex justify-between">
                     <p class="font-[Roboto] text-[12px] mb-1 pb-2">CONTRATO: <span
                             class="font-[Roboto] text-[12px] font-bold">{{ contractName }}</span></p>
+                    <p v-if="purchaseProcess === 5"
+                        class="font-[Roboto] text-[12px] mb-1 pb-2 font-bold text-orange-600">SEGUIMIENTO EN DOLARES</p>
                 </div>
 
                 <div class="w-full overflow-y-auto">
-                    <div
-                        class="w-[3500px] flex bg-[#001c48] text-white border border-gray-600 bg-opacity-80 min-w-[900px]">
+                    <table class="w-full bg-opacity-80 min-w-[900px]">
                         <!-- Table header -->
-                        <div class="w-[350px] flex items-center justify-center border-r h-[30px]">
-                            <p class="text-center font-[MuseoSans] text-[11px]">PRODUCTO
-                            </p>
-                        </div>
-                        <div class="w-[3150px] grid grid-cols-12 h-[30px]">
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">ENERO</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">FEBRERO</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">MARZO</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">ABRIL</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">MAYO</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">JUNIO</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">JULIO</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">AGOSTO</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">SEPTIEMBRE</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">OCTUBRE</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center border-r">NOVIEMBRE</p>
-                            <p class="text-center font-[MuseoSans] text-[11px] flex items-center justify-center">DICIEMBRE</p>
-                        </div>
-                    </div>
-                    <!-- <template v-for="(prod, index) in products" :key="index">
-                        <div class="grid grid-cols-[18%_82%] hover:bg-gray-300 max-w-full w-full border-l border-gray-600 bg-opacity-80 min-w-[900px]"
-                            :class="index % 2 === 0 ? 'bg-slate-200' : 'bg-white'">
-                            <div
-                                class="w-full max-h-[131px] overflow-y-auto flex items-center justify-center border-b border-r border-gray-600">
-                                <p class="font-[MuseoSans] text-[10px] font-bold h-full p-0.5">
-                                    {{ prod.producto }}
-                                </p>
-                            </div>
-                            <div class="w-full flex-row items-center justify-center h-full">
-                                <div class="w-full">
-                                    <div class="w-full grid grid-cols-6">
-                                        <template v-for="(month, index2) in prod.meses" :key="index2">
-                                            <div v-if="index2 <= 5"
-                                                class="w-full flex-row items-center justify-center border-r border-b border-gray-600">
-                                                <p class="font-[MuseoSans] text-[12px] text-center underline">
-                                                    {{
-                                                        month.mes }}</p>
-                                                <div class="grid grid-cols-2">
-                                                    <p class="font-[MuseoSans] text-gray-500 text-[11px] text-center">
-                                                        Contratado</p>
-                                                    <p class="font-[MuseoSans] text-gray-500 text-[11px] text-center">
-                                                        Recibido </p>
-                                                </div>
-                                            </div>
-                                        </template>
+                        <thead class="bg-[#001c48] text-white border border-gray-600">
+                            <tr>
+                                <th class="min-w-[250px] border-r border-gray-500 h-[30px] text-center font-[MuseoSans] text-[10px]">
+                                    PRODUCTO
+                                </th>
+                                <th v-for="(month, index) in months" :key="index"
+                                    class="min-w-[200px] border-r border-gray-500 h-[30px] text-center font-[MuseoSans] text-[10px]">
+                                    {{ month }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <!-- Table body -->
+                        <tbody>
+                            <tr v-for="(prod, index) in products" :key="index"
+                                :class="index % 2 === 0 ? 'bg-gray-100' : 'bg-white'"
+                                class="hover:bg-gray-300 border-x border-b border-gray-600 h-[60px]">
+                                <td
+                                    class="h-[60px] overflow-y-auto min-w-[250px] border-r border-gray-600 ">
+                                    <div class="text-center h-[60px] font-[MuseoSans] text-[10px] font-bold overflow-y-auto">{{ prod.producto }}</div>
+                                    
+                                </td>
+                                <td v-for="(month, index2) in prod.meses" :key="index2"
+                                    class="min-w-[200px] border-r border-gray-600 h-[60px]">
+                                    <div class="grid grid-cols-3 ">
+                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px]">
+                                            Contratado</div>
+                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px]">
+                                            Recibido</div>
+                                        <div class="text-center font-[MuseoSans] text-[10px]">Saldo</div>
                                     </div>
-                                    <div class="w-full grid grid-cols-6 h-[30px] border-b border-gray-600">
-                                        <template v-for="(month, index3) in prod.meses" :key="index3">
-                                            <div v-if="index3 <= 5" class="w-full grid grid-cols-2">
-                                                <div
-                                                    class="w-full flex items-center justify-center border-r border-gray-600">
-                                                    <p class="font-[MuseoSans] text-[11px]">
-                                                        {{ month.res.cant_pa }} </p>
-                                                </div>
-                                                <div
-                                                    class="w-full flex items-center justify-center border-r border-gray-600">
-                                                    <p class="font-[MuseoSans] text-[11px]">
-                                                        {{ month.res.cant_rec }} </p>
-                                                </div>
-                                            </div>
-                                        </template>
+                                    <div class="grid grid-cols-3 ">
+                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px]">
+                                            {{ month.res.cant_pa }}</div>
+                                        <div class="border-r border-gray-600 text-center font-[MuseoSans] text-[10px]">
+                                            {{ month.res.cant_rec }}</div>
+                                        <div class="text-center font-[MuseoSans] text-[10px]">{{ month.res.saldo }}
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="w-full">
-                                    <div class="w-full grid grid-cols-6">
-                                        <template v-for="(month, index2) in prod.meses" :key="index2">
-                                            <div v-if="index2 >= 6"
-                                                class="w-full flex-row items-center justify-center border-r border-b border-gray-600">
-                                                <p class="font-[MuseoSans] text-[12px] text-center underline">
-                                                    {{
-                                                        month.mes }}</p>
-                                                <div class="grid grid-cols-2">
-                                                    <p class="font-[MuseoSans] text-gray-500 text-[11px] text-center">
-                                                        Contratado</p>
-                                                    <p class="font-[MuseoSans] text-gray-500 text-[11px] text-center">
-                                                        Recibido </p>
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <div class="w-full grid grid-cols-6 h-[30px] border-b border-gray-600">
-                                        <template v-for="(month, index3) in prod.meses" :key="index3">
-                                            <div v-if="index3 >= 6" class="w-full grid grid-cols-2">
-                                                <div
-                                                    class="w-full flex items-center justify-center border-r border-gray-600">
-                                                    <p class="font-[MuseoSans] text-[11px]">
-                                                        {{ month.res.cant_pa }} </p>
-                                                </div>
-                                                <div
-                                                    class="w-full flex items-center justify-center border-r border-gray-600">
-                                                    <p class="font-[MuseoSans] text-[11px]">
-                                                        {{ month.res.cant_rec }} </p>
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </template> -->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
             </div>
@@ -310,6 +252,10 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
+        const months = ref([
+            'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
+        ])
+
         const {
             isLoadingReport, reportInfo, errors, contracts, filterItems, products,
             contractName, purchaseProcess, load,
@@ -319,7 +265,7 @@ export default {
         return {
             permits, isLoadingReport, reportInfo, errors, contracts, filterItems,
             products, moment, contractName, purchaseProcess,
-            load,
+            load, months,
             getOption, changeContract, getContractTrackingReport, generatePDF
         };
     },
