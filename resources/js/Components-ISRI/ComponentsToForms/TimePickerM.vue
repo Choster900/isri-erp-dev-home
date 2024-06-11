@@ -33,7 +33,7 @@ export default {
             type: [String, Date],
             default: '',
         },
-        inputWrapHeight: {
+        timeHeight: {
             type: String,
             default: '30px' // Valor predeterminado
         },
@@ -72,9 +72,9 @@ export default {
             ...es,
         };
 
-        const { modelValue, height, inputWrapHeight } = toRefs(props)
+        const { modelValue, height, timeHeight } = toRefs(props)
 
-        console.log(inputWrapHeight.value);
+        console.log(timeHeight.value);
 
         const config = {
             modeHeight: height.value,
@@ -84,7 +84,7 @@ export default {
             modelValue,
             localeConfig,
             config,
-            inputWrapHeight
+            timeHeight
         };
     },
 };
@@ -98,11 +98,11 @@ export default {
 }
 
 .dp__input_wrap {
-    height: v-bind(inputWrapHeight) !important;
+    height: v-bind(timeHeight) !important;
 }
 
 .dp__input {
-    height: 100%;
+    min-height: v-bind(timeHeight) !important;
     font-weight: 600;
 }
 

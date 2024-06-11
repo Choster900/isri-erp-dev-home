@@ -60,7 +60,7 @@
                 </div>
                 <div class="md:mr-2 md:mb-0 basis-1/2">
                     <time-picker-m :height="200" v-model="finiquitoEmp.signatureTime" :placeholder="'Hora firma'"
-                        :label="'Hora firma'" :required="true"  />
+                        :label="'Hora firma'" :required="true" :timeHeight="'40px'" />
                         <InputError v-for="(item, index2) in errors.signatureTime" :key="index2"
                         class="mt-2" :message="item" />
                 </div>

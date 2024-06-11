@@ -295,7 +295,7 @@
                                         <div class="max-w-[95%]">
                                             <DateTimePickerM v-if="prod.perishable === 1" v-model="prod.expiryDate"
                                                 :showIcon="false" :placeholder="'Seleccione'" 
-                                                :disabled="infoToShow.status != 1" :inputWrapHeight="'40px'" />
+                                                :disabled="infoToShow.status != 1" :inputWrapHeight="'35px'" />
                                             <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
                                         </div>
                                     </div>

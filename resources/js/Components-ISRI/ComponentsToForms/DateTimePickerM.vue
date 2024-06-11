@@ -114,7 +114,7 @@ export default {
 }
 
 .dp__input {
-    height: 100%;
+    height: v-bind(inputWrapHeight) !important;
     font-weight: 600;
 }
 

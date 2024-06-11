@@ -174,7 +174,7 @@
                         class="font-[Roboto] text-[12px] mb-1 pb-2 font-bold text-orange-600">SEGUIMIENTO EN DOLARES</p>
                 </div>
 
-                <div class="w-full overflow-y-auto">
+                <div class="w-full overflow-y-auto pb-2">
                     <table class="w-full bg-opacity-80 min-w-[900px]">
                         <!-- Table header -->
                         <thead class="bg-[#001c48] text-white border border-gray-600">
