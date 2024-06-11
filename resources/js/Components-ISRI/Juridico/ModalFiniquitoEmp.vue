@@ -54,13 +54,13 @@
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-10">
                 <div class="md:mr-2 md:mb-0 basis-1/2">
                     <date-time-picker-m v-model="finiquitoEmp.signatureDate" :placeholder="'Fecha firma'"
-                        :label="'Fecha firma'" :required="true" />
+                        :label="'Fecha firma'" :required="true" :inputWrapHeight="'40px'" />
                     <InputError v-for="(item, index2) in errors.signatureDate" :key="index2"
                         class="mt-2" :message="item" />
                 </div>
                 <div class="md:mr-2 md:mb-0 basis-1/2">
                     <time-picker-m :height="200" v-model="finiquitoEmp.signatureTime" :placeholder="'Hora firma'"
-                        :label="'Hora firma'" :required="true" />
+                        :label="'Hora firma'" :required="true"  />
                         <InputError v-for="(item, index2) in errors.signatureTime" :key="index2"
                         class="mt-2" :message="item" />
                 </div>

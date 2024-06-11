@@ -19,13 +19,13 @@
 
                 <div class="mb-4 md:mr-2 md:mb-0 basis-[12%]">
                     <DateTimePickerM v-model="reportInfo.startDate" :showIcon="false" :label="'Fecha inicio'"
-                        :placeholder="'Seleccione'" :required="true" />
+                        :placeholder="'Seleccione'" :required="true" :inputWrapHeight="'30px'" />
                     <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2" :message="item" />
                 </div>
 
                 <div class="mb-4 md:mr-2 md:mb-0 basis-[12%]">
                     <DateTimePickerM v-model="reportInfo.endDate" :showIcon="false" :label="'Fecha fin'"
-                        :placeholder="'Seleccione'" :required="true" />
+                        :placeholder="'Seleccione'" :required="true" :inputWrapHeight="'30px'" />
                     <InputError v-for="(item, index) in errors.endDate" :key="index" class="mt-2" :message="item" />
                 </div>
 
@@ -280,10 +280,6 @@ export default {
 <style>
 .dp__theme_light {
     --dp-primary-color: rgba(0, 28, 72, 0.8);
-}
-
-.dp__input_wrap {
-    height: 30px !important;
 }
 
 @keyframes bounce-svg {

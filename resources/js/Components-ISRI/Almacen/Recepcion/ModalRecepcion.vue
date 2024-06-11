@@ -294,8 +294,8 @@
                                         :class="(errors['prods.' + indexLt + '.productos.'+ index + '.expiryDate'] && !prod.expiryDate) ? 'bg-red-300' : ''">
                                         <div class="max-w-[95%]">
                                             <DateTimePickerM v-if="prod.perishable === 1" v-model="prod.expiryDate"
-                                                :showIcon="false" :placeholder="'Seleccione'"
-                                                :disabled="infoToShow.status != 1" />
+                                                :showIcon="false" :placeholder="'Seleccione'" 
+                                                :disabled="infoToShow.status != 1" :inputWrapHeight="'40px'" />
                                             <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
                                         </div>
                                     </div>
@@ -508,9 +508,7 @@ export default {
     animation: blink 1s infinite;
 }
 
-.dp__input_wrap {
-    height: 35px !important;
-}
+
 
 .dp__theme_light {
     /* I've edited this */

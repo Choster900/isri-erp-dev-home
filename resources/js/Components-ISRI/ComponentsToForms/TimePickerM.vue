@@ -3,7 +3,7 @@
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
     <vue-date-picker :config="config" v-model="modelValue" time-picker :placeholder="placeholder" :teleport="teleport"
         :disabled="disabled" @update:model-value="$emit('update:modelValue', $event)"
-        :style="hasError ? '--dp-border-color: #F87171;' : ''">
+        :style="hasError ? '--dp-border-color: #F87171;' : ''" >
         <template #input-icon>
             <svg class="ml-[10px] w-auto h-[20px] relative text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -32,6 +32,10 @@ export default {
         modelValue: {
             type: [String, Date],
             default: '',
+        },
+        inputWrapHeight: {
+            type: String,
+            default: '30px' // Valor predeterminado
         },
         teleport: {
             type: Boolean,
@@ -68,7 +72,9 @@ export default {
             ...es,
         };
 
-        const { modelValue, height } = toRefs(props)
+        const { modelValue, height, inputWrapHeight } = toRefs(props)
+
+        console.log(inputWrapHeight.value);
 
         const config = {
             modeHeight: height.value,
@@ -77,7 +83,8 @@ export default {
         return {
             modelValue,
             localeConfig,
-            config
+            config,
+            inputWrapHeight
         };
     },
 };
@@ -91,7 +98,7 @@ export default {
 }
 
 .dp__input_wrap {
-    height: 40px;
+    height: v-bind(inputWrapHeight) !important;
 }
 
 .dp__input {

@@ -3,9 +3,8 @@
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
     <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" :no-today="noToday"
         :hide-input-icon="!showIcon" :placeholder="placeholder" :disabled="disabled" :teleport="teleport" auto-apply
-        :locale="localeConfig" :day-names="dayNames" :required="required"
-        @update:model-value="$emit('update:modelValue', $event)" :style="hasError ? '--dp-border-color: #F87171;' : ''"
-        class="py-0">
+        :locale="localeConfig" :day-names="dayNames" :required="required" :style="hasError ? '--dp-border-color: #F87171;' : ''"
+        @update:model-value="$emit('update:modelValue', $event)"  class="py-0">
         <template #input-icon>
             <svg :class="iconColor" fill="currentColor" class="ml-[10px] w-auto h-[16px] relative" viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg">
@@ -17,7 +16,7 @@
 </template>
 
 <script>
-import { ref, toRefs, onMounted, watch } from 'vue';
+import { toRefs } from 'vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { es } from 'date-fns/locale';
@@ -30,6 +29,10 @@ export default {
         iconColor: {
             type: String,
             default: 'text-gray-500',
+        },
+        inputWrapHeight: {
+            type: String,
+            default: '30px' // Valor predeterminado
         },
         modelValue: {
             type: [String, Date],
@@ -90,11 +93,14 @@ export default {
             ...es,
         };
 
-        const { modelValue } = toRefs(props)
+        const { modelValue, inputWrapHeight  } = toRefs(props)
+
+        console.log(inputWrapHeight.value);
 
         return {
             modelValue,
             localeConfig,
+            inputWrapHeight
         };
     },
 };
@@ -107,13 +113,13 @@ export default {
     font-size: 13px;
 }
 
-.dp__input_wrap {
-    height: 40px;
-}
-
 .dp__input {
     height: 100%;
     font-weight: 600;
+}
+
+.dp__input_wrap {
+    height: v-bind(inputWrapHeight) !important;
 }
 
 .dp__theme_light {

@@ -70,7 +70,7 @@
                             </div>
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="mb-5 md:mr-2 md:mb-0 basis-full justify-start text-left">
-                                    <date-time-picker-m v-model="center.date"
+                                    <date-time-picker-m v-model="center.date" :inputWrapHeight="'40px'"
                                         :hasError="errors['centers.' + index + '.date'] ? true : false" />
                                     <InputError v-for="(item, index2) in errors['centers.' + index + '.date']" :key="index2"
                                         class="mt-2 h-[32px]" :message="item" />
