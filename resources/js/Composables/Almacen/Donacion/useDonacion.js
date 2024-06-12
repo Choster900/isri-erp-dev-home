@@ -334,7 +334,8 @@ export const useDonacion = (context) => {
     // Observa cambios en las propiedades qty y cost de cada producto
     watch(donInfo, (newValue) => {
         newValue.prods.forEach((prod) => {
-            prod.total = (prod.qty * prod.cost).toFixed(2);
+            let prevRes = prod.qty * prod.cost
+            prod.total = prod.fractionated === 1 ? prevRes.toFixed(4) : prevRes.toFixed(2)
         });
     }, { deep: true });
 

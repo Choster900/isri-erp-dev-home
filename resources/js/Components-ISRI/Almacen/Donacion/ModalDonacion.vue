@@ -178,7 +178,7 @@
                                 :class="errors['prods.' + index + '.expDate'] ? 'bg-red-300' : ''">
                                 <div v-if="prod.perishable === 1" class="max-w-[95%]">
                                     <DateTimePickerM v-model="prod.expDate" :showIcon="false" :placeholder="'Fecha'"
-                                        :disabled="donInfo.status != 1" />
+                                        :disabled="donInfo.status != 1" :inputWrapHeight="'35px'" />
                                 </div>
                                 <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
                             </div>
@@ -346,10 +346,6 @@ export default {
 
 .blinking {
     animation: blink 1s infinite;
-}
-
-.dp__input_wrap {
-    height: 35px !important;
 }
 
 .select-err .multiselect-wrapper input {

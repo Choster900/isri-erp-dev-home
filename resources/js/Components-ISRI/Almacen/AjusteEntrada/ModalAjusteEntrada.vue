@@ -201,7 +201,7 @@
                                 <div class="flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.expDate'] ? 'bg-red-300' : ''">
                                     <div v-if="prod.perishable === 1" class="max-w-[95%]">
-                                        <DateTimePickerM v-model="prod.expDate" :showIcon="false"
+                                        <DateTimePickerM v-model="prod.expDate" :showIcon="false" :inputWrapHeight="'35px'"
                                             :placeholder="'Fecha'" :disabled="adjustment.status != 1" />
                                     </div>
                                     <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
@@ -355,9 +355,6 @@ export default {
 </script>
 
 <style>
-.dp__input_wrap {
-    height: 35px !important;
-}
 
 @keyframes blink {
     0% {
