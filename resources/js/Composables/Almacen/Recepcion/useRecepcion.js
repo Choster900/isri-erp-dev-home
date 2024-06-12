@@ -617,7 +617,7 @@ export const useRecepcion = (context) => {
             return !('existencia' in product) || product.existencia > 0;
         });
     });
-    
+
     // Observa cambios en las propiedades qty y cost de cada producto
     watch(recDocument, (newValue) => {
         newValue.prods.forEach((lts) => {
@@ -633,7 +633,8 @@ export const useRecepcion = (context) => {
                         prod.cost = '0.00'
                     }
                 } else {
-                    prod.total = (prod.qty * prod.cost).toFixed(2)
+                    let prevRes = prod.qty * prod.cost
+                    prod.total = prod.fractionated === 1 ? prevRes.toFixed(4) : prevRes.toFixed(2)
                 }
             })
         });
