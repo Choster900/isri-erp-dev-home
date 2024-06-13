@@ -230,7 +230,7 @@
                     </div>
                 </div>
 
-                <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px]">
+                <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px] bg-white">
                     <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500">
                         <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                             <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL DONACION</p>

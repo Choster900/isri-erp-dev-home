@@ -49,7 +49,6 @@ export const useAjusteSalida = (context) => {
             });
             setModalValues(response.data, id)
         } catch (err) {
-            console.log(err);
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -86,6 +85,8 @@ export const useAjusteSalida = (context) => {
             products.value = data.products
             filteredOptions.value = data.products
 
+            console.log(data.products);
+
             // Iterate over detalle_requerimiento
             req.detalles_requerimiento.forEach(element => {
                 // Check estado_det_recepcion_pedido
@@ -97,10 +98,11 @@ export const useAjusteSalida = (context) => {
                     const array = {
                         id: element.id_det_requerimiento, //id_det_recepcion_pedido
                         detId: element.id_det_existencia_almacen, //id_det_existencia_almacen
-                        qty: element.cant_det_requerimiento, //Represents the the number of products the user wants to register
+                        qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_requerimiento) : element.cant_det_requerimiento, //Represents the the number of products the user wants to register
                         cost: element.detalle_existencia_almacen.existencia_almacen.costo_existencia_almacen, //Represents the the cost of the product
                         prevAvails: element.detalle_existencia_almacen.cant_det_existencia_almacen,
                         prodLabel: selectedProd.label,
+                        fractionated: element.producto.fraccionado_producto,
                         avails: "",
                         total: "", //Represents the result of qty x cost for every row
                         deleted: false, //This is the state of the row, it represents the logical deletion.
@@ -125,6 +127,7 @@ export const useAjusteSalida = (context) => {
             id: "",
             detId: "",
             prodLabel: "",
+            fractionated: "",
             qty: "",
             cost: "",
             prevAvails: "",
@@ -205,11 +208,13 @@ export const useAjusteSalida = (context) => {
             adjustment.value.prods[index].avails = selectedProd.allInfo.cant_det_existencia_almacen
             adjustment.value.prods[index].prevAvails = selectedProd.allInfo.cant_det_existencia_almacen
             adjustment.value.prods[index].prodLabel = selectedProd.label
+            adjustment.value.prods[index].fractionated = selectedProd.allInfo.existencia_almacen.producto.fraccionado_producto
         } else {
             adjustment.value.prods[index].cost = ''
             adjustment.value.prods[index].avails = ''
             adjustment.value.prods[index].prevAvails = ''
             adjustment.value.prods[index].prodLabel = ''
+            adjustment.value.prods[index].fractionated = ''
         }
         adjustment.value.prods[index].qty = ''
     }
@@ -265,6 +270,16 @@ export const useAjusteSalida = (context) => {
                 load.value = 0
             }
         });
+    }
+
+    // Método para convertir un valor flotante con dos decimales a entero
+    const floatToInt = (value) => {
+        // Primero, convertimos el valor a un número flotante
+        const floatValue = parseFloat(value);
+        // Luego, lo redondeamos al entero más cercano
+        const roundedValue = Math.round(floatValue);
+        // Devolvemos el resultado como un número entero
+        return roundedValue;
     }
 
     const changeFinancingSource = (id) => {
@@ -405,7 +420,9 @@ export const useAjusteSalida = (context) => {
     // Observa cambios en las propiedades qty y cost de cada producto
     watch(adjustment, (newValue) => {
         newValue.prods.forEach((prod) => {
-            prod.total = (prod.qty * prod.cost).toFixed(2);
+            let prevRes = prod.qty * prod.cost
+            prod.total = prod.fractionated === 1 ? prevRes.toFixed(8) : prevRes.toFixed(6)
+
             prod.avails = prod.prevAvails - prod.qty
         });
     }, { deep: true });
