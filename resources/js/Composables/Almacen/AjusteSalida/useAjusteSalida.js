@@ -423,7 +423,8 @@ export const useAjusteSalida = (context) => {
             let prevRes = prod.qty * prod.cost
             prod.total = prod.fractionated === 1 ? prevRes.toFixed(8) : prevRes.toFixed(6)
 
-            prod.avails = prod.prevAvails - prod.qty
+            let prev = prod.prevAvails - prod.qty
+            prod.avails = prod.fractionated === 1 ? prev.toFixed(2) : prev
         });
     }, { deep: true });
 

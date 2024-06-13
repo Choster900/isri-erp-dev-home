@@ -259,7 +259,7 @@
                                     <!-- El input -->
                                     <input v-model="prod.qty" :disabled="adjustment.status != 1"
                                         class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db] hover:border-gray-400 transition duration-300 ease-in-out"
-                                        @input="handleValidation('qty', { limit: 3, number: true }, { index: index })"
+                                        @input="handleValidation('qty', prod.fractionated ? { limit: 7, amount: true } : { limit: 4, number: true }, { index: index })"
                                         type="text" name="" id="">
                                 </div>
                                 <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center">
@@ -403,17 +403,6 @@ export default {
 </script>
 
 <style>
-.dp__input_wrap {
-    height: 35px;
-}
-
-.dp__theme_light {
-    /* I've edited this */
-    --dp-primary-color: rgba(0, 28, 72, 0.8);
-    --dp-cell-size: 25px;
-    --dp-font-size: 0.8rem;
-}
-
 .selected-opt .multiselect {
     background: var(--ms-bg, #E5E7EB);
 }
