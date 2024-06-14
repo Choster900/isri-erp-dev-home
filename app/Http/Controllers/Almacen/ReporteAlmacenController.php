@@ -1667,20 +1667,35 @@ class ReporteAlmacenController extends Controller
         $sheet->mergeCells('A6:A7');
         $sheet->setCellValue('A6', 'PRODUCTO');
 
+        $style = $sheet->getStyle('A6');
+        $alignment = $style->getAlignment();
+        $alignment->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $alignment->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
         $months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
 
         $columns = range('B', 'Z');
         $columns = array_merge($columns, array_map(fn ($col) => 'A' . $col, range('A', 'K')));
-        
+
         $i = 0;
         foreach ($months as $month) {
             $sheet->mergeCells($columns[$i] . '6' . ':' . $columns[$i + 2] . '6');
 
             $sheet->setCellValue($columns[$i] . '6', $month);
 
+            $style = $sheet->getStyle($columns[$i] . '6');
+            $alignment = $style->getAlignment();
+            $alignment->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $alignment->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
             $sheet->setCellValue($columns[$i] . '7', 'Contratado');
             $sheet->setCellValue($columns[$i + 1] . '7', 'Recibido');
             $sheet->setCellValue($columns[$i + 2] . '7', 'Saldo');
+
+            $style = $sheet->getStyle($columns[$i] . '7:' . $columns[$i + 2] . '7');
+            $alignment = $style->getAlignment();
+            $alignment->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $alignment->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
             $i = $i + 3;
         }
@@ -1694,6 +1709,11 @@ class ReporteAlmacenController extends Controller
                 $sheet->setCellValue($columns[$i] . $baseRow, $mes['res']['cant_pa']);
                 $sheet->setCellValue($columns[$i + 1] . $baseRow, $mes['res']['cant_rec']);
                 $sheet->setCellValue($columns[$i + 2] . $baseRow, $mes['res']['saldo']);
+
+                $style = $sheet->getStyle($columns[$i] . $baseRow . ':' . $columns[$i + 2] . $baseRow);
+                $alignment = $style->getAlignment();
+                $alignment->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $alignment->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
                 $i = $i + 3;
             }
