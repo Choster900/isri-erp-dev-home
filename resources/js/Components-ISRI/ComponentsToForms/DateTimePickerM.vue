@@ -95,8 +95,6 @@ export default {
 
         const { modelValue, inputWrapHeight  } = toRefs(props)
 
-        console.log(inputWrapHeight.value);
-
         return {
             modelValue,
             localeConfig,

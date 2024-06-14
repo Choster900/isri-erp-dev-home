@@ -13,6 +13,8 @@ use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class ReporteAlmacenController extends Controller
 {
@@ -1622,6 +1624,105 @@ class ReporteAlmacenController extends Controller
         ]);
     }
 
+    public function createExcelTrackingContract(Request $request)
+    {
+        $products = $request->products;
+        $contractName = $request->contractName;
+        $purchaseProcess = $request->purchaseProcess;
+        $startDate = $request->startDate;
+        $endDate = $request->endDate;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        //Merge cells
+        $sheet->mergeCells('A2:K2');
+        $sheet->mergeCells('A3:K3');
+        $sheet->mergeCells('A4:K4');
+        $sheet->mergeCells('A5:K5');
+
+        // Set up the header
+        $sheet->setCellValue('A2', 'INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL');
+        $sheet->setCellValue('A3', 'ALMACEN GENERAL');
+        $sheet->setCellValue('A4', 'SEGUIMIENTO DE PRODUCTOS POR CONTRATO');
+        $sheet->setCellValue('A5', 'CONTRATO: ' . $contractName);
+        $sheet->setCellValue('L4', 'DEL ' . Str::upper($startDate));
+        $sheet->setCellValue('L5', 'AL ' . Str::upper($endDate));
+
+        $sheet->getRowDimension('6')->setRowHeight(20);
+        $sheet->getRowDimension('7')->setRowHeight(20);
+
+        // Set column width for column B
+        $sheet->getColumnDimension('A')->setWidth(35); // Ajusta el ancho según tus necesidades
+
+        // Aplica el formato de centrado y negrita al texto
+        $header = $sheet->getStyle('A2:A5');
+        $header->getFont()->setBold(true);
+
+        $date = $sheet->getStyle('L4:L5');
+        $date->getFont()->setBold(true);
+
+        $sheet->getStyle('6')->getFont()->setBold(true);
+
+        $sheet->mergeCells('A6:A7');
+        $sheet->setCellValue('A6', 'PRODUCTO');
+
+        $months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+
+        $columns = range('B', 'Z');
+        $columns = array_merge($columns, array_map(fn ($col) => 'A' . $col, range('A', 'K')));
+        
+        $i = 0;
+        foreach ($months as $month) {
+            $sheet->mergeCells($columns[$i] . '6' . ':' . $columns[$i + 2] . '6');
+
+            $sheet->setCellValue($columns[$i] . '6', $month);
+
+            $sheet->setCellValue($columns[$i] . '7', 'Contratado');
+            $sheet->setCellValue($columns[$i + 1] . '7', 'Recibido');
+            $sheet->setCellValue($columns[$i + 2] . '7', 'Saldo');
+
+            $i = $i + 3;
+        }
+
+        $baseRow = 8;
+        foreach ($products as $prod) {
+            $sheet->setCellValue('A' . $baseRow, $prod['producto']);
+
+            $i = 0;
+            foreach ($prod['meses'] as $mes) {
+                $sheet->setCellValue($columns[$i] . $baseRow, $mes['res']['cant_pa']);
+                $sheet->setCellValue($columns[$i + 1] . $baseRow, $mes['res']['cant_rec']);
+                $sheet->setCellValue($columns[$i + 2] . $baseRow, $mes['res']['saldo']);
+
+                $i = $i + 3;
+            }
+
+            $baseRow++;
+        }
+
+        // Set text wrap for column A from A6 downwards
+        $highestRow = $sheet->getHighestRow();
+        for ($row = 8; $row <= $highestRow; $row++) {
+            $sheet->getStyle('A' . $row)->getAlignment()->setWrapText(true);
+        }
+
+        // Set row height for rows from 8 downwards
+        for ($row = 8; $row <= $highestRow; $row++) {
+            $sheet->getRowDimension($row)->setRowHeight(15); // Ajusta la altura según tus necesidades
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        $current_date = Carbon::now()->format('d_m_Y');
+        $filename = 'RPT_SEGUIMIENTO_' . $current_date . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+    }
 
     function getReportePerc(Request $request)
     {

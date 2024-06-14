@@ -123,7 +123,7 @@
                         products.length
                             }})</span></p>
                     <div class="flex">
-                        <div class="flex items-center cursor-pointer text-slate-700 hover:text-green-600">
+                        <div @click="exportExcel()" class="flex items-center cursor-pointer text-slate-700 hover:text-green-600">
                             <svg class="h-4 w-4 text-green-500" xmlns:xlink="http://www.w3.org/1999/xlink"
                                 viewBox="0 0 26 26" fill="#000000">
                                 <path fill="currentColor"
@@ -171,7 +171,7 @@
                     <p class="font-[Roboto] text-[12px] mb-1 pb-2">CONTRATO: <span
                             class="font-[Roboto] text-[12px] font-bold">{{ contractName }}</span></p>
                     <p v-if="purchaseProcess === 5"
-                        class="font-[Roboto] text-[12px] mb-1 pb-2 font-bold text-orange-600">SEGUIMIENTO EN DOLARES</p>
+                        class="font-[Roboto] text-[12px] mb-1 pb-2 font-bold text-orange-600">SEGUIMIENTO EN DOLARES ($)</p>
                 </div>
 
                 <div class="w-full overflow-y-auto pb-2">
@@ -263,14 +263,13 @@ export default {
         const {
             isLoadingReport, reportInfo, errors, contracts, filterItems, products,
             contractName, purchaseProcess, load,
-            getOption, changeContract, getContractTrackingReport, generatePDF
+            getOption, changeContract, getContractTrackingReport, generatePDF, exportExcel
         } = useReporteSeguimientoContrato(context);
 
         return {
             permits, isLoadingReport, reportInfo, errors, contracts, filterItems,
-            products, moment, contractName, purchaseProcess,
-            load, months,
-            getOption, changeContract, getContractTrackingReport, generatePDF
+            products, moment, contractName, purchaseProcess, load, months,
+            getOption, changeContract, getContractTrackingReport, generatePDF, exportExcel
         };
     },
 }

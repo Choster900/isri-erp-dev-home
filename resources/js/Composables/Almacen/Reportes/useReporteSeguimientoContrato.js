@@ -118,9 +118,9 @@ export const useReporteSeguimientoContrato = (context) => {
                     nuevoProducto.meses.push({
                         mes: mesesCompletos[index],
                         res: {
-                            cant_pa: purchaseProcess.value === 5 ? cantPa.toFixed(2) : floatToInt(cantPa),
-                            cant_rec: purchaseProcess.value === 5 ? cantRec.toFixed(2) : floatToInt(cantRec),
-                            saldo: purchaseProcess.value === 5 ? saldo.toFixed(2) : floatToInt(saldo)
+                            cant_pa: (purchaseProcess.value === 5 || producto.fraccionado_producto === 1) ? cantPa.toFixed(2) : floatToInt(cantPa),
+                            cant_rec: (purchaseProcess.value === 5 || producto.fraccionado_producto === 1) ? cantRec.toFixed(2) : floatToInt(cantRec),
+                            saldo: (purchaseProcess.value === 5 || producto.fraccionado_producto === 1) ? saldo.toFixed(2) : floatToInt(saldo)
                         }
                     });
                 });
@@ -246,6 +246,54 @@ export const useReporteSeguimientoContrato = (context) => {
         });
     };
 
+    const exportExcel = async () => {
+        
+        swal({
+            title: "¿Está seguro de exportar este reporte a Excel?",
+            icon: "question",
+            confirmButtonText: "Si, exportar.",
+            confirmButtonColor: "#047857",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+            iconColor: "green"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    isLoadingReport.value = true;
+                    const data = {
+                        products: products.value,
+                        contractName: contractName.value,
+                        purchaseProcess: purchaseProcess.value,
+                        startDate: moment(reportInfo.value.startDate).format('DD,MMMM, YYYY'),
+                        endDate: moment(reportInfo.value.endDate).format('DD,MMMM, YYYY')
+                    };
+
+                    const response = await axios.post('/create-excel-tracking-contract', data, { responseType: 'blob' });
+
+                    //Set the file name
+                    const disposition = response.headers['content-disposition'];
+                    const filenameRegex = /filename[^;=\n]*=((['"])[^\2]*\2|[^;\n]*)/;
+                    const matches = filenameRegex.exec(disposition);
+                    const filename = matches && matches.length > 1 ? matches[1].replace(/['"]/g, '') : 'default_filename.xlsx';
+
+                    //Code to download excel
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', filename); // Name assigned from the server
+                    document.body.appendChild(link);
+                    link.click();
+                } catch (err) {
+                    console.log(err);
+                    const { title, text, icon } = useHandleError(err);
+                    swal({ title: title, text: text, icon: icon, timer: 5000 });
+                } finally {
+                    isLoadingReport.value = false;
+                }
+            }
+        });
+    };
 
     onMounted(async () => {
         await getContractsInfo()
@@ -254,6 +302,6 @@ export const useReporteSeguimientoContrato = (context) => {
     return {
         isLoadingReport, reportInfo, errors, contracts, filterItems, products,
         contractName, purchaseProcess, load,
-        getOption, changeContract, getContractTrackingReport, generatePDF
+        getOption, changeContract, getContractTrackingReport, generatePDF, exportExcel
     }
 }
