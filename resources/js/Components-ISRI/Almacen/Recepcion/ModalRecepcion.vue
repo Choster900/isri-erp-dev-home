@@ -62,17 +62,19 @@
                 </p>
                 <div class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="doc" class="font-[Roboto]">Numero documento: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
+                        <label for="doc" class="font-[Roboto]">Numero documento: <span
+                                class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="doc" v-model="infoToShow.docId" :options="filteredDoc" :searchable="true"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione documento"
-                            @change="infoToShow.detDocId = ''; recDocument.monthId = '';"/>
+                            @change="infoToShow.detDocId = ''; recDocument.monthId = '';" />
                     </div>
                 </div>
                 <div class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="det-doc" class="font-[Roboto]">Item: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
+                        <label for="det-doc" class="font-[Roboto]">Item: <span
+                                class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="det-doc" v-model="infoToShow.detDocId" :options="filteredItems"
@@ -82,12 +84,13 @@
                 </div>
                 <div v-if="docSelected === 1" class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="det-doc" class="font-[Roboto]">Mes: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
+                        <label for="det-doc" class="font-[Roboto]">Mes: <span
+                                class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
-                        <Multiselect id="det-doc" v-model="recDocument.monthId" :options="months" 
-                            :disabled="months.length <= 0" :loading="isLoadingItem"
-                            :searchable="true" :noOptionsText="'Lista vacía.'" @change="changeMonth($event)"
+                        <Multiselect id="det-doc" v-model="recDocument.monthId" :options="months"
+                            :disabled="months.length <= 0" :loading="isLoadingItem" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" @change="changeMonth($event)"
                             :placeholder="months.length <= 0 ? 'Sin meses disponibles' : 'Seleccione mes'" />
                     </div>
                 </div>
@@ -133,7 +136,8 @@
                     <div class="min-w-[970px]">
                         <div class="grid grid-cols-[40%_35%_25%] max-w-[96%] bg-white">
                             <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha y hora de recepción:
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha y hora de
+                                    recepción:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.dateTime }}</span>
                                 </p>
@@ -161,10 +165,11 @@
                                 </p>
                             </div>
                             <div class="w-full justify-start flex items-center border-r border-gray-500 bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1"> {{ infoToShow.dui ? 'DUI:' : 'NIT:' }}
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1"> {{ infoToShow.dui ? 'DUI:' :
+                                    'NIT:' }}
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.dui ? infoToShow.dui : infoToShow.nit
-                                    }}</span>
+                                        }}</span>
                                 </p>
                             </div>
                         </div>
@@ -172,7 +177,8 @@
                     <div class="min-w-[970px]">
                         <div class="grid grid-cols-[75%_25%] max-w-[96%] bg-white border-b border-x border-gray-500">
                             <div class="w-full justify-start flex items-center bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha referencia documento de compra:
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha referencia
+                                    documento de compra:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.acqDocDate }}</span>
                                 </p>
@@ -181,7 +187,7 @@
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1"> Mes:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.monthName
-                                    }}</span>
+                                        }}</span>
                                 </p>
                             </div>
                         </div>
@@ -245,25 +251,27 @@
                     <template v-for="(lts, indexLt) in recDocument.prods" :key="indexLt"> <!-- Lineas de trabajo -->
                         <div v-if="hasActiveProds(indexLt)" class="min-w-[970px]">
                             <div @click="lts.isOpen = !lts.isOpen" @mouseover="lts.hover = true"
-                            @mouseleave="lts.hover = false"
+                                @mouseleave="lts.hover = false"
                                 class="max-w-[96%] bg-white border-x border-b flex border-gray-500 py-2 cursor-pointer hover:bg-gray-300">
                                 <!-- Icono de flecha a la izquierda -->
                                 <div class="w-1/3 flex items-center justify-start">
-                                    <svg class="w-5 h-5 text-green-800 ml-2"
-                                        :class="{ 'rotate-180': !lts.isOpen }" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <svg class="w-5 h-5 text-green-800 ml-2" :class="{ 'rotate-180': !lts.isOpen }"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 9l-7 7-7-7">
                                         </path>
                                     </svg>
                                 </div>
                                 <div class="w-1/3 flex items-center justify-center">
-                                    <p class="font-[MuseoSans] text-[13px] text-green-800 font-semibold mr-1">UP/LT = {{ lts.codigo_up_lt }}
-                                </p>
+                                    <p class="font-[MuseoSans] text-[13px] text-green-800 font-semibold mr-1">UP/LT = {{
+                                        lts.codigo_up_lt }}
+                                    </p>
                                 </div>
                                 <div class="w-1/3 flex items-center justify-end">
-                                    <p class="font-[MuseoSans] text-[13px] text-green-800 font-semibold mr-1">${{ calculateLtTotal(indexLt) }}
-                                </p>
+                                    <p class="font-[MuseoSans] text-[13px] text-green-800 font-semibold mr-1">${{
+                                        calculateLtTotal(indexLt) }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -273,7 +281,7 @@
                                 v-show="prod.deleted == false && lts.isOpen">
                                 <div :id="'lt-' + indexLt + 'prod-' + index"
                                     class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-full border-b border-x border-gray-500 hover:bg-gray-200"
-                                    :class="(lts.hover && lts.isOpen && !checkBlinkingClass(indexLt,index)) ? 'bg-gray-200' : 'bg-white'">
+                                    :class="(lts.hover && lts.isOpen && !checkBlinkingClass(indexLt, index)) ? 'bg-gray-200' : 'bg-white'">
                                     <div
                                         class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
                                         <div class="overflow-y-auto h-full flex items-center justify-center">
@@ -281,7 +289,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full border-r border-gray-500 min-h-[75px] flex items-center justify-center"
-                                        :class="errors['prods.' + indexLt + '.productos.'+ index +'.brandId'] && !prod.brandId ? 'bg-red-300' : ''">
+                                        :class="errors['prods.' + indexLt + '.productos.' + index + '.brandId'] && !prod.brandId ? 'bg-red-300' : ''">
                                         <Multiselect v-if="infoToShow.status == 1" id="doc" v-model="prod.brandId"
                                             :options="brands" class="h-[35px] max-w-[95%]"
                                             :disabled="infoToShow.status != 1" :searchable="true"
@@ -291,27 +299,34 @@
                                     </div>
 
                                     <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                        :class="(errors['prods.' + indexLt + '.productos.'+ index + '.expiryDate'] && !prod.expiryDate) ? 'bg-red-300' : ''">
+                                        :class="(errors['prods.' + indexLt + '.productos.' + index + '.expiryDate'] && !prod.expiryDate) ? 'bg-red-300' : ''">
                                         <div class="max-w-[95%]">
-                                            <DateTimePickerM v-if="prod.perishable === 1" v-model="prod.expiryDate"
-                                                :showIcon="false" :placeholder="'Seleccione'" 
+                                            <p v-if="prod.perishable === 0" class="font-[MuseoSans] text-[12px] p-1 ">
+                                                N/A</p>
+                                            <p v-else-if="infoToShow.status != 1"
+                                                class="font-[MuseoSans] text-[12px] p-1 ">{{
+                                                moment(prod.expiryDate).format('DD/MM/YYYY') }}</p>
+                                            <DateTimePickerM v-else="prod.perishable === 1" v-model="prod.expiryDate"
+                                                :showIcon="false" :placeholder="'Seleccione'"
                                                 :disabled="infoToShow.status != 1" :inputWrapHeight="'35px'" />
-                                            <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
                                         </div>
                                     </div>
 
                                     <div class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                        :class="((errors['prods.' + indexLt + '.productos.'+ index + '.qty'] && (!prod.qty || prod.qty <= 0)) || (showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0 && !recDocument.isGas)) ? 'bg-red-300' : ''">
+                                        :class="((errors['prods.' + indexLt + '.productos.' + index + '.qty'] && (!prod.qty || prod.qty <= 0)) || (showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0 && !recDocument.isGas)) ? 'bg-red-300' : ''">
                                         <!-- Aquí se colocará el número dinámicamente -->
                                         <span v-if="infoToShow.status == 1 && !(recDocument.isGas)"
                                             class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">REST:
                                             {{ showAvails(prod.prodId, indexLt, index, recDocument.isGas) }}</span>
 
                                         <!-- El input -->
-                                        <input v-model="prod.qty" :disabled="infoToShow.status != 1"
+                                        <input v-if="infoToShow.status === 1" v-model="prod.qty"
+                                            :disabled="infoToShow.status != 1"
                                             class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db] hover:border-gray-400 transition duration-300 ease-in-out"
                                             type="text" name="" id=""
                                             @input="handleValidation('qty', prod.fractionated ? { limit: 7, amount: true } : { limit: 4, number: true }, { indexLt: indexLt, index: index })">
+
+                                        <p v-else class="font-[MuseoSans] text-[12px] p-1 ">{{ prod.qty }}</p>
                                     </div>
 
                                     <div
@@ -322,8 +337,9 @@
                                     </div>
 
                                     <!-- Gas -->
-                                    <div v-if="recDocument.isGas" class="relative w-full flex items-center justify-center min-h-[75px]"
-                                        :class="(((errors['prods.' + indexLt + '.productos.'+ index +'.total'] && !prod.total) || showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0)) ? 'bg-red-300' : ''">
+                                    <div v-if="recDocument.isGas"
+                                        class="relative w-full flex items-center justify-center min-h-[75px]"
+                                        :class="(((errors['prods.' + indexLt + '.productos.' + index + '.total'] && !prod.total) || showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0)) ? 'bg-red-300' : ''">
                                         <!-- Aquí se colocará el número dinámicamente -->
                                         <span v-if="infoToShow.status == 1"
                                             class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">
@@ -344,7 +360,8 @@
                                 </div>
                                 <div class="w-full flex items-center justify-center">
                                     <div class="max-w-full h-[30px]">
-                                        <svg v-if="infoToShow.status == 1" @click="deleteRow(indexLt, index, prod.detRecId)"
+                                        <svg v-if="infoToShow.status == 1"
+                                            @click="deleteRow(indexLt, index, prod.detRecId)"
                                             class="text-red-600 cursor-pointer ml-1 hover:text-red-800" width="20px"
                                             height="20px" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
@@ -371,7 +388,8 @@
                         </div>
                     </div>
                     <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[970px]">
-                        <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500 bg-white">
+                        <div
+                            class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500 bg-white">
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                                 <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL ACTA</p>
                             </div>
@@ -431,6 +449,7 @@ import InputError from "@/Components/InputError.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
+import moment from 'moment';
 
 import { toRefs, onMounted } from 'vue';
 
@@ -456,7 +475,7 @@ export default {
             documents, ordenC, contrato, docSelected, products, brands, months,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, handleReceptionStart, setProdItem, calculateLtTotal, checkBlinkingClass,
-            deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, 
+            deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop,
             hasActiveProds, selectItem, changeMonth
         } = useRecepcion(context);
 
@@ -469,9 +488,9 @@ export default {
         return {
             isLoadingRequest, recDocument, errors, activeDetails, months,
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
-            filteredDoc, filteredItems, startRec, filteredProds, infoToShow, isLoadingItem,
+            filteredDoc, filteredItems, startRec, filteredProds, infoToShow, isLoadingItem, moment,
             handleValidation, handleReceptionStart, setProdItem, calculateLtTotal, checkBlinkingClass,
-            deleteRow, storeReception, updateReception, showAvails, returnToTop, 
+            deleteRow, storeReception, updateReception, showAvails, returnToTop,
             hasActiveProds, selectItem, changeMonth
         }
     }

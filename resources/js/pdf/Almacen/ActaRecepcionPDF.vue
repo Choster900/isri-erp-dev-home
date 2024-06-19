@@ -121,8 +121,8 @@
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] px-0.5">
                             {{ prod.producto.codigo_producto + " — " +
                                 prod.producto.nombre_completo_producto + " — " +
-                                prod.producto.unidad_medida.nombre_unidad_medida + " — " +
-                                prod.producto_adquisicion.descripcion_prod_adquisicion }}
+                                prod.producto_adquisicion.descripcion_prod_adquisicion + " — " +
+                                prod.producto.unidad_medida.nombre_unidad_medida }}
                             {{ " — " + (prod.marca.nombre_marca ? "Marca: " +
                                 prod.marca.nombre_marca : +"N/A") }}
                         </p>

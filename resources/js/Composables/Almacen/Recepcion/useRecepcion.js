@@ -160,7 +160,7 @@ export const useRecepcion = (context) => {
     const setExistingReceptionData = (prodcs, recepData) => {
         products.value = filterExistingProducts(prodcs, recepData);
         recDocument.value.prods = groupProducts(recepData.detalle_recepcion);
-        scrollToLastRow();
+        scrollToElement('observ');
     };
 
     const filterExistingProducts = (prods, recepData) => {
@@ -192,10 +192,9 @@ export const useRecepcion = (context) => {
         return {
             detRecId: element.id_det_recepcion_pedido,
             prodId: element.producto_adquisicion.id_prod_adquisicion,
-            desc: `${element.producto_adquisicion.linea_trabajo.codigo_up_lt} — ${element.producto_adquisicion.centro_atencion.codigo_centro_atencion} — ${element.producto.codigo_producto} — ${element.producto.nombre_completo_producto} — ${element.producto.unidad_medida.nombre_unidad_medida} — ${element.producto_adquisicion.descripcion_prod_adquisicion}`,
+            desc: `${element.producto_adquisicion.linea_trabajo.codigo_up_lt} — ${element.producto_adquisicion.centro_atencion.codigo_centro_atencion} — ${element.producto.codigo_producto} — ${element.producto.nombre_completo_producto} — ${element.producto_adquisicion.descripcion_prod_adquisicion} — ${element.producto.unidad_medida.nombre_unidad_medida}`,
             brandId: element.id_marca,
             brandLabel: element.marca ? element.marca.nombre_marca : 'N/A',
-            prodLabel: `${element.producto_adquisicion.linea_trabajo.codigo_up_lt} — ${element.producto_adquisicion.centro_atencion.codigo_centro_atencion} — ${element.producto.codigo_producto}`,
             expiryDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido),
             perishable: element.producto.perecedero_producto,
             fractionated: element.producto.fraccionado_producto,
@@ -214,15 +213,6 @@ export const useRecepcion = (context) => {
             return recDocument.value.isGas ? element.total_menos_acumulado_monto > 0 : element.total_menos_acumulado > 0;
         });
         products.value = newOptions;
-    };
-
-    const scrollToLastRow = () => {
-        nextTick(() => {
-            const newRowElement = document.getElementById(`observ`);
-            if (newRowElement) {
-                newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-        });
     };
 
     const selectItem = async (detDocId) => {
@@ -262,86 +252,75 @@ export const useRecepcion = (context) => {
         }
     }
 
+    const createProdArray = (selectedProd, paId) => ({
+        detRecId: '', //id_det_recepcion_pedido
+        prodId: paId, //id_prod_adquisicion
+        desc: `${selectedProd.codigo_up_lt} — ${selectedProd.codigo_centro_atencion} — ${selectedProd.codigo_producto} — ${selectedProd.nombre_completo_producto} — ${selectedProd.nombre_unidad_medida} — ${selectedProd.descripcion_prod_adquisicion}`, //Acquisition product description
+        brandId: '',
+        brandLabel: '',
+        expiryDate: '',
+        perishable: selectedProd.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
+        fractionated: selectedProd.fraccionado_producto,
+        avails: '', //Represents the maximum number of products that the user can write.
+        qty: '', //Represents the the number of products the user wants to register
+        cost: selectedProd.costo_prod_adquisicion, //Represents the the cost of the product
+        total: '', //Represents the result of qty x cost for every row
+        deleted: false, //This is the state of the row, it represents the logical deletion.
+        initial: selectedProd.total_menos_acumulado, //Represents the initial availability of a product
+        initialAmount: selectedProd.total_menos_acumulado_monto, //Represents available money
+    });
+    
+    const addProdToLineOfWork = (lineOfWork, array) => {
+        lineOfWork.isOpen = true;
+        lineOfWork.productos.push(array);
+        return {
+            indexLt: recDocument.value.prods.findIndex(group => group.id_lt === lineOfWork.id_lt),
+            index: lineOfWork.productos.length - 1,
+        };
+    };
+    
+    const createNewLineOfWork = (selectedProd, array) => {
+        recDocument.value.prods.push({
+            id_lt: selectedProd.id_lt,
+            codigo_up_lt: selectedProd.codigo_up_lt, // Si necesitas esta propiedad
+            hover: false,
+            isOpen: true,
+            productos: [array],
+        });
+    
+        recDocument.value.prods.sort((a, b) => a.id_lt - b.id_lt);
+    
+        return {
+            indexLt: recDocument.value.prods.findIndex(e => e.id_lt === selectedProd.id_lt),
+            index: 0,
+        };
+    };
+    
     const setProdItem = (paId) => {
         if (!paId) {
             useShowToast(toast.info, "Debes elegir un producto de la lista.");
-        } else {
-            const selectedProd = products.value.find((element) => {
-                return element.value === paId; // Adding a return statement here
-            });
-
-            // Construct array
-            const array = {
-                detRecId: '', //id_det_recepcion_pedido
-                prodId: paId, //id_prod_adquisicion
-                desc: selectedProd.codigo_up_lt + ' — ' + selectedProd.codigo_centro_atencion + ' — ' +
-                    selectedProd.codigo_producto + ' — ' + selectedProd.nombre_completo_producto + ' — '
-                    + selectedProd.nombre_unidad_medida
-                    + ' — ' + selectedProd.descripcion_prod_adquisicion, //Acquisition product description
-                brandId: '',
-                brandLabel: '',
-                prodLabel: '',
-                expiryDate: '',
-                perishable: selectedProd.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
-                fractionated: selectedProd.fraccionado_producto,
-                avails: '', //Represents the maximum number of products that the user can write.
-                qty: '', //Represents the the number of products the user wants to register
-                cost: selectedProd.costo_prod_adquisicion, //Represents the the cost of the product
-                total: '', //Represents the result of qty x cost for every row
-                deleted: false, //This is the state of the row, it represents the logical deletion.
-                initial: selectedProd.total_menos_acumulado, //Represents the initial availability of a product
-                initialAmount: selectedProd.total_menos_acumulado_monto, //Represents available money
-            };
-
-            // Buscar si existe un elemento de línea de trabajo con el id_lt correspondiente
-            const lineOfWork = recDocument.value.prods.find(group => group.id_lt === selectedProd.id_lt);
-
-            let indexLt, index;
-
-            if (lineOfWork) {
-                lineOfWork.isOpen = true
-                // Si la línea de trabajo existe, insertar el producto en ella
-                lineOfWork.productos.push(array);
-                // Actualizar los índices para la fila insertada
-                indexLt = recDocument.value.prods.findIndex(group => group.id_lt === selectedProd.id_lt);
-                index = lineOfWork.productos.length - 1; // Índice del producto dentro del grupo
-            } else {
-                // Si la línea de trabajo no existe, crear un nuevo grupo y luego insertar el producto
-                recDocument.value.prods.push({
-                    id_lt: selectedProd.id_lt,
-                    codigo_up_lt: selectedProd.codigo_up_lt, // Si necesitas esta propiedad
-                    hover: false,
-                    isOpen: true,
-                    productos: [array]
-                });
-
-                // Ordenar nuevamente el arreglo por id_lt
-                recDocument.value.prods.sort((a, b) => a.id_lt - b.id_lt);
-
-                // Actualizar los índices para la fila insertada
-                indexLt = recDocument.value.prods.findIndex(e => e.id_lt === selectedProd.id_lt);
-                index = 0; // Como es el primer producto en un nuevo grupo, el índice del producto es 0
-            }
-
-            // Desplazar la pantalla hasta la última fila agregada
-            nextTick(() => {
-                const newRowId = `lt-${indexLt}prod-${index}`;
-                const newRowElement = document.getElementById(newRowId);
-                if (newRowElement) {
-                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                    // Aplicar la clase de animación temporalmente
-                    newRowElement.classList.add('blinking');
-                    // Eliminar la clase después de un período de tiempo
-                    setTimeout(() => {
-                        newRowElement.classList.remove('blinking');
-                    }, 3000); // 3000 milisegundos (3 segundos) en este ejemplo
-                }
-            });
-
-            //Clean the select
-            recDocument.value.detStockId = ''
+            return;
         }
-    }
+    
+        const selectedProd = products.value.find(element => element.value === paId);
+    
+        if (!selectedProd) {
+            useShowToast(toast.error, "Producto no encontrado.");
+            return;
+        }
+    
+        const array = createProdArray(selectedProd, paId);
+    
+        const lineOfWork = recDocument.value.prods.find(group => group.id_lt === selectedProd.id_lt);
+    
+        const { indexLt, index } = lineOfWork
+            ? addProdToLineOfWork(lineOfWork, array)
+            : createNewLineOfWork(selectedProd, array);
+    
+        scrollToElement(`lt-${indexLt}prod-${index}`, 'smooth', 'end', true);
+    
+        recDocument.value.detStockId = '';
+    };
 
     const checkBlinkingClass = (indexLt, index) => {
         const newRowId = `lt-${indexLt}prod-${index}`;
@@ -349,14 +328,23 @@ export const useRecepcion = (context) => {
         return newRowElement && newRowElement.classList.contains('blinking');
     }
 
-    const returnToTop = () => {
-        // Desplazar la pantalla a la parte superior
+    const scrollToElement = (elementId, behavior = 'smooth', block = 'end', highlight = false) => {
         nextTick(() => {
-            const newRowElement = document.getElementById(`headerFormat`);
-            if (newRowElement) {
-                newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.scrollIntoView({ behavior, block });
+                if (highlight) {
+                    element.classList.add('blinking');
+                    setTimeout(() => {
+                        element.classList.remove('blinking');
+                    }, 3000);
+                }
             }
         });
+    };
+
+    const returnToTop = () => {
+        scrollToElement('headerFormat');
     }
 
     // Método para convertir un valor flotante con dos decimales a entero
@@ -481,7 +469,6 @@ export const useRecepcion = (context) => {
 
         return formattedQtyTotal;
     };
-
 
     const storeReception = async (obj) => {
         swal({

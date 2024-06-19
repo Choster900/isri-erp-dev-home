@@ -143,7 +143,7 @@
                 'bg-gray-50 pl-12': withIcon,
                 'pl-[14px]': !withIcon,
                 'bg-gray-200': !withIcon && modelValue,
-                'bg-gray-50': modelValue === '',
+                'bg-white': modelValue === '',
             }], addClases" :validation="validation" @input="updateValue($event)"
                 class="text-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full font-semibold text-[12px] placeholder-gray-400
                 hover:border-gray-400 transition duration-300 ease-in-out"
