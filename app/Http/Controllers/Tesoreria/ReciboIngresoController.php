@@ -20,7 +20,7 @@ class ReciboIngresoController extends Controller
 {
     public function getRecibosIngreso(Request $request)
     {
-        $columns = ['numero_recibo_ingreso', 'fecha_recibo_ingreso', 'cliente_recibo_ingreso', 'descripcion_recibo_ingreso', 'id_ccta_presupuestal', 'monto_recibo_ingreso', 'estado_recibo_ingreso'];
+        $columns = ['numero_recibo_ingreso', 'fecha_recibo_ingreso', 'cliente_recibo_ingreso', 'descripcion_recibo_ingreso', 'codigo_ccta_presupuestal', 'monto_recibo_ingreso', 'estado_recibo_ingreso'];
 
         $length = $request->input('length');
         $column = $request->input('column'); //Index
@@ -28,27 +28,44 @@ class ReciboIngresoController extends Controller
         $search_value = $request->input('search');
 
         $query = ReciboIngreso::select('*')
-            ->with('detalles')
-            ->with('detalles.concepto_ingreso.dependencia')
-            ->with('cuenta_presupuestal')
-            ->with('proyecto_financiado')
-            ->with('empleado_tesoreria');
+            ->with([
+                'detalles',
+                'detalles.concepto_ingreso.dependencia',
+                'cuenta_presupuestal',
+                'proyecto_financiado',
+                'empleado_tesoreria'
+            ]);
 
         if ($column == -1) {
             $query->orderBy('id_recibo_ingreso', 'desc');
         } else {
-            $query->orderBy($columns[$column], $dir);
+            if($column == 4) {
+                $query->orderByRaw('(SELECT codigo_ccta_presupuestal FROM catalogo_cta_presupuestal WHERE catalogo_cta_presupuestal.id_ccta_presupuestal = recibo_ingreso.id_ccta_presupuestal) ' . $dir);
+            }else{
+                $query->orderBy($columns[$column], $dir);
+            }
         }
 
 
         if ($search_value) {
             $query->where('numero_recibo_ingreso', 'like', '%' . $search_value['numero_recibo_ingreso'] . '%')
                 ->where('fecha_recibo_ingreso', 'like', '%' . $search_value['fecha_recibo_ingreso'] . '%')
-                ->where('id_ccta_presupuestal', 'like', '%' . $search_value['id_ccta_presupuestal'] . '%')
                 ->where('cliente_recibo_ingreso', 'like', '%' . $search_value['cliente_recibo_ingreso'] . '%')
                 ->where('monto_recibo_ingreso', 'like', '%' . $search_value['monto_recibo_ingreso'] . '%')
                 ->where('descripcion_recibo_ingreso', 'like', '%' . $search_value['descripcion_recibo_ingreso'] . '%')
                 ->where('estado_recibo_ingreso', 'like', '%' . $search_value['estado_recibo_ingreso'] . '%');
+
+            //Search by document type
+            if ($search_value['codigo_ccta_presupuestal']) {
+                $query->whereHas(
+                    'cuenta_presupuestal',
+                    function ($query) use ($search_value) {
+                        if ($search_value["codigo_ccta_presupuestal"] != '') {
+                            $query->where('codigo_ccta_presupuestal', 'like', '%' . $search_value['codigo_ccta_presupuestal'] . '%');
+                        }
+                    }
+                );
+            }
         }
         $income_receipt = $query->paginate($length)->onEachSide(1);
 
@@ -273,7 +290,7 @@ class ReciboIngresoController extends Controller
             'empleado_tesoreria'
         ])->find($id);
 
-        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
+        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(codigo_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('tesoreria_ccta_presupuestal', '=', 1)
             ->where('estado_ccta_presupuestal', '=', 1)
             ->whereHas('conceptos_ingreso', function ($query) use ($receipt) {
