@@ -1,6 +1,7 @@
 import { ref, inject, computed, nextTick, watch } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
+import { useToCalculate } from '@/Composables/General/useToCalculate.js';
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
@@ -58,6 +59,8 @@ export const useRecepcion = (context) => {
     const {
         formatDateVue3DP
     } = useFormatDateTime()
+
+    const { round2Decimals } = useToCalculate();
 
     const getInfoForModalRecep = async (id) => {
         if (id > 0) {
@@ -201,7 +204,7 @@ export const useRecepcion = (context) => {
             avails: "",
             qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
             cost: element.producto_adquisicion.costo_prod_adquisicion,
-            total: recDocument.value.isGas ? (element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2) : '',
+            total: recDocument.value.isGas ? round2Decimals(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido) : '',
             deleted: false,
             initial: "",
             initialAmount: "",
@@ -380,7 +383,7 @@ export const useRecepcion = (context) => {
                 }
             }
         })
-        return acumulado.toFixed(2)
+        return round2Decimals(acumulado)
     }
 
     const hasActiveProds = (indexLt) => {
@@ -456,7 +459,7 @@ export const useRecepcion = (context) => {
             ? (prodProcedure.cant_prod_adquisicion * prodProcedure.costo_prod_adquisicion) - acumulado
             : prodProcedure.cant_prod_adquisicion - acumulado;
 
-        const formattedQtyTotal = isGas ? qtyTotal.toFixed(2) : qtyTotal;
+        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal) : qtyTotal;
 
         recDocument.value.prods[indexLt].productos[index].avails = formattedQtyTotal;
 
@@ -566,8 +569,8 @@ export const useRecepcion = (context) => {
                 }
             }
         }
-        recDocument.value.total = sum.toFixed(2);
-        return sum.toFixed(2);
+        recDocument.value.total = round2Decimals(sum);
+        return round2Decimals(sum);
     });
 
     const ordenC = computed(() => {
