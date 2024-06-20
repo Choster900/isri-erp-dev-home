@@ -67,7 +67,7 @@
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 text-center">{{ receipt.id_ccta_presupuestal }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ receipt.cuenta_presupuestal.codigo_ccta_presupuestal }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="font-medium text-slate-800 text-center">
@@ -250,7 +250,7 @@ export default {
             { width: "6%", label: "Fecha", name: "fecha_recibo_ingreso", type: "date" },
             { width: "25%", label: "Cliente", name: "cliente_recibo_ingreso", type: "text" },
             { width: "25%", label: "Descripcion", name: "descripcion_recibo_ingreso", type: "text" },
-            { width: "6%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+            { width: "6%", label: "Especifico", name: "codigo_ccta_presupuestal", type: "text" },
             { width: "9%", label: "Monto", name: "monto_recibo_ingreso", type: "text" },
             {
                 width: "10%", label: "Estado", name: "estado_recibo_ingreso", type: "select",

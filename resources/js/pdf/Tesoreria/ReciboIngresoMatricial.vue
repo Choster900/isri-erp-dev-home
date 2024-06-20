@@ -12,19 +12,19 @@ import moment from 'moment';
                     <img src="../../../img/escudo-nacional.png" alt="Escudo El Salvador"
                         class="w-[50px] h-[50px] object-contain">
                     <div class="text-center">
-                        <div class="text-[11px] font-bold ml-0  text-left">REPUBLICA DE EL SALVADOR</div>
-                        <div class="text-[11px] font-bold ml-0 text-left">MINISTERIO DE SALUD</div>
+                        <div class="text-[11px] font-[Roboto] font-bold ml-0  text-left">REPUBLICA DE EL SALVADOR</div>
+                        <div class="text-[11px] font-[Roboto] font-bold ml-0 text-left">MINISTERIO DE SALUD</div>
                     </div>
                 </div>
                 <!-- Encabezado centrado  -->
                 <div class="title-container w-[33.33%] flex flex-col justify-center items-center">
-                    <h1 class=" text-[12px] font-bold">RECIBO DE INGRESO</h1>
-                    <p class=" text-[11px] font-bold mt-[20px]">ORIGINAL - INTERESADO</p>
+                    <h1 class=" text-[12px] font-[Roboto] font-bold">RECIBO DE INGRESO</h1>
+                    <p class=" text-[11px] font-[Roboto] font-bold mt-[20px]">ORIGINAL - INTERESADO</p>
                 </div>
                 <!-- Encabezado derecho -->
                 <div class="flex-none w-[33.33%] flex flex-col justify-center items-center">
                     <img src="../../../img/isri-logo2.png" alt="Logo ISRI" class="w-[50px] h-[50px] object-contain ">
-                    <div class="text-center text-[11px] font-bold ml-0 mr-0" style="text-align: center;">INSTITUTO
+                    <div class="text-center text-[11px] font-[Roboto] font-bold ml-0 mr-0" style="text-align: center;">INSTITUTO
                         SALVADOREÑO DE
                         REHABILITACION INTEGRAL</div>
                 </div>
@@ -50,8 +50,8 @@ import moment from 'moment';
                 <div class="flex w-[8cm] text-left ">
                     <div class="relative flex w-full flex-row">
                         <label for="" class="w-[3.5cm] flex items-center text-[10px] invisible">3) LUGAR Y FECHA </label>
-                        <div class="w-[4.5cm] ml-0 text-center  text-[10px] font-bold">
-                            <p class="mb-0"> {{ ciudad + ' ' + fecha_recibo }}</p>
+                        <div class="w-[4.5cm] ml-0 text-center">
+                            <p class="mb-0 text-[10px] font-[Roboto] font-bold"> {{ ciudad + ' ' + fecha_recibo }}</p>
                         </div>
                     </div>
                 </div>
@@ -71,8 +71,8 @@ import moment from 'moment';
                                                 class="invisible h-full flex w-[4.5cm] items-center text-[10px] mb-0 mt-0">4)
                                                 Nombre o
                                                 Razón Social</label>
-                                            <div class="h-full ml-0 text-left w-[14.0cm] text-[10px] font-bold ">
-                                                <p class="ml-0">{{ receipt_to_print.cliente_recibo_ingreso
+                                            <div class="h-full ml-0 text-left w-[14.0cm]">
+                                                <p class="ml-0 text-[10px] font-[Roboto] font-bold">{{ receipt_to_print.cliente_recibo_ingreso
                                                 }}</p>
                                             </div>
                                         </div>
@@ -86,8 +86,8 @@ import moment from 'moment';
                                                 <label for=""
                                                     class="invisible w-[1.1cm] flex items-center text-[10px] mb-0 mt-0">5)
                                                     Por</label>
-                                                <div class="text-center w-[3.4cm]  text-[10px] font-bold">
-                                                    <p class="ml-0">{{ formatedAmount }}</p>
+                                                <div class="text-center w-[3.4cm]">
+                                                    <p class="ml-0 text-[10px] font-[Roboto] font-bold">{{ formatedAmount }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -97,8 +97,8 @@ import moment from 'moment';
                                                 Total
                                                 en
                                                 Letras</label>
-                                            <div class="text-left w-[10.9cm] text-[9px] font-bold">
-                                                <p class="ml-0">{{ letras1 }}</p>
+                                            <div class="text-left w-[10.9cm]">
+                                                <p class="ml-0 text-[9px] font-[Roboto] font-bold">{{ letras1 }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -106,8 +106,8 @@ import moment from 'moment';
                                 <div class="h-[0.45cm] w-full flex justify-between items-center">
                                     <div class="h-full flex w-full text-left">
                                         <div class="h-full relative flex w-full flex-row">
-                                            <div class="text-left w-full  text-[9px] font-bold">
-                                                <p class="ml-0">{{ letras2 ? letras2 : '' }}</p>
+                                            <div class="text-left w-full">
+                                                <p class="ml-0 text-[9px] font-[Roboto] font-bold">{{ letras2 ? letras2 : '' }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -129,7 +129,7 @@ import moment from 'moment';
                                 <div class="h-full flex flex-col ">
                                     <div class="flex justify-center items-start mb-0 h-[4cm]">
                                         <div class="flex w-full text-left mx-4 mt-0">
-                                            <div class="font-bold flex items-center text-[10px]">
+                                            <div class="font-[Roboto] font-bold flex items-center text-[10px]">
                                                 {{ receipt_to_print.descripcion_recibo_ingreso }}
                                             </div>
                                         </div>
@@ -138,8 +138,8 @@ import moment from 'moment';
                                     <div class="flex justify-center items-start mb-0 h-[1.2cm]">
                                         <div class="w-full flex flex-col h-full">
                                             <div class="w-max-full flex justify-center mx-4 h-[0.5cm]">
-                                                <div class="ml-0 text-center w-full text-[9px] font-bold">
-                                                    <p class="ml-0 mb-0 mt-0">{{ empleado }}</p>
+                                                <div class="ml-0 text-center w-full">
+                                                    <p class="ml-0 mb-0 mt-0 font-[Roboto] font-bold text-[9px]">{{ empleado }}</p>
                                                 </div>
                                             </div>
                                             <div
@@ -154,8 +154,8 @@ import moment from 'moment';
                             <td class="h-full w-[9.4cm]">
                                 <div class="h-full flex flex-col">
                                     <div class="flex justify-center items-start h-[0.7cm]">
-                                        <div class="font-bold flex w-full text-left text-[9px] mx-4 mt-0">
-                                            {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
+                                        <div class="font-[Roboto] font-bold flex w-full text-left text-[9px] mx-4 mt-0">
+                                            {{ receipt_to_print.cuenta_presupuestal.codigo_ccta_presupuestal }} {{ nombre_cuenta }}
                                         </div>
                                     </div>
 
@@ -163,8 +163,8 @@ import moment from 'moment';
                                         <div class="w-full flex flex-col h-full">
                                             <div v-for="(detail, index) in receipt_to_print.detalles" :key="index"
                                                 class="relative flex w-full h-[0.5cm] flex-row center-vertically mt-0">
-                                                <div class="font-bold flex items-center text-[9px] w-2/3 mx-4">
-                                                    <label class="">
+                                                <div class="font-[Roboto] font-bold flex items-center text-[9px] w-2/3 mx-4">
+                                                    <label class="font-[Roboto] font-bold text-[9px]">
                                                         {{ detail.concepto_ingreso.centro_atencion ?
                                                             detail.concepto_ingreso.centro_atencion.codigo_centro_atencion + ' - ' : ''
                                                         }}
@@ -174,24 +174,24 @@ import moment from 'moment';
                                                 </div>
                                                 <div class="w-1/3 relative mr-2">
                                                     <span
-                                                        class=" absolute left-0 top-1/2 transform text-[9px] -translate-y-1/2 font-bold">$</span>
-                                                    <div class="text-right w-full text-[9px] font-bold pl-8 py-0">
-                                                        <p class="">{{ detail.monto_det_recibo_ingreso }}</p>
+                                                        class=" absolute left-0 top-1/2 transform text-[9px] -translate-y-1/2 font-[Roboto] font-bold">$</span>
+                                                    <div class="text-right w-full pl-8 py-0">
+                                                        <p class="text-[9px] font-[Roboto] font-bold">{{ detail.monto_det_recibo_ingreso }}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="flex justify-center items-start h-[0.5cm] mt-1">
                                                 <div class="relative flex w-full flex-row h-full">
                                                     <label for=""
-                                                        class="font-bold flex items-center text-[9px] w-2/3 mx-4 mt-0 h-full">
+                                                        class="font-[Roboto] font-bold flex items-center text-[9px] w-2/3 mx-4 mt-0 h-full">
                                                         TOTAL:
                                                     </label>
                                                     <div class="w-1/3 relative mr-2 h-full">
                                                         <span
-                                                            class="absolute left-0 top-1/2 transform text-[9px] -translate-y-1/2 font-bold">$</span>
+                                                            class="absolute left-0 top-1/2 transform text-[9px] -translate-y-1/2 font-[Roboto] font-bold">$</span>
                                                         <div
-                                                            class="border-t border-gray-700 text-right w-full text-[9px] font-bold pl-8 py-0">
-                                                            <p class="">{{ receipt_to_print.monto_recibo_ingreso }}</p>
+                                                            class="border-t border-gray-700 text-right w-full pl-8 py-0">
+                                                            <p class="text-[9px] font-[Roboto] font-bold">{{ receipt_to_print.monto_recibo_ingreso }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
