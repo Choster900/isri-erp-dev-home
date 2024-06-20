@@ -49,7 +49,7 @@
                                 <td class="border text-sm border-black text-center font-medium px-8" colspan="3">
                                     <div class="flex items-center justify-center gap-1">
                                         <div class="relative text-center text-sm">
-                                            ORDEN DE COMPRA DE BIENES Y SERVICIOS
+                                            CONTRATO DE BIENES Y SERVICIOS
                                         </div>
                                     </div>
                                 </td>
