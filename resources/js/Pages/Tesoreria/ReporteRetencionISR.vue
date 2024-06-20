@@ -31,7 +31,7 @@ import axios from 'axios';
                 </div>
             </div>
         </div>
-        <div class="border border-gray-300 rounded p-4 mb-4 mx-auto w-[75%]">
+        <div class="border border-gray-300 rounded p-4 mb-4 mx-auto w-[75%] bg-white">
             <h2 class="text-lg font-bold mb-4 text-center">Reporte Retencion Renta</h2>
             <div class="mb-7 md:flex flex-row justify-items-start">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
