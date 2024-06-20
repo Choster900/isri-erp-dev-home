@@ -64,7 +64,7 @@
                                     service.nombre_concepto_ingreso }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ service.id_ccta_presupuestal }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ service.codigo_ccta_presupuestal }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800">
@@ -214,7 +214,7 @@ export default {
             { width: "10%", label: "ID", name: "id_concepto_ingreso", type: "text" },
             { width: "30%", label: "Centro", name: "nombre_dependencia", type: "text" },
             { width: "30%", label: "Concepto Ingreso", name: "nombre_concepto_ingreso", type: "text" },
-            { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+            { width: "10%", label: "Especifico", name: "codigo_ccta_presupuestal", type: "text" },
             {
                 width: "10%", label: "Estado", name: "estado_concepto_ingreso", type: "select",
                 options: [

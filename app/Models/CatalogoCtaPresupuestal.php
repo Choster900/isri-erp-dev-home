@@ -16,6 +16,7 @@ class CatalogoCtaPresupuestal extends Model
     protected $fillable = [
         'id_tipo_af',
         'id_padre_ccta_presupuestal',
+        'codigo_ccta_presupuestal',
         'nombre_ccta_presupuestal',
         'cuenta_gasto_ccta_presupuestal',
         'cuenta_inversion_ccta_presupuestal',
@@ -25,6 +26,5 @@ class CatalogoCtaPresupuestal extends Model
         'activo_fijo_ccta_presupuestal',
         'compra_ccta_presupuestal',
         'descripcion_ccta_presupuestal',
-
     ];
 }

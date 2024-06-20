@@ -612,7 +612,8 @@ export const useAjusteEntrada = (context) => {
         // Iterate through each product in the 'prods' array of the 'adjustment' object
         newValue.prods.forEach((prod) => {
             // Calculate the total amount for the product (quantity * cost)
-            prod.total = (prod.qty * prod.cost).toFixed(2);
+            let prevRes = prod.qty * prod.cost
+            prod.total = prod.fractionated === 1 ? prevRes.toFixed(8) : prevRes.toFixed(6)
         });
     }, { deep: true });
 

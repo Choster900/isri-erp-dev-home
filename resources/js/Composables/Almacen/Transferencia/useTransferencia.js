@@ -101,6 +101,7 @@ export const useTransferencia = (context) => {
                         qty: element.cant_det_requerimiento, //Represents the the number of products the user wants to register
                         cost: element.detalle_existencia_almacen.existencia_almacen.costo_existencia_almacen, //Represents the the cost of the product
                         prevAvails: element.detalle_existencia_almacen.cant_det_existencia_almacen,
+                        fractionated: element.producto.fraccionado_producto,
                         prodLabel: selectedProd.label,
                         avails: "",
                         total: "", //Represents the result of qty x cost for every row
@@ -125,6 +126,7 @@ export const useTransferencia = (context) => {
         let array = {
             id: "",
             detId: "",
+            fractionated: "",
             prodLabel: "",
             qty: "",
             cost: "",
@@ -206,11 +208,13 @@ export const useTransferencia = (context) => {
             adjustment.value.prods[index].avails = selectedProd.allInfo.cant_det_existencia_almacen
             adjustment.value.prods[index].prevAvails = selectedProd.allInfo.cant_det_existencia_almacen
             adjustment.value.prods[index].prodLabel = selectedProd.label
+            adjustment.value.prods[index].fractionated = selectedProd.allInfo.existencia_almacen.producto.fraccionado_producto
         } else {
             adjustment.value.prods[index].cost = ''
             adjustment.value.prods[index].avails = ''
             adjustment.value.prods[index].prevAvails = ''
             adjustment.value.prods[index].prodLabel = ''
+            adjustment.value.prods[index].fractionated = ''
         }
         adjustment.value.prods[index].qty = ''
     }
@@ -416,8 +420,11 @@ export const useTransferencia = (context) => {
     // Observa cambios en las propiedades qty y cost de cada producto
     watch(adjustment, (newValue) => {
         newValue.prods.forEach((prod) => {
-            prod.total = (prod.qty * prod.cost).toFixed(2);
-            prod.avails = prod.prevAvails - prod.qty
+            let prevRes = prod.qty * prod.cost
+            prod.total = prod.fractionated === 1 ? prevRes.toFixed(8) : prevRes.toFixed(6)
+
+            let prev = prod.prevAvails - prod.qty
+            prod.avails = prod.fractionated === 1 ? prev.toFixed(2) : prev
         });
     }, { deep: true });
 
