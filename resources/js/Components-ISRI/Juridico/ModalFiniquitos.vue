@@ -70,7 +70,7 @@
                             </div>
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="mb-5 md:mr-2 md:mb-0 basis-full justify-start text-left">
-                                    <date-time-picker-m v-model="center.date"
+                                    <date-time-picker-m v-model="center.date" :inputWrapHeight="'40px'"
                                         :hasError="errors['centers.' + index + '.date'] ? true : false" />
                                     <InputError v-for="(item, index2) in errors['centers.' + index + '.date']" :key="index2"
                                         class="mt-2 h-[32px]" :message="item" />
@@ -79,7 +79,8 @@
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <time-picker-m :height="200" v-model="center.startTime" :placeholder="'Hora inicio'"
-                                        :hasError="errors['centers.' + index + '.startTime'] ? true : false" />
+                                        :hasError="errors['centers.' + index + '.startTime'] ? true : false"
+                                        :timeHeight="'40px'" />
                                     <InputError v-for="(item, index2) in errors['centers.' + index + '.startTime']"
                                         :key="index2" class="mt-2 h-[32px]" :message="item" />
                                 </div>
@@ -87,7 +88,8 @@
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <time-picker-m :height="200" v-model="center.endTime" :placeholder="'Hora fin'"
-                                        :hasError="errors['centers.' + index + '.endTime'] ? true : false" />
+                                        :hasError="errors['centers.' + index + '.endTime'] ? true : false" 
+                                        :timeHeight="'40px'"/>
                                     <InputError v-for="(item, index2) in errors['centers.' + index + '.endTime']"
                                         :key="index2" class="mt-2 h-[32px]" :message="item" />
                                 </div>

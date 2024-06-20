@@ -129,7 +129,7 @@
                                 <div class="h-64 flex flex-col">
                                     <div class="flex justify-center items-start mb-1 h-[10%]">
                                         <div class="font-bold flex w-full text-left text-[10px] mx-4 mt-0">
-                                            {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
+                                            {{ receipt_to_print.cuenta_presupuestal.codigo_ccta_presupuestal }} {{ nombre_cuenta }}
                                         </div>
                                     </div>
 
@@ -308,7 +308,7 @@
                                 <div class="h-64 flex flex-col">
                                     <div class="flex justify-center items-start mb-1 h-[10%]">
                                         <div class="font-bold flex w-full text-left text-[10px] mx-4 mt-0">
-                                            {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
+                                            {{ receipt_to_print.cuenta_presupuestal.codigo_ccta_presupuestal }} {{ nombre_cuenta }}
                                         </div>
                                     </div>
 
@@ -491,7 +491,7 @@
                                     <div class="h-64 flex flex-col">
                                         <div class="flex justify-center items-start mb-1 h-[10%]">
                                             <div class="font-bold flex w-full text-left text-[10px] mx-4 mt-0">
-                                                {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
+                                                {{ receipt_to_print.cuenta_presupuestal.codigo_ccta_presupuestal }} {{ nombre_cuenta }}
                                             </div>
                                         </div>
 
@@ -674,7 +674,7 @@
                                     <div class="h-64 flex flex-col">
                                         <div class="flex justify-center items-start mb-1 h-[10%]">
                                             <div class="font-bold flex w-full text-left text-[10px] mx-4 mt-0">
-                                                {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
+                                                {{ receipt_to_print.cuenta_presupuestal.codigo_ccta_presupuestal }} {{ nombre_cuenta }}
                                             </div>
                                         </div>
 

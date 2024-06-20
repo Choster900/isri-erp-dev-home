@@ -123,7 +123,7 @@
                             </div>
                         </div>
 
-                        <div v-if="income_receipt.budget_account_id === 16304"
+                        <div v-if="income_receipt.budget_account_id === 252"
                             class="mb-4 md:flex flex-row justify-items-start px-2">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
                                 <TextInput id="client-direccion" v-model="income_receipt.direction" type="text"

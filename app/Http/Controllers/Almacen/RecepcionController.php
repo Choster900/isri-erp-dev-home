@@ -634,17 +634,17 @@ class RecepcionController extends Controller
         $customMessages = [
             'conctManagerId.required' => 'Debe seleccionar el administrador de documento.',
             'suppRep.required' => 'Debe escribir el nombre del representante del proveedor.',
-            'nonCompliant.required' => 'Debe seleccionar si existe incumplimiento.',
+            //'nonCompliant.required' => 'Debe seleccionar si existe incumplimiento.',
             'nonCompliant.not_in' => 'Debe seleccionar si existe incumplimiento.',
-            'observation.required_if' => 'Debe agregar la descripción por incumplimiento.'
+            'observation.required' => 'Debe digitar observación.'
         ];
 
         // Validate the request data with custom error messages and custom rule
         $validatedData = Validator::make($request->all(), [
             'conctManagerId' => 'required',
             'suppRep' => 'required',
-            'nonCompliant' => 'required|not_in:-1',
-            'observation' => 'required_if:nonCompliant,1',
+            'nonCompliant' => 'not_in:-1',
+            'observation' => 'required',
         ], $customMessages)->validate();
 
         //Find the current products reception

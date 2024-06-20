@@ -178,7 +178,7 @@
                                 :class="errors['prods.' + index + '.expDate'] ? 'bg-red-300' : ''">
                                 <div v-if="prod.perishable === 1" class="max-w-[95%]">
                                     <DateTimePickerM v-model="prod.expDate" :showIcon="false" :placeholder="'Fecha'"
-                                        :disabled="donInfo.status != 1" />
+                                        :disabled="donInfo.status != 1" :inputWrapHeight="'35px'" />
                                 </div>
                                 <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
                             </div>
@@ -230,7 +230,7 @@
                     </div>
                 </div>
 
-                <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px]">
+                <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px] bg-white">
                     <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500">
                         <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                             <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL DONACION</p>
@@ -346,10 +346,6 @@ export default {
 
 .blinking {
     animation: blink 1s infinite;
-}
-
-.dp__input_wrap {
-    height: 35px;
 }
 
 .select-err .multiselect-wrapper input {

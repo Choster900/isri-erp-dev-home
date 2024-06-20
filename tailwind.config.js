@@ -12,7 +12,7 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Nunito', ...defaultTheme.fontFamily.sans],
+                sans: ['Nunito','Roboto', ...defaultTheme.fontFamily.sans],
             },
             gridTemplateRows: {
                 // Agregando nueva clase para manejar Grid Template Rows

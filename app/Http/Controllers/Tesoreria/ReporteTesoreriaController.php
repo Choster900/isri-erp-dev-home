@@ -479,7 +479,7 @@ class ReporteTesoreriaController extends Controller
             ->where('estado_centro_atencion', '=', 1)
             ->orderBy('id_centro_atencion')
             ->get();
-        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
+        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(codigo_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('tesoreria_ccta_presupuestal', '=', 1)
             ->where('estado_ccta_presupuestal', '=', 1)
             ->orderBy('nombre_ccta_presupuestal')
@@ -632,14 +632,14 @@ class ReporteTesoreriaController extends Controller
             t.id_centro_atencion,
             t.codigo_centro_atencion,
             GROUP_CONCAT(DISTINCT t.nombre_concepto_ingreso SEPARATOR ", ") as observacion,
-            SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0)) as "14199",
-            SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0)) as "14202",
-            SUM(IF(t.id_ccta_presupuestal = 14204, t.total, 0)) as "14204",
-            SUM(IF(t.id_ccta_presupuestal = 14299, t.total, 0)) as "14299",
-            SUM(IF(t.id_ccta_presupuestal = 15799, t.total, 0)) as "15799",
-            SUM(IF(t.id_ccta_presupuestal = 15502, t.total, 0)) as "15502",
-            SUM(IF(t.id_ccta_presupuestal = 16304, t.total, 0)) as "16304",
-            (SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14204, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14299, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 15799, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 15502, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 16304, t.total, 0))) as total
+            SUM(IF(t.id_ccta_presupuestal = 192, t.total, 0)) as "14199",
+            SUM(IF(t.id_ccta_presupuestal = 194, t.total, 0)) as "14202",
+            SUM(IF(t.id_ccta_presupuestal = 196, t.total, 0)) as "14204",
+            SUM(IF(t.id_ccta_presupuestal = 201, t.total, 0)) as "14299",
+            SUM(IF(t.id_ccta_presupuestal = 246, t.total, 0)) as "15799",
+            SUM(IF(t.id_ccta_presupuestal = 237, t.total, 0)) as "15502",
+            SUM(IF(t.id_ccta_presupuestal = 252, t.total, 0)) as "16304",
+            (SUM(IF(t.id_ccta_presupuestal = 192, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 194, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 196, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 201, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 246, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 237, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 252, t.total, 0))) as total
             
             FROM
             (
@@ -657,7 +657,7 @@ class ReporteTesoreriaController extends Controller
                 WHERE ri.estado_recibo_ingreso = 1
                 AND ri.fecha_recibo_ingreso = ?
                 AND ci.id_proy_financiado = ?
-                AND ci.id_ccta_presupuestal <> 16201 
+                AND ci.id_ccta_presupuestal <> 593 
                 AND dri.estado_det_recibo_ingreso = 1
                 GROUP BY 
                 ci.id_centro_atencion, 
