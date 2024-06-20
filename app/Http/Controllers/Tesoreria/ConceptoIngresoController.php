@@ -17,7 +17,7 @@ class ConceptoIngresoController extends Controller
 {
     public function getConceptoIngresos(Request $request)
     {
-        $columns = ['id_concepto_ingreso', 'nombre_dependencia', 'nombre_concepto_ingreso', 'id_ccta_presupuestal', 'estado_concepto_ingreso'];
+        $columns = ['id_concepto_ingreso', 'nombre_dependencia', 'nombre_concepto_ingreso', 'codigo_ccta_presupuestal', 'estado_concepto_ingreso'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -25,6 +25,9 @@ class ConceptoIngresoController extends Controller
         $search_value = $request->search;
 
         $query = ConceptoIngreso::select('*')
+            ->join('catalogo_cta_presupuestal', function ($join) {
+                $join->on('concepto_ingreso.id_ccta_presupuestal', '=', 'catalogo_cta_presupuestal.id_ccta_presupuestal');
+            })
             ->leftJoin('centro_atencion', function ($join) {
                 $join->on('concepto_ingreso.id_centro_atencion', '=', 'centro_atencion.id_centro_atencion');
             })
@@ -33,7 +36,7 @@ class ConceptoIngresoController extends Controller
             $query->where([
                 ['id_concepto_ingreso', 'like', '%' . $search_value['id_concepto_ingreso'] . '%'],
                 ['nombre_concepto_ingreso', 'like', '%' . $search_value['nombre_concepto_ingreso'] . '%'],
-                ['id_ccta_presupuestal', 'like', '%' . $search_value['id_ccta_presupuestal'] . '%'],
+                ['catalogo_cta_presupuestal.codigo_ccta_presupuestal', 'like', '%' . $search_value['codigo_ccta_presupuestal'] . '%'],
                 ['estado_concepto_ingreso', 'like', '%' . $search_value['estado_concepto_ingreso'] . '%'],
                 [function ($query) use ($search_value) {
                     if ($search_value['nombre_dependencia'] == 'N/A' || $search_value['nombre_dependencia'] == 'n/a') {
@@ -85,7 +88,7 @@ class ConceptoIngresoController extends Controller
     public function getInfoModalConceptoIngreso(Request $request, $id)
     {
         $concept = ConceptoIngreso::with('centro_atencion')->find($id);
-        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
+        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(codigo_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('tesoreria_ccta_presupuestal', '=', 1)
             ->where('estado_ccta_presupuestal', '=', 1)
             ->orderBy('nombre_ccta_presupuestal')
@@ -104,30 +107,6 @@ class ConceptoIngresoController extends Controller
             'financing_sources'         => $financing_sources,
             'concept'                   => $concept ?? []
         ]);
-    }
-
-
-    public function getSelectsIncomeConcept(Request $request)
-    {
-        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
-            ->where('tesoreria_ccta_presupuestal', '=', 1)
-            ->where('estado_ccta_presupuestal', '=', 1)
-            ->orderBy('nombre_ccta_presupuestal')
-            ->get();
-        //This was before.
-        // $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
-        //     ->where('id_tipo_dependencia', '=', 1)
-        //     ->orderBy('nombre_dependencia')
-        //     ->get();
-        $dependencies = CentroAtencion::selectRaw("id_centro_atencion as value , concat(codigo_centro_atencion, ' - ', nombre_centro_atencion) as label")
-            ->orderBy('nombre_centro_atencion')
-            ->get();
-        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
-            ->where('estado_proy_financiado', '=', 1)
-            ->orderBy('nombre_proy_financiado')
-            ->get();
-
-        return ['budget_accounts' => $budget_accounts, 'dependencies' => $dependencies, 'financing_sources' => $financing_sources];
     }
 
     public function saveIncomeConcept(IncomeConceptRequest $request)
