@@ -3,6 +3,10 @@ import html2pdf from "html2pdf.js";
 import moment from "moment";
 import { createApp } from "vue";
 import OrdenCompraBienesServicios from "@/pdf/UnidadComprasPublicas/OrdenCompraBienesServicios.vue";
+//import OrdenCompraBienesServicios from "@/pdf/UnidadComprasPublicas/OrdenCompraBienesServicios.vue";
+import OrdenCompraPdf from "@/pdf/UnidadComprasPublicas/OrdenCompraPdf.vue";
+import ContratoPdf from "@/pdf/UnidadComprasPublicas/ContratoPdf.vue";
+
 
 /**
  * Composable para configurar y generar PDFs de órdenes de compra.
@@ -21,7 +25,7 @@ import OrdenCompraBienesServicios from "@/pdf/UnidadComprasPublicas/OrdenCompraB
  * @param {Ref<String>} letterNumber - Número de carta.
  * @param {Ref<Number>} totProductos - Total de productos.
  *
- * @returns {Object} - Retorna la función `printPdf` para generar el PDF.
+ * @returns {Object} - Retorna la función `printOrdenCompraPdf` para generar el PDF.
  */
 export const useConfigPdf = (
     arrayDocAdquisicion,
@@ -42,7 +46,7 @@ export const useConfigPdf = (
     /**
      * Función para generar y descargar el PDF de la orden de compra.
      */
-    const printPdf = () => {
+    const printOrdenCompraPdf = () => {
         // Cambiar el cursor a "wait" para indicar que el PDF se está generando
         document.body.style.cursor = 'wait';
 
@@ -54,11 +58,11 @@ export const useConfigPdf = (
             filename: "ORDEN DE COMPRA BIENES Y SERVICIOS",
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: { scale: 3, useCORS: true },
-            jsPDF: { unit: "cm", format: "letter", orientation: "landscape" },
+            jsPDF: { unit: "cm", format: "letter", orientation: "portrait" },
         };
 
         // Crear una instancia de la aplicación Vue para el componente OrdenCompraBienesServicios
-        const app = createApp(OrdenCompraBienesServicios, {
+        const app = createApp(OrdenCompraPdf, {
             arrayDocAdquisicion: arrayDocAdquisicion.value,
             idDetDocAdquisicion: idDetDocAdquisicion.value,
             objectGetFromProp: objectGetFromProp.value,
@@ -116,6 +120,84 @@ export const useConfigPdf = (
     };
 
 
+    /**
+     * Función para generar y descargar el PDF de la orden de compra.
+     */
+    const printContratoPdf = () => {
+        // Cambiar el cursor a "wait" para indicar que el PDF se está generando
+        document.body.style.cursor = 'wait';
+
+        console.log(objectGetFromProp.value);
+
+        // Configuración de opciones para html2pdf
+        const opt = {
+            margin: [0.5, 0.5, 2, 0.5], // Márgenes: superior, izquierdo, inferior, derecho
+            filename: "ORDEN DE COMPRA BIENES Y SERVICIOS",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 3, useCORS: true },
+            jsPDF: { unit: "cm", format: "letter", orientation: "landscape" },
+        };
+
+        // Crear una instancia de la aplicación Vue para el componente OrdenCompraBienesServicios
+        const app = createApp(ContratoPdf, {
+            arrayDocAdquisicion: arrayDocAdquisicion.value,
+            idDetDocAdquisicion: idDetDocAdquisicion.value,
+            objectGetFromProp: objectGetFromProp.value,
+            notificacionDetDocAdquisicion: notificacionDetDocAdquisicion.value,
+            recepcionDetDocAdquisicion: recepcionDetDocAdquisicion.value,
+            observacionDetDocAdquisicion: observacionDetDocAdquisicion.value,
+            arrayLineaTrabajo: arrayLineaTrabajo.value,
+            arrayProductoAdquisicion: arrayProductoAdquisicion.value,
+            arrayMarca: brandsUsedInDoc.value,
+            arrayUnidadMedida: arrayUnidadMedida.value,
+            arrayCentroAtencion: arrayCentroAtencion.value,
+            letterNumber: letterNumber.value,
+            totProductos: totProductos.value,
+        });
+
+        // Crear un elemento div y montar la instancia de la aplicación en él
+        const div = document.createElement("div");
+        const pdfPrint = app.mount(div);
+        const html = div.outerHTML;
+        const currentDateTime = moment().format("DD/MM/YYYY, HH:mm:ss");
+
+        // Generar y guardar el PDF utilizando html2pdf
+        html2pdf()
+            .set(opt)
+            .from(html)
+            .toPdf()
+            .get("pdf")
+            .then(function (pdf) {
+                var totalPages = pdf.internal.getNumberOfPages();
+                for (var i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(10);
+
+                    // Texto para el número de página
+                    let text = "Página " + i + " de " + totalPages;
+                    const centerX = pdf.internal.pageSize.getWidth() / 2;
+                    const textWidth1 = (pdf.getStringUnitWidth(text) * pdf.internal.getFontSize()) / pdf.internal.scaleFactor;
+                    const textX = centerX - textWidth1 / 2;
+                    pdf.text(textX, pdf.internal.pageSize.getHeight() - 0.6, text);
+
+                    // Texto para la fecha y hora
+                    let date_text = "Generado: " + currentDateTime;
+                    const textWidth = (pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize()) / pdf.internal.scaleFactor;
+                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.6, pdf.internal.pageSize.getHeight() - 0.6, date_text);
+                }
+
+                // Cambiar el cursor de vuelta a "default"
+                document.body.style.cursor = 'default';
+            })
+            .save()
+            .catch((err) => {
+                console.error(err);
+                document.body.style.cursor = 'default';
+            });
+    };
+
+
+
     const exportDocumentToExcel = async () => {
         try {
             try {
@@ -170,6 +252,6 @@ export const useConfigPdf = (
     };
 
     return {
-        printPdf,exportDocumentToExcel
-    };
-};
+        printOrdenCompraPdf,exportDocumentToExcel, printContratoPdf
+    }
+}
