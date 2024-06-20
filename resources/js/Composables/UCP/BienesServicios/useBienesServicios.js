@@ -1,7 +1,8 @@
 import { ref, onMounted, watch, computed, reactive } from "vue";
 import axios from "axios";
-import { executeRequest } from "@/plugins/requestHelpers";
 import Swal from "sweetalert2";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 /**
  * Hook personalizado para la gestión de bienes y servicios.
  * Este hook se encarga de realizar operaciones relacionadas con la gestión de bienes y servicios,
@@ -49,7 +50,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
     const addingRows = (i) => {
         try {
             // Verifica si hay datos en la posición i de arrayProductoAdquisicion y si hay documentos de adquisición disponibles
-            if (arrayProductoAdquisicion.value[i] && arrayDocAdquisicion.value.length > 0) {
+            if (arrayProductoAdquisicion.value[i]) {
 
                 // Agrega un nuevo objeto de detalle de adquisición a la matriz de productos
                 arrayProductoAdquisicion.value[i].detalleDoc.push({
@@ -73,7 +74,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                 // Muestra la matriz actualizada en la consola
             } else {
                 // Muestra un mensaje de error si faltan datos para agregar filas
-                console.error("No se pueden agregar filas debido a datos faltantes.");
+                console.error("No se pueden agregar filas debido a datos faltantes (No hay documento de adquisicion).");
             }
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola

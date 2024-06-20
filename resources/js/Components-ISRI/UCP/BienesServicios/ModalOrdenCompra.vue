@@ -49,7 +49,7 @@
                                 <td class="border text-sm border-black text-center font-medium px-8" colspan="3">
                                     <div class="flex items-center justify-center gap-1">
                                         <div class="relative text-center text-sm">
-                                            CONTRATO DE BIENES Y SERVICIOS
+                                            ORDEN DE COMPRA DE BIENES Y SERVICIOS
                                         </div>
                                     </div>
                                 </td>
@@ -482,10 +482,11 @@ export default {
         */
         const saveProductAdquisicion = async () => {
             const confirmed = await Swal.fire({
-                title: '<p class="text-[18pt] text-center">¿Esta seguro de guardar el anexo?</p>',
+                title: '<p class="text-[15pt]">¿Está seguro de guardar los productos en el documento?</p>',
+                text: "Al confirmar esta acción, los cambios se guardarán de manera instantánea. Tenga en cuenta que serán permanentes una vez confirmada la operación.",
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Editar",
+                confirmButtonText: "Si, Guardar",
                 confirmButtonColor: "#001b47",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
@@ -509,10 +510,11 @@ export default {
          */
         const updateProductAdquisicion = async () => {
             const confirmed = await Swal.fire({
-                title: '<p class="text-[18pt] text-center">¿Esta seguro de editar?</p>',
+                title: '<p class="text-[15pt]">¿Está seguro de actualizar los productos en el documento?</p>',
+                text: "Al confirmar esta acción, los cambios se guardarán de manera instantánea. Tenga en cuenta que serán permanentes una vez confirmada la operación.",
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Editar",
+                confirmButtonText: "Si, Actualizar",
                 confirmButtonColor: "#001b47",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,

@@ -94,7 +94,7 @@ export const useDatatable = (type) => {
                 links.value[links.value.length - 1].label = "Siguiente";
             }
 
-            emptyObject.value = evaluaciones.value.length === 0;
+            emptyObject.value = prodAdquisicion.value.length === 0;
         } catch (error) {
             // Manejo de errores aquí
         } finally {
