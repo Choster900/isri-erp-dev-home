@@ -147,8 +147,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                     <div :id="`familiar-${rowIndex}`" class=" p-2 rounded-md bg-gray-200 mb-3 relative border "
                         v-if="!row.isDelete" :class="row.onEdit ? 'animate-shake' : ''">
                         <div class=" md:flex flex-row justify-items-start">
-                            <div class=" md:mr-2 md:mb-0 basis-1/12 ">
-                                <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+                            <div class="mb-2 md:mb-0 md:mr-2 md:basis-1/12">
+                                <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" fill="#000000" class="w-10 h-10 mx-auto md:mx-0">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                     <g id="SVGRepo_iconCarrier">
@@ -158,18 +158,18 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                                     </g>
                                 </svg>
                             </div>
-                            <div class="md:mr-2 md:mb-0 basis-1/2">
+                            <div class="md:basis-1/2">
                                 <!--  {{ row.id_parentesco }} -->
                                 <h5 class="text-sm font-medium" :class="row.nombre_familiar == '' ? 'py-2' : ''"
                                     v-if="!row.onEdit">{{ row.nombre_familiar }} - {{ row.nombre_parentesco }}</h5>
-                                <div v-else class="flex items-center gap-1">
+                                <div v-else class="flex flex-col md:flex-row md:items-center md:gap-1">
                                     <div>
                                         <input v-model="row.nombre_familiar" type="text" :class="row.onEdit ? '' : ''"
                                             maxlength="35" class="rounded w-52 h-7 text-xs font-medium"
                                             placeholder="Nombre del familiar"
                                             @input="row.nombre_familiar = row.nombre_familiar.toUpperCase()">
                                     </div>
-                                    <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                                    <div class="mt-2 md:mt-0 w-full md:w-auto">
                                         <div class="relative w-40 flex h-7 flex-row-reverse">
                                             <Multiselect :options="dataForSelect" v-model="row.id_parentesco"
                                                 @select="(selected) => selectParentesco(selected, rowIndex)"
@@ -182,19 +182,19 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-3">
+                                <div class="flex flex-col md:flex-row md:items-center md:gap-3">
                                     <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.nombre_familiar`]" />
                                     <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.id_parentesco`]" />
                                 </div>
-                                <h5 class="text-sm ">0 al 100 %</h5>
-                                <div class="flex items-center gap-3" style="width: 445px;">
+                                <h5 class="text-sm mt-2 md:mt-0">0 al 100 %</h5>
+                                <div class="flex items-center gap-3 w-full md:w-[445px]">
                                     <span class="text-2xl cursor-pointer text-selection-disable"
                                         @click="increaseOrDecreaseDesignacionDePorcentajes(rowIndex, 'resta')">-</span>
                                     <input @input="calcularDesignacionDePorcentajes(rowIndex)"
                                         v-model="row.porcentaje_familiar"
-                                        class="cursor-grabbing	 rounded-lg overflow-hidden appearance-none bg-gray-400 h-3 w-full"
+                                        class="cursor-grabbing rounded-lg overflow-hidden appearance-none bg-gray-400 h-3 w-full"
                                         type="range" min="0" max="100" step="1" />
-                                    <span class="text-sm font-medium ml-2 ">{{ row.porcentaje_familiar }}%</span>
+                                    <span class="text-sm font-medium ml-2">{{ row.porcentaje_familiar }}%</span>
                                     <span class="text-2xl cursor-pointer text-selection-disable"
                                         @click="increaseOrDecreaseDesignacionDePorcentajes(rowIndex, 'suma')">+</span>
                                 </div>
@@ -209,12 +209,12 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                             <DropDownOptions v-if="!row.onEdit">
                                 <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                     <div class="font-semibold text-xs text-green-700 w-full" @click="row.onEdit = true">
-                                        M O D I F I C A R</div>
+                                        MODIFICAR
+                                    </div>
                                 </div>
                                 <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                    <div class="font-semibold text-xs text-red-700 w-full"
-                                        @click="deleteFamiliarFromList(rowIndex)">
-                                        E L I M I N A R
+                                    <div class="font-semibold text-xs text-red-700 w-full" @click="deleteFamiliarFromList(rowIndex)">
+                                        ELIMINAR
                                     </div>
                                 </div>
                             </DropDownOptions>
@@ -642,7 +642,7 @@ export default {
             /* if (this.totalPorcentajeAsignado > 100) {
                 // Calcular el excedente
                 const ajuste = parseInt(this.totalPorcentajeAsignado) - 100;
-        
+
                 // Ajustar los porcentajes de las filas diferentes a la actual
                 this.dataSent.dataRow.forEach((obj, index) => {
                     if (index !== rowIndex) {
