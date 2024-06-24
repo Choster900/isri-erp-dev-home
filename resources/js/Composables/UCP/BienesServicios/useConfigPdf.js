@@ -229,7 +229,7 @@ export const useConfigPdf = (
                 // Crear un enlace temporal y simular un clic para descargar el archivo
                 const link = document.createElement("a");
                 link.href = url;
-                link.setAttribute("download", "REPORTE_CONSUMO_" + moment().format('L') + ".xlsx"); // Nombre del archivo deseado
+                link.setAttribute("download", "CONTRATO DE BIENES Y SERVICIOS " + moment().format('L') + ".xlsx"); // Nombre del archivo deseado
                 document.body.appendChild(link);
                 link.click();
 
