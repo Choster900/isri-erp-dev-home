@@ -143,8 +143,8 @@ import axios from 'axios';
                         </div>
                     </div>
                 </div>
-                <div class="sidebar-style-isri" style="overflow-x:auto; max-height: 435px; max-width: 800px;">
-                    <table class="table-auto">
+                <div class="">
+                    <table class="table-auto w-full">
                         <thead class="text-xs uppercase text-white bg-[#001b47]   border-slate-200 sticky top-0">
                             <tr>
                                 <th class="px-4 py-3 w-[1px]  rounded-tl-2xl">
@@ -163,13 +163,13 @@ import axios from 'axios';
                                     <div class="font-medium text-center w-40 text-[12px]">DETALLE</div>
                                 </th>
                                 <th class="px-4 py-2 min-w-20 max-w-20 ">
-                                    <div class="font-medium text-center w-10 text-[12px]">FECHA</div>
+                                    <div class="font-medium text-center text-[12px]">FECHA</div>
                                 </th>
-                                <th class="px-4 py-2  min-w-10 max-w-10 ">
-                                    <div class="font-medium text-center w-20  text-[12px]">RETENCIONES</div>
+                                <th class="px-4 py-2 ">
+                                    <div class="font-medium text-center text-[12px] ">RETENCION</div>
                                 </th>
-                                <th class="px-4 py-2 min-w-10 max-w-10 rounded-tr-2xl">
-                                    <div class="font-medium text-center w-20 text-[12px]">MONTO</div>
+                                <th class="px-4 py-2 rounded-tr-2xl">
+                                    <div class="font-medium text-center text-[12px] ">MONTO</div>
                                 </th>
                             </tr>
                         </thead>
