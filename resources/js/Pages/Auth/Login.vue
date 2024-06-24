@@ -59,7 +59,8 @@ const submit = () => {
                                 <input v-if="showPassword" type="text" v-model="form.password" id="password"
                                     placeholder="Contraseña"
                                     class="w-full pr-12 input flex px-3 py-2 md:px-4 md:py-3 border-2 border-black rounded-lg font-medium placeholder:font-normal" />
-                                <input v-else type="password" v-model="form.password" id="password" placeholder="Contraseña"
+                                <input v-else type="password"     autocomplete="current-password"
+                                v-model="form.password" id="password" placeholder="Contraseña"
                                     class="w-full pr-12 input flex px-3 py-2 md:px-4 md:py-3 border-2 border-black rounded-lg font-medium placeholder:font-normal">
                                 <div class="cursor-pointer no-select absolute inset-y-0 right-0 flex items-center px-4 focus:outline-none"
                                     @click="toggleShow">
