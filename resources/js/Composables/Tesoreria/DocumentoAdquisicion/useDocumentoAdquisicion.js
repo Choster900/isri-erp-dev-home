@@ -55,7 +55,7 @@ export const useDocumentoAdquisicion = (context) => {
             name: '',
             has_quedan: '',
             selected: false,
-            deleted: false
+            deleted: false,
         }
     )
     const config = {
@@ -308,6 +308,8 @@ export const useDocumentoAdquisicion = (context) => {
 
     const saveDocAdquisicion = async (doc, url) => {
         isLoadingRequest.value = true;
+
+        doc.comesFrom = window.location.href.split('/')[3];
         await axios
             .post(url, doc)
             .then((response) => {

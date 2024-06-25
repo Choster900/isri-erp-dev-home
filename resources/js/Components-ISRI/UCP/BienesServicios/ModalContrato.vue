@@ -622,7 +622,7 @@ table.sheet0 col.col0 {
 }
 
 table.sheet0 col.col1 {
-    width: 281.06666592pt
+    width: 581.06666592pt
 }
 
 /* Define las clases de animación */
