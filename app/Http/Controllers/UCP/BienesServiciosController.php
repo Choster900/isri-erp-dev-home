@@ -126,9 +126,9 @@ class BienesServiciosController extends Controller
             $fechaActual = now();
             $totCostoProdAdquisicion = 0; // Variable para almacenar la el total
 
-            foreach ($detalles as $detalle) {
+            foreach ( $detalles as $detalle ) {
                 if ($detalle["estadoLt"] != 0) {
-                    foreach ($detalle["detalleDoc"] as $detalleProducto) {
+                    foreach ( $detalle["detalleDoc"] as $detalleProducto ) {
                         if ($detalleProducto["estadoProdAdquisicion"] == 1) {
                             $nuevoDetalle = [
                                 'id_producto'                  => $detalleProducto["idProducto"],
@@ -145,18 +145,18 @@ class BienesServiciosController extends Controller
                                 'ip_prod_adquisicion'          => $ip,
 
 
-                               'cant_ene_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["January"]) ? $detalleProducto["amountsPerMonthList"]["January"] : 0,
-                    'cant_feb_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["February"]) ? $detalleProducto["amountsPerMonthList"]["February"] : 0,
-                    'cant_mar_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["March"]) ? $detalleProducto["amountsPerMonthList"]["March"] : 0,
-                    'cant_abr_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["April"]) ? $detalleProducto["amountsPerMonthList"]["April"] : 0,
-                    'cant_may_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["May"]) ? $detalleProducto["amountsPerMonthList"]["May"] : 0,
-                    'cant_jun_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["June"]) ? $detalleProducto["amountsPerMonthList"]["June"] : 0,
-                    'cant_jul_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["July"]) ? $detalleProducto["amountsPerMonthList"]["July"] : 0,
-                    'cant_ago_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["August"]) ? $detalleProducto["amountsPerMonthList"]["August"] : 0,
-                    'cant_sept_prod_adquisicion'   => isset($detalleProducto["amountsPerMonthList"]["September"]) ? $detalleProducto["amountsPerMonthList"]["September"] : 0,
-                    'cant_oct_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["October"]) ? $detalleProducto["amountsPerMonthList"]["October"] : 0,
-                    'cant_nov_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["November"]) ? $detalleProducto["amountsPerMonthList"]["November"] : 0,
-                    'cant_dic_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["December"]) ? $detalleProducto["amountsPerMonthList"]["December"] : 0,
+                                'cant_ene_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["January"]) ? $detalleProducto["amountsPerMonthList"]["January"] : 0,
+                                'cant_feb_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["February"]) ? $detalleProducto["amountsPerMonthList"]["February"] : 0,
+                                'cant_mar_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["March"]) ? $detalleProducto["amountsPerMonthList"]["March"] : 0,
+                                'cant_abr_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["April"]) ? $detalleProducto["amountsPerMonthList"]["April"] : 0,
+                                'cant_may_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["May"]) ? $detalleProducto["amountsPerMonthList"]["May"] : 0,
+                                'cant_jun_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["June"]) ? $detalleProducto["amountsPerMonthList"]["June"] : 0,
+                                'cant_jul_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["July"]) ? $detalleProducto["amountsPerMonthList"]["July"] : 0,
+                                'cant_ago_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["August"]) ? $detalleProducto["amountsPerMonthList"]["August"] : 0,
+                                'cant_sept_prod_adquisicion'   => isset($detalleProducto["amountsPerMonthList"]["September"]) ? $detalleProducto["amountsPerMonthList"]["September"] : 0,
+                                'cant_oct_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["October"]) ? $detalleProducto["amountsPerMonthList"]["October"] : 0,
+                                'cant_nov_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["November"]) ? $detalleProducto["amountsPerMonthList"]["November"] : 0,
+                                'cant_dic_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["December"]) ? $detalleProducto["amountsPerMonthList"]["December"] : 0,
                             ];
                             // Sumando el total
                             $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
@@ -196,42 +196,42 @@ class BienesServiciosController extends Controller
             $fechaActual = now();
             $totCostoProdAdquisicion = 0; // Variable para almacenar la el total
 
-            foreach ($detalles as $detalle) {
+            foreach ( $detalles as $detalle ) {
                 // Verificar si la linea de trabajo del producto adquisicion no ha sido eliminada en el front
                 if ($detalle["estadoLt"] != 0) {
-                    foreach ($detalle["detalleDoc"] as $detalleProducto) {
+                    foreach ( $detalle["detalleDoc"] as $detalleProducto ) {
                         // Actualizar producto existente
                         if ($detalleProducto["estadoProdAdquisicion"] == 2) {
                             ProductoAdquisicion::where([
                                 'id_prod_adquisicion' => $detalleProducto["idProdAdquisicion"],
                                 'id_lt'               => $detalle["idLt"],
                             ])->update([
-                                // Actualizar campos del producto
-                                'id_producto'                  => $detalleProducto["idProducto"],
-                                'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
-                                'id_marca'                     => $detalleProducto["idMarca"],
-                                'id_lt'                        => $detalle["idLt"],
-                                'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
-                                'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
-                                'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
-                                'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
-                                'estado_prod_adquisicion'      => 1,
-                                'fecha_reg_prod_adquisicion'   => $fechaActual,
-                                'usuario_prod_adquisicion'     => $usuario,
-                                'ip_prod_adquisicion'          => $ip,
-                              'cant_ene_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["January"]) ? $detalleProducto["amountsPerMonthList"]["January"] : 0,
-                    'cant_feb_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["February"]) ? $detalleProducto["amountsPerMonthList"]["February"] : 0,
-                    'cant_mar_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["March"]) ? $detalleProducto["amountsPerMonthList"]["March"] : 0,
-                    'cant_abr_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["April"]) ? $detalleProducto["amountsPerMonthList"]["April"] : 0,
-                    'cant_may_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["May"]) ? $detalleProducto["amountsPerMonthList"]["May"] : 0,
-                    'cant_jun_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["June"]) ? $detalleProducto["amountsPerMonthList"]["June"] : 0,
-                    'cant_jul_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["July"]) ? $detalleProducto["amountsPerMonthList"]["July"] : 0,
-                    'cant_ago_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["August"]) ? $detalleProducto["amountsPerMonthList"]["August"] : 0,
-                    'cant_sept_prod_adquisicion'   => isset($detalleProducto["amountsPerMonthList"]["September"]) ? $detalleProducto["amountsPerMonthList"]["September"] : 0,
-                    'cant_oct_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["October"]) ? $detalleProducto["amountsPerMonthList"]["October"] : 0,
-                    'cant_nov_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["November"]) ? $detalleProducto["amountsPerMonthList"]["November"] : 0,
-                    'cant_dic_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["December"]) ? $detalleProducto["amountsPerMonthList"]["December"] : 0,
-                            ]);
+                                        // Actualizar campos del producto
+                                        'id_producto'                  => $detalleProducto["idProducto"],
+                                        'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
+                                        'id_marca'                     => $detalleProducto["idMarca"],
+                                        'id_lt'                        => $detalle["idLt"],
+                                        'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
+                                        'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
+                                        'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
+                                        'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
+                                        'estado_prod_adquisicion'      => 1,
+                                        'fecha_reg_prod_adquisicion'   => $fechaActual,
+                                        'usuario_prod_adquisicion'     => $usuario,
+                                        'ip_prod_adquisicion'          => $ip,
+                                        'cant_ene_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["January"]) ? $detalleProducto["amountsPerMonthList"]["January"] : 0,
+                                        'cant_feb_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["February"]) ? $detalleProducto["amountsPerMonthList"]["February"] : 0,
+                                        'cant_mar_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["March"]) ? $detalleProducto["amountsPerMonthList"]["March"] : 0,
+                                        'cant_abr_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["April"]) ? $detalleProducto["amountsPerMonthList"]["April"] : 0,
+                                        'cant_may_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["May"]) ? $detalleProducto["amountsPerMonthList"]["May"] : 0,
+                                        'cant_jun_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["June"]) ? $detalleProducto["amountsPerMonthList"]["June"] : 0,
+                                        'cant_jul_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["July"]) ? $detalleProducto["amountsPerMonthList"]["July"] : 0,
+                                        'cant_ago_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["August"]) ? $detalleProducto["amountsPerMonthList"]["August"] : 0,
+                                        'cant_sept_prod_adquisicion'   => isset($detalleProducto["amountsPerMonthList"]["September"]) ? $detalleProducto["amountsPerMonthList"]["September"] : 0,
+                                        'cant_oct_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["October"]) ? $detalleProducto["amountsPerMonthList"]["October"] : 0,
+                                        'cant_nov_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["November"]) ? $detalleProducto["amountsPerMonthList"]["November"] : 0,
+                                        'cant_dic_prod_adquisicion'    => isset($detalleProducto["amountsPerMonthList"]["December"]) ? $detalleProducto["amountsPerMonthList"]["December"] : 0,
+                                    ]);
 
                             // Sumando el total
                             $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
@@ -264,20 +264,20 @@ class BienesServiciosController extends Controller
                                 'id_prod_adquisicion' => $detalleProducto["idProdAdquisicion"],
                                 'id_lt'               => $detalle["idLt"],
                             ])->update([
-                                'estado_prod_adquisicion' => 0,
-                            ]);
+                                        'estado_prod_adquisicion' => 0,
+                                    ]);
                         }
                     }
                 }
                 // Desactivar los productos adquisiciones por linea de trabajo
                 else {
-                    foreach ($detalle["detalleDoc"] as $detalleProducto) {
+                    foreach ( $detalle["detalleDoc"] as $detalleProducto ) {
                         ProductoAdquisicion::where([
                             'id_prod_adquisicion' => $detalleProducto["idProdAdquisicion"],
                             'id_lt'               => $detalle["idLt"],
                         ])->update([
-                            'estado_prod_adquisicion' => 0,
-                        ]);
+                                    'estado_prod_adquisicion' => 0,
+                                ]);
                     }
                 }
             }
@@ -307,7 +307,10 @@ class BienesServiciosController extends Controller
         $query = DetDocumentoAdquisicion::with([
             "documento_adquisicion.proveedor",
             "documento_adquisicion.proceso_compra"
-        ])->where("estado_det_doc_adquisicion", 1)->whereDoesntHave("productos_adquisiciones");
+        ])
+            ->where("estado_det_doc_adquisicion", 1)
+            ->where("visible_ucp_doc_adquisicion", 1)
+            ->whereDoesntHave("productos_adquisiciones");
 
         // Si el tipo de documento es "contrato", añadir una condición adicional a la consulta
         if ($request->tipoDoc == "contrato") {
@@ -394,13 +397,13 @@ class BienesServiciosController extends Controller
         $sheet->getStyle('A2')->getFill()->getStartColor()->setARGB('244062'); // Azul, énfasis 1, oscuro 50%
 
 
-       // Obtener el número de documento de adquisición
-    $docAdquisicion = collect($request->arrayDocAdquisicion)->firstWhere('value', $request->idDetDocAdquisicion);
-    $numeroDocAdquisicion = $docAdquisicion['dataDoc']['documento_adquisicion']['numero_doc_adquisicion'] ?? '-';
+        // Obtener el número de documento de adquisición
+        $docAdquisicion = collect($request->arrayDocAdquisicion)->firstWhere('value', $request->idDetDocAdquisicion);
+        $numeroDocAdquisicion = $docAdquisicion['dataDoc']['documento_adquisicion']['numero_doc_adquisicion'] ?? '-';
 
-    $sheet->setCellValue('C4', ':' . $numeroDocAdquisicion);
-    $sheet->getStyle('C4')->getFont()->setName('Cambria')->setSize(10);
-    $sheet->getStyle('C4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet->setCellValue('C4', ':' . $numeroDocAdquisicion);
+        $sheet->getStyle('C4')->getFont()->setName('Cambria')->setSize(10);
+        $sheet->getStyle('C4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         // Obtener el valor correspondiente a idDetDocAdquisicion
         $docAdquisicion = collect($request->arrayDocAdquisicion)->firstWhere('value', $request->idDetDocAdquisicion);
@@ -418,17 +421,51 @@ class BienesServiciosController extends Controller
 
         // Encabezados
         $encabezados = [
-            'PRODUCTO', 'MARCA', 'DESCRIPCIÓN', 'CENTRO', 'CANTIDAD', 'PRECIO UNITARIO', 'VALOR TOTAL',
-            'DISTRIBUCIÓN MENSUAL', '', '', '', '', '', '', '', '', '', '', '', ''
+            'PRODUCTO',
+            'MARCA',
+            'DESCRIPCIÓN',
+            'CENTRO',
+            'CANTIDAD',
+            'PRECIO UNITARIO',
+            'VALOR TOTAL',
+            'DISTRIBUCIÓN MENSUAL',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            ''
         ];
 
         $sheet->fromArray([$encabezados], null, 'A8');
 
         // Sub-encabezados para los meses
         $meses = [
-            '', '', '', '', '', '', '',
-            'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE',
-            'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            'ENERO',
+            'FEBRERO',
+            'MARZO',
+            'ABRIL',
+            'MAYO',
+            'JUNIO',
+            'JULIO',
+            'AGOSTO',
+            'SEPTIEMBRE',
+            'OCTUBRE',
+            'NOVIEMBRE',
+            'DICIEMBRE'
         ];
 
         $sheet->fromArray([$meses], null, 'A9');
@@ -455,19 +492,19 @@ class BienesServiciosController extends Controller
         $styleHeader = ['font' => ['bold' => true, 'size' => 9]];
         $sheet->getStyle('A8:J8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        foreach (range('A', 'J') as $column) {
+        foreach ( range('A', 'J') as $column ) {
             $sheet->getStyle($column . '8')->applyFromArray($styleHeader);
             $sheet->getStyle($column . '8')->getAlignment()->setWrapText(true);
         }
 
 
         // Combinar celdas de la columna A a la G para las filas 8 y 9
-        foreach (range('A', 'G') as $column) {
+        foreach ( range('A', 'G') as $column ) {
             $sheet->mergeCells($column . '8:' . $column . '9');
         }
 
         // Aplicar fuente "Calibri Light" y tamaño 10 a las filas 8 y 9
-        foreach (range('A', 'S') as $column) {
+        foreach ( range('A', 'S') as $column ) {
             $sheet->getStyle($column . '8:' . $column . '9')->getFont()->setName('Calibri Light')->setSize(10);
             $sheet->getStyle($column . '8')->getFill()->setFillType(Fill::FILL_SOLID);
             $sheet->getStyle($column . '8')->getFill()->getStartColor()->setARGB('D9E1F2'); // Azul, énfasis 1, oscuro 50%
@@ -478,8 +515,8 @@ class BienesServiciosController extends Controller
 
         $row = 10; // Comenzar desde la fila 10 para los datos
 
-        foreach ($request->arrayProductoAdquisicion as $data) {
-            foreach ($data["detalleDoc"] as $value) {
+        foreach ( $request->arrayProductoAdquisicion as $data ) {
+            foreach ( $data["detalleDoc"] as $value ) {
                 $sheet->setCellValue('A' . $row, $value["detalleProducto"]);
 
                 // Encontrar la marca correspondiente
@@ -515,7 +552,7 @@ class BienesServiciosController extends Controller
                 $sheet->setCellValue('R' . $row, $value["amountsPerMonthList"]["November"]);
                 $sheet->setCellValue('S' . $row, $value["amountsPerMonthList"]["December"]);
 
-                foreach (range('A', 'S') as $column) {
+                foreach ( range('A', 'S') as $column ) {
                     $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true)->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
                 }
 
@@ -530,7 +567,7 @@ class BienesServiciosController extends Controller
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['argb' => '000000'],
+                    'color'       => ['argb' => '000000'],
                 ],
             ],
         ];
