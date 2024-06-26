@@ -459,7 +459,7 @@ export const useRecepcion = (context) => {
             ? (prodProcedure.cant_prod_adquisicion * prodProcedure.costo_prod_adquisicion) - acumulado
             : prodProcedure.cant_prod_adquisicion - acumulado;
 
-        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal).toFixed(2) : qtyTotal;
+        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal).toFixed(2) : recDocument.value.prods[indexLt].productos[index].fractionated ? qtyTotal.toFixed(2) : qtyTotal;
 
         recDocument.value.prods[indexLt].productos[index].avails = formattedQtyTotal;
 
