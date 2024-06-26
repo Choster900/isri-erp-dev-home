@@ -60,7 +60,7 @@ export const useRecepcion = (context) => {
         formatDateVue3DP
     } = useFormatDateTime()
 
-    const { round2Decimals } = useToCalculate();
+    const { round2Decimals, downwardRounding } = useToCalculate();
 
     const getInfoForModalRecep = async (id) => {
         if (id > 0) {
@@ -548,27 +548,6 @@ export const useRecepcion = (context) => {
     const showErrorMessage = (err) => {
         const { title, text, icon } = useHandleError(err);
         swal({ title: title, text: text, icon: icon, timer: 5000 });
-    };
-
-    const downwardRounding = (amount) => {
-        // Convertimos a un número de 4 decimales
-        const number = parseFloat(amount.toFixed(4));
-
-        // Obtenemos la parte fraccionaria
-        const fractionalPart = number - Math.floor(number);
-
-        // Convertimos la parte fraccionaria a una cadena
-        const fractionalStr = fractionalPart.toFixed(4).substring(2); // Obtenemos los decimales como cadena
-
-        // Obtenemos los terceros y cuartos decimales
-        const thirdAndFourthDecimals = parseInt(fractionalStr.substring(2, 4), 10);
-
-        // Verificamos si los decimales tercero y cuarto son mayores a 50
-        if (thirdAndFourthDecimals > 50) {
-            return (Math.ceil(number * 100) / 100).toFixed(2); // Redondea al alza
-        } else {
-            return (Math.floor(number * 100) / 100).toFixed(2); // Redondea a la baja
-        }
     };
 
     const activeDetails = computed(() => {

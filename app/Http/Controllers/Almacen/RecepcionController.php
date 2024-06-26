@@ -785,14 +785,22 @@ class RecepcionController extends Controller
             foreach ($detallesAgrupados as $lineaTrabajo => $detalles) {
                 $total = 0;
                 foreach ($detalles as $detalle) {
-                    $total += $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
+                    $res = 0;
+                    $costXQty = $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
+                    if ($detalle->producto->fraccionado_producto) {
+                        $res = downwardRounding($costXQty);
+                    } else {
+                        $res = round($costXQty, 4);
+                    }
+                    $total += $res;
                 }
                 // Agregar los campos comunes
                 $detallesFormateados[] = [
                     'codigo_up_lt' => $detalles->first()->linea_trabajo->codigo_up_lt,
                     'nombre_up_lt' => $detalles->first()->linea_trabajo->nombre_lt,
                     'id_lt' => $detalles->first()->id_lt,
-                    'total' => number_format($total, 2), // Formatear total
+                    'total' => $total,
+                    //'total' => number_format($total, 2), // Formatear total
                     'productos' => $detalles->toArray(),
                 ];
             }
@@ -809,17 +817,25 @@ class RecepcionController extends Controller
 
                     // Calcular la suma de las cantidades multiplicadas por el costo de los detalles
                     $total = $det->sum(function ($detalle) {
-                        return $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
+                        $res = 0;
+                        $costXQty = $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
+                        if ($detalle->producto->fraccionado_producto) {
+                            $res = downwardRounding($costXQty);
+                        } else {
+                            $res = round($costXQty, 4);
+                        }
+                        return $res;
                     });
 
                     // Agregar los campos comunes
                     $detallesFormateadosByEsp[] = [
                         'codigo_up_lt' => $primerDetalle->linea_trabajo->codigo_up_lt,
                         'nombre_up_lt' => $primerDetalle->linea_trabajo->nombre_lt,
-                        'id_ccta_presupuestal' => $primerDetalle->producto->catalogo_cta_presupuestal->codigo_cta_presupuestal,
+                        'id_ccta_presupuestal' => $primerDetalle->producto->catalogo_cta_presupuestal->codigo_ccta_presupuestal,
                         'nombre_ccta_presupuestal' => $primerDetalle->producto->catalogo_cta_presupuestal->nombre_ccta_presupuestal,
                         'id_lt' => $primerDetalle->id_lt,
-                        'total' => number_format($total, 2), //Formatear total
+                        'total' => $total,
+                        //'total' => number_format($total, 2), //Formatear total
                         //'productos' => $det->toArray(),
                     ];
                 }
@@ -836,7 +852,6 @@ class RecepcionController extends Controller
             return response()->json(['logical_error' => 'Error, la recepcion ha cambiado de estado.'], 422);
         }
     }
-
 
     function getPendingItems($byMonto, $reception)
     {
