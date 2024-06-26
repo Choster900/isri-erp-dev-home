@@ -272,7 +272,7 @@ export const useRecepcion = (context) => {
         initial: selectedProd.total_menos_acumulado, //Represents the initial availability of a product
         initialAmount: selectedProd.total_menos_acumulado_monto, //Represents available money
     });
-    
+
     const addProdToLineOfWork = (lineOfWork, array) => {
         lineOfWork.isOpen = true;
         lineOfWork.productos.push(array);
@@ -281,7 +281,7 @@ export const useRecepcion = (context) => {
             index: lineOfWork.productos.length - 1,
         };
     };
-    
+
     const createNewLineOfWork = (selectedProd, array) => {
         recDocument.value.prods.push({
             id_lt: selectedProd.id_lt,
@@ -290,38 +290,38 @@ export const useRecepcion = (context) => {
             isOpen: true,
             productos: [array],
         });
-    
+
         recDocument.value.prods.sort((a, b) => a.id_lt - b.id_lt);
-    
+
         return {
             indexLt: recDocument.value.prods.findIndex(e => e.id_lt === selectedProd.id_lt),
             index: 0,
         };
     };
-    
+
     const setProdItem = (paId) => {
         if (!paId) {
             useShowToast(toast.info, "Debes elegir un producto de la lista.");
             return;
         }
-    
+
         const selectedProd = products.value.find(element => element.value === paId);
-    
+
         if (!selectedProd) {
             useShowToast(toast.error, "Producto no encontrado.");
             return;
         }
-    
+
         const array = createProdArray(selectedProd, paId);
-    
+
         const lineOfWork = recDocument.value.prods.find(group => group.id_lt === selectedProd.id_lt);
-    
+
         const { indexLt, index } = lineOfWork
             ? addProdToLineOfWork(lineOfWork, array)
             : createNewLineOfWork(selectedProd, array);
-    
+
         scrollToElement(`lt-${indexLt}prod-${index}`, 'smooth', 'end', true);
-    
+
         recDocument.value.detStockId = '';
     };
 
@@ -551,8 +551,25 @@ export const useRecepcion = (context) => {
     };
 
     const downwardRounding = (amount) => {
-        return (Math.floor(amount * 100) / 100).toFixed(2);
-    }
+        // Convertimos a un número de 4 decimales
+        const number = parseFloat(amount.toFixed(4));
+
+        // Obtenemos la parte fraccionaria
+        const fractionalPart = number - Math.floor(number);
+
+        // Convertimos la parte fraccionaria a una cadena
+        const fractionalStr = fractionalPart.toFixed(4).substring(2); // Obtenemos los decimales como cadena
+
+        // Obtenemos los terceros y cuartos decimales
+        const thirdAndFourthDecimals = parseInt(fractionalStr.substring(2, 4), 10);
+
+        // Verificamos si los decimales tercero y cuarto son mayores a 50
+        if (thirdAndFourthDecimals > 50) {
+            return (Math.ceil(number * 100) / 100).toFixed(2); // Redondea al alza
+        } else {
+            return (Math.floor(number * 100) / 100).toFixed(2); // Redondea a la baja
+        }
+    };
 
     const activeDetails = computed(() => {
         // Filtrar los productos no eliminados dentro de todos los grupos
