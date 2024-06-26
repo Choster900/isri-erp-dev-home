@@ -156,7 +156,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
 
                 // Actualiza el peso del producto en arrayProductoAdquisicion
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].pesoProducto = unidad_medida.id_unidad_medida;
-                arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].detalleProducto = nombre_completo_producto + ' - ' + unidad_medida.nombre_unidad_medida;
+                arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].detalleProducto = id_ccta_presupuestal + '-' + nombre_completo_producto + ' - ' + unidad_medida.nombre_unidad_medida;
 
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].especifico = id_ccta_presupuestal;
 

@@ -156,10 +156,7 @@ export default {
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
-
-                                    <!--     {{ requ.linea_trabajo["nombre_lt"] }} -->
                                     {{ requ.linea_trabajo?.nombre_lt }}
-
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
@@ -172,11 +169,15 @@ export default {
                                     {{ requ.fecha_requerimiento }}
                                 </div>
                             </td>
-
-
-                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[2%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ requ.estado_requerimiento.nombre_estado_req }}
+                                    <div :class="{
+                                            'text-green-600 bg-green-200': requ.id_estado_req === 1,
+                                            'bg-blue-300 text-blue-600': requ.id_estado_req === 2,
+                                            'text-red-600 bg-red-300': requ.id_estado_req === 3
+                                        }" class="inline-flex font-medium rounded-full text-center px-1.5 py-.5">
+                                        {{ requ.estado_requerimiento.nombre_estado_req }}
+                                    </div>
                                 </div>
                             </td>
                             <td class="first:pl-5 last:pr-5">
@@ -186,13 +187,12 @@ export default {
                                             @click.stop="objectRequerimientoToSendModal = requ; showModalRequerimientoAlmacen = !showModalRequerimientoAlmacen">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="w-6 h-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+                                                        fill="currentColor" class="size-5">
+                                                        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
+                                                        <path fill-rule="evenodd"
+                                                            d="M1.38 8.28a.87.87 0 0 1 0-.566 7.003 7.003 0 0 1 13.238.006.87.87 0 0 1 0 .566A7.003 7.003 0 0 1 1.379 8.28ZM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                                            clip-rule="evenodd" />
                                                     </svg>
 
                                                 </span>
@@ -203,16 +203,15 @@ export default {
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="requ.id_estado_req == 1"
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 2)">
-                                            <div class="w-8 text-blue-900">
+                                            <div class="w-8 text-indigo-700">
                                                 <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="w-6 h-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+                                                        fill="currentColor" class="size-5">
+                                                        <path fill-rule="evenodd"
+                                                            d="M4 2a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5V6.621a1.5 1.5 0 0 0-.44-1.06L9.94 2.439A1.5 1.5 0 0 0 8.878 2H4Zm6.713 4.16a.75.75 0 0 1 .127 1.053l-2.75 3.5a.75.75 0 0 1-1.078.106l-1.75-1.5a.75.75 0 1 1 .976-1.138l1.156.99L9.66 6.287a.75.75 0 0 1 1.053-.127Z"
+                                                            clip-rule="evenodd" />
                                                     </svg>
+
                                                 </span>
                                             </div>
                                             <div class="font-semibold">Aprobar</div>
@@ -222,18 +221,17 @@ export default {
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="requ.id_estado_req == 2 && canSaveReq == true"
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 3)">
-                                            <div class="w-8 text-blue-900">
-                                                <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="w-6 h-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                    </svg>
+                                            <div class="w-8 text-indigo-700">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+                                                    fill="currentColor" class="size-5">
+                                                    <path fill-rule="evenodd"
+                                                        d="M11.986 3H12a2 2 0 0 1 2 2v6a2 2 0 0 1-1.5 1.937V7A2.5 2.5 0 0 0 10 4.5H4.063A2 2 0 0 1 6 3h.014A2.25 2.25 0 0 1 8.25 1h1.5a2.25 2.25 0 0 1 2.236 2ZM10.5 4v-.75a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75V4h3Z"
+                                                        clip-rule="evenodd" />
+                                                    <path fill-rule="evenodd"
+                                                        d="M2 7a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7Zm6.585 1.08a.75.75 0 0 1 .336 1.005l-1.75 3.5a.75.75 0 0 1-1.16.234l-1.75-1.5a.75.75 0 0 1 .977-1.139l1.02.875 1.321-2.64a.75.75 0 0 1 1.006-.336Z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
 
-                                                </span>
                                             </div>
                                             <div class="font-semibold">Despachar</div>
                                         </div>
@@ -241,20 +239,19 @@ export default {
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="requ.id_estado_req == 1 || requ.id_estado_req == 2"
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 4)">
-                                            <div class="w-8 text-blue-900">
-                                                <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                        class="w-6 h-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            <div class="w-8 text-red-600">
+                                                <span class="text">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+                                                        fill="currentColor" class="size-5">
+                                                        <path fill-rule="evenodd"
+                                                            d="M4 2a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5V6.621a1.5 1.5 0 0 0-.44-1.06L9.94 2.439A1.5 1.5 0 0 0 8.878 2H4Zm7 7a.75.75 0 0 1-.75.75h-4.5a.75.75 0 0 1 0-1.5h4.5A.75.75 0 0 1 11 9Z"
+                                                            clip-rule="evenodd" />
                                                     </svg>
+
 
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">Eliminar</div>
+                                            <div class="font-semibold ">Eliminar</div>
                                         </div>
 
                                     </DropDownOptions>
