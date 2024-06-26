@@ -112,7 +112,7 @@
         <!-- Table body -->
         <template v-for="(lts, indexLt) in recToPrint.detalles_agrupados" :key="indexLt">
             <div class="flex  border-x border-b border-black justify-center items-center font-[MuseoSans] pb-[12px]">
-                <p class="font-[MuseoSans] font-bold text-[11px]">{{ lts.codigo_up_lt }} - ${{ lts.total }}</p>
+                <p class="font-[MuseoSans] font-bold text-[11px]">{{ lts.codigo_up_lt }} - ${{ lts.total.toFixed(2) }}</p>
             </div>
             <template v-for="(prod, index) in lts.productos" :key="index">
                 <div class="flex w-full border-x border-b border-black" style="page-break-inside: avoid;">
@@ -152,13 +152,15 @@
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
                             ${{ recToPrint.det_doc_adquisicion.documento_adquisicion.id_proceso_compra == 5 ?
                                 prod.costo_det_recepcion_pedido :
-                                round2Decimals(parseFloat(prod.costo_det_recepcion_pedido)) }}
+                                parseFloat(prod.costo_det_recepcion_pedido).toFixed(2) }}
                         </p>
                     </div>
                     <!-- Total -->
                     <div class="w-[15%] flex justify-center items-center">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            ${{ round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido) }}
+                            ${{ prod.producto.fraccionado_producto == 1 ?
+                            downwardRounding(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido)
+                            : round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido).toFixed(2) }}
                         </p>
                     </div>
                 </div>
@@ -311,7 +313,7 @@
                         <p class="text-center font-[Roboto] text-[11px] mb-[3px]">{{ esp.nombre_ccta_presupuestal }}</p>
                     </div>
                     <div class="w-full flex items-center justify-end pb-2">
-                        <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px]">${{ esp.total.replace(/,/g, '')
+                        <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px]">${{ esp.total.toFixed(2)
                             }}</p>
                     </div>
                 </div>
@@ -347,11 +349,11 @@ export default {
         }
     },
     setup(props) {
-        const { round2Decimals } = useToCalculate();
+        const { round2Decimals, downwardRounding } = useToCalculate();
 
         const calculateTotal = (lts) => {
-            const total = lts.reduce((acc, e) => acc + parseFloat(e.total.replace(/,/g, '')), 0)
-            return round2Decimals(total)
+            const total = lts.reduce((acc, e) => acc + parseFloat(e.total), 0)
+            return round2Decimals(total).toFixed(2)
         }
         const floatToInt = (value) => {
             // Primero, convertimos el valor a un número flotante
@@ -361,8 +363,9 @@ export default {
             // Devolvemos el resultado como un número entero
             return roundedValue;
         }
+
         return {
-            moment, round2Decimals, floatToInt, calculateTotal
+            moment, round2Decimals, floatToInt, calculateTotal, downwardRounding
         }
     }
 };

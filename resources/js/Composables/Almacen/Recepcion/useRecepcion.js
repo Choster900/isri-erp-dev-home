@@ -60,7 +60,7 @@ export const useRecepcion = (context) => {
         formatDateVue3DP
     } = useFormatDateTime()
 
-    const { round2Decimals } = useToCalculate();
+    const { round2Decimals, downwardRounding } = useToCalculate();
 
     const getInfoForModalRecep = async (id) => {
         if (id > 0) {
@@ -259,7 +259,7 @@ export const useRecepcion = (context) => {
         detRecId: '', //id_det_recepcion_pedido
         prodId: paId, //id_prod_adquisicion
         desc: `${selectedProd.codigo_up_lt} — ${selectedProd.codigo_centro_atencion} — ${selectedProd.codigo_producto} — ${selectedProd.nombre_completo_producto} — ${selectedProd.nombre_unidad_medida} — ${selectedProd.descripcion_prod_adquisicion}`, //Acquisition product description
-        brandId: '',
+        brandId: selectedProd.id_marca,
         brandLabel: '',
         expiryDate: '',
         perishable: selectedProd.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
@@ -272,7 +272,7 @@ export const useRecepcion = (context) => {
         initial: selectedProd.total_menos_acumulado, //Represents the initial availability of a product
         initialAmount: selectedProd.total_menos_acumulado_monto, //Represents available money
     });
-    
+
     const addProdToLineOfWork = (lineOfWork, array) => {
         lineOfWork.isOpen = true;
         lineOfWork.productos.push(array);
@@ -281,7 +281,7 @@ export const useRecepcion = (context) => {
             index: lineOfWork.productos.length - 1,
         };
     };
-    
+
     const createNewLineOfWork = (selectedProd, array) => {
         recDocument.value.prods.push({
             id_lt: selectedProd.id_lt,
@@ -290,38 +290,39 @@ export const useRecepcion = (context) => {
             isOpen: true,
             productos: [array],
         });
-    
+
         recDocument.value.prods.sort((a, b) => a.id_lt - b.id_lt);
-    
+
         return {
             indexLt: recDocument.value.prods.findIndex(e => e.id_lt === selectedProd.id_lt),
             index: 0,
         };
     };
-    
+
     const setProdItem = (paId) => {
         if (!paId) {
             useShowToast(toast.info, "Debes elegir un producto de la lista.");
             return;
         }
-    
+
         const selectedProd = products.value.find(element => element.value === paId);
-    
+
         if (!selectedProd) {
             useShowToast(toast.error, "Producto no encontrado.");
             return;
         }
-    
+
+        console.log(selectedProd);
         const array = createProdArray(selectedProd, paId);
-    
+
         const lineOfWork = recDocument.value.prods.find(group => group.id_lt === selectedProd.id_lt);
-    
+
         const { indexLt, index } = lineOfWork
             ? addProdToLineOfWork(lineOfWork, array)
             : createNewLineOfWork(selectedProd, array);
-    
+
         scrollToElement(`lt-${indexLt}prod-${index}`, 'smooth', 'end', true);
-    
+
         recDocument.value.detStockId = '';
     };
 
@@ -459,7 +460,7 @@ export const useRecepcion = (context) => {
             ? (prodProcedure.cant_prod_adquisicion * prodProcedure.costo_prod_adquisicion) - acumulado
             : prodProcedure.cant_prod_adquisicion - acumulado;
 
-        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal).toFixed(2) : qtyTotal;
+        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal).toFixed(2) : recDocument.value.prods[indexLt].productos[index].fractionated ? qtyTotal.toFixed(2) : qtyTotal;
 
         recDocument.value.prods[indexLt].productos[index].avails = formattedQtyTotal;
 
@@ -549,10 +550,6 @@ export const useRecepcion = (context) => {
         const { title, text, icon } = useHandleError(err);
         swal({ title: title, text: text, icon: icon, timer: 5000 });
     };
-
-    const downwardRounding = (amount) => {
-        return (Math.floor(amount * 100) / 100).toFixed(2);
-    }
 
     const activeDetails = computed(() => {
         // Filtrar los productos no eliminados dentro de todos los grupos
