@@ -383,7 +383,7 @@ export const useRecepcion = (context) => {
                 }
             }
         })
-        return round2Decimals(acumulado)
+        return round2Decimals(acumulado).toFixed(2)
     }
 
     const hasActiveProds = (indexLt) => {
@@ -459,7 +459,7 @@ export const useRecepcion = (context) => {
             ? (prodProcedure.cant_prod_adquisicion * prodProcedure.costo_prod_adquisicion) - acumulado
             : prodProcedure.cant_prod_adquisicion - acumulado;
 
-        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal) : qtyTotal;
+        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal).toFixed(2) : qtyTotal;
 
         recDocument.value.prods[indexLt].productos[index].avails = formattedQtyTotal;
 
@@ -550,6 +550,10 @@ export const useRecepcion = (context) => {
         swal({ title: title, text: text, icon: icon, timer: 5000 });
     };
 
+    const downwardRounding = (amount) => {
+        return (Math.floor(amount * 100) / 100).toFixed(2);
+    }
+
     const activeDetails = computed(() => {
         // Filtrar los productos no eliminados dentro de todos los grupos
         const activeProducts = recDocument.value.prods.flatMap(group => group.productos.filter(producto => !producto.deleted));
@@ -569,8 +573,8 @@ export const useRecepcion = (context) => {
                 }
             }
         }
-        recDocument.value.total = round2Decimals(sum);
-        return round2Decimals(sum);
+        recDocument.value.total = round2Decimals(sum).toFixed(2);
+        return round2Decimals(sum).toFixed(2);
     });
 
     const ordenC = computed(() => {
@@ -624,7 +628,7 @@ export const useRecepcion = (context) => {
                     }
                 } else {
                     let prevRes = prod.qty * prod.cost
-                    prod.total = prod.fractionated === 1 ? prevRes.toFixed(4) : prevRes.toFixed(2)
+                    prod.total = prod.fractionated === 1 ? downwardRounding(prevRes) : prevRes.toFixed(2)
                 }
             })
         });
