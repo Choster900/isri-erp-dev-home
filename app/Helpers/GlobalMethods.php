@@ -171,3 +171,28 @@ if (!function_exists('getMenusByUsuario')) {
         }
     }
 }
+
+if (!function_exists('downwardRounding')) {
+    function downwardRounding(float $amount)
+    {
+        // Convertimos a un número de 4 decimales
+        $number = round($amount, 4);
+
+        // Obtenemos la parte fraccionaria
+        $fractionalPart = $number - floor($number);
+
+        // Convertimos la parte fraccionaria a una cadena
+        $fractionalStr = sprintf("%.4f", $fractionalPart);
+        $fractionalStr = substr($fractionalStr, 2); // Obtenemos los decimales como cadena
+
+        // Obtenemos los terceros y cuartos decimales
+        $thirdAndFourthDecimals = intval(substr($fractionalStr, 2, 2));
+
+        // Verificamos si los decimales tercero y cuarto son mayores a 50
+        if ($thirdAndFourthDecimals > 50) {
+            return number_format(ceil($number * 100) / 100, 2);
+        } else {
+            return number_format(floor($number * 100) / 100, 2);
+        }
+    }
+}
