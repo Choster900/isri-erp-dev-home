@@ -1,14 +1,13 @@
 import { ref, inject, computed, nextTick, watch } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
+import { useToCalculate } from '@/Composables/General/useToCalculate.js';
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
-//import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
 import _ from "lodash";
-//moment.locale('es', localeData)
 
 export const useDonacion = (context) => {
     const swal = inject("$swal");
@@ -43,6 +42,8 @@ export const useDonacion = (context) => {
     const {
         validateInput
     } = useValidateInput()
+
+    const { round2Decimals } = useToCalculate();
 
     const handleValidation = (input, validation, element) => {
         if (element) {
@@ -335,7 +336,8 @@ export const useDonacion = (context) => {
     watch(donInfo, (newValue) => {
         newValue.prods.forEach((prod) => {
             let prevRes = prod.qty * prod.cost
-            prod.total = prod.fractionated === 1 ? prevRes.toFixed(4) : prevRes.toFixed(2)
+            //prod.total = prod.fractionated === 1 ? prevRes.toFixed(4) : prevRes.toFixed(2)
+            prod.total = round2Decimals(prevRes).toFixed(2) 
         });
     }, { deep: true });
 

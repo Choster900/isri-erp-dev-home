@@ -4,6 +4,7 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
+import { useToCalculate } from '@/Composables/General/useToCalculate.js';
 import { toast } from "vue3-toastify";
 import _ from "lodash";
 
@@ -57,6 +58,14 @@ export const useAjusteEntrada = (context) => {
         validateInput
     } = useValidateInput()
 
+    /**
+    * Utility method to round to 2 decimals
+    *
+    * @function validateInput
+    * @param {String} amount - The amount to round.
+    * @returns {String} The rounded amount
+    */
+    const { round2Decimals } = useToCalculate();
 
     /**
     * Handles input validation, optionally targeting a specific element within an array of inputs.
@@ -75,7 +84,6 @@ export const useAjusteEntrada = (context) => {
             adjustment.value[input] = validateInput(adjustment.value[input], validation)
         }
     }
-
 
     /**
     * Retrieves initial information to populate the adjustment modal based on the given ID.
@@ -586,9 +594,9 @@ export const useAjusteEntrada = (context) => {
             }
         }
         // Set the total amount in the adjustment object
-        adjustment.value.total = sum.toFixed(2);
+        adjustment.value.total = round2Decimals(sum).toFixed(2);
         // Return the computed total amount
-        return sum.toFixed(2);
+        return round2Decimals(sum).toFixed(2);
     });
 
     /**

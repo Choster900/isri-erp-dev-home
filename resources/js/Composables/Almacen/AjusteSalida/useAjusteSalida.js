@@ -4,6 +4,7 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
+import { useToCalculate } from '@/Composables/General/useToCalculate.js';
 import moment from 'moment';
 import _ from "lodash";
 
@@ -39,6 +40,8 @@ export const useAjusteSalida = (context) => {
         status: '',
         prods: []
     })
+
+    const { round2Decimals } = useToCalculate();
 
     const getInfoForModalAdjustment = async (id) => {
         try {
@@ -84,8 +87,6 @@ export const useAjusteSalida = (context) => {
             load.value++
             products.value = data.products
             filteredOptions.value = data.products
-
-            console.log(data.products);
 
             // Iterate over detalle_requerimiento
             req.detalles_requerimiento.forEach(element => {
@@ -397,8 +398,10 @@ export const useAjusteSalida = (context) => {
                 }
             }
         }
-        adjustment.value.total = sum.toFixed(2);
-        return sum.toFixed(2);
+        // Set the total amount in the adjustment object
+        adjustment.value.total = round2Decimals(sum).toFixed(2);
+        // Return the computed total amount
+        return round2Decimals(sum).toFixed(2);
     });
 
     const activeDetails = computed(() => {
