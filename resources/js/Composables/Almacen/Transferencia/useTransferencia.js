@@ -4,6 +4,7 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
+import { useToCalculate } from '@/Composables/General/useToCalculate.js';
 import _ from "lodash";
 
 export const useTransferencia = (context) => {
@@ -39,6 +40,8 @@ export const useTransferencia = (context) => {
         status: '',
         prods: []
     })
+
+    const { round2Decimals } = useToCalculate();
 
     const getInfoForModalTransfers = async (id) => {
         try {
@@ -393,8 +396,10 @@ export const useTransferencia = (context) => {
                 }
             }
         }
-        adjustment.value.total = sum.toFixed(2);
-        return sum.toFixed(2);
+        // Set the total amount in the adjustment object
+        adjustment.value.total = round2Decimals(sum).toFixed(2);
+        // Return the computed total amount
+        return round2Decimals(sum).toFixed(2);
     });
 
     const activeDetails = computed(() => {
