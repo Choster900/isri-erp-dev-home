@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Swal from "sweetalert2";
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import { useFileHandling } from "@/Composables/RRHH/Expediente/useFileHandling";
@@ -325,7 +325,31 @@ export const useArchivoAnexo = () => {
     }
 
 
+    const annexTypeData = ref([])
+    /**
+     * Obtiene todos los tipos de archivos de anexos desde la API.
+     * @returns Promesa que se resuelve con la respuesta de la API.
+     */
+    const getAllTipoArchivoAnexos = async () => {
+        try {
+            const resp = await axios.get("/getAllTipoArchivoAnexos");
+            // Inicializa los estados con la respuesta de la API
+            annexTypeData.value = resp.data;
+            return resp;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+
+    // Se ejecuta al montar el componente para obtener los tipos de archivos de anexos
+    onMounted(async () => {
+        await getAllTipoArchivoAnexos();
+    });
+
+
     return {
+        annexTypeData,
         downloadFile,
         openInNewTab,
         onClickForEditFile,
