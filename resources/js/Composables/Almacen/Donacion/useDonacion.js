@@ -270,9 +270,14 @@ export const useDonacion = (context) => {
     }, 350);
 
     const selectProv = (id) => {
-        const selectedProv = suppliers.value.find((e) => e.value == id);
-        donInfo.value.nit = selectedProv.nit_proveedor
-        donInfo.value.dui = selectedProv.dui_proveedor
+        if (id) {
+            const selectedProv = suppliers.value.find((e) => e.value == id);
+            donInfo.value.nit = selectedProv.nit_proveedor
+            donInfo.value.dui = selectedProv.dui_proveedor
+        }else{
+            donInfo.value.nit = ''
+            donInfo.value.dui = ''
+        }
     }
 
     const selectProd = (prodId) => {
@@ -300,7 +305,7 @@ export const useDonacion = (context) => {
 
             // Desplazar la pantalla hasta la última fila agregada
             nextTick(() => {
-                const newRowId = `row-${donInfo.value.prods.length-1}`;
+                const newRowId = `row-${donInfo.value.prods.length - 1}`;
                 const newRowElement = document.getElementById(newRowId);
                 if (newRowElement) {
                     newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -337,7 +342,7 @@ export const useDonacion = (context) => {
         newValue.prods.forEach((prod) => {
             let prevRes = prod.qty * prod.cost
             //prod.total = prod.fractionated === 1 ? prevRes.toFixed(4) : prevRes.toFixed(2)
-            prod.total = round2Decimals(prevRes).toFixed(2) 
+            prod.total = round2Decimals(prevRes).toFixed(2)
         });
     }, { deep: true });
 
@@ -348,7 +353,7 @@ export const useDonacion = (context) => {
 
     return {
         isLoadingRequest, errors, donInfo, suppliers, products, centers,
-        asyncFindProduct, isLoadingProduct, totalRec, brands, activeDetails, 
+        asyncFindProduct, isLoadingProduct, totalRec, brands, activeDetails,
         getInfoForModalDonation, selectProv, selectProd, returnToTop,
         deleteRow, storeReception, updateReception, handleValidation
     }
