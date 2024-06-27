@@ -119,7 +119,7 @@ class TransferenciaController extends Controller
 
             if (!$req) {
                 return response()->json([
-                    'logical_error' => 'Error, no fue posible obtener el ajuste seleccionado.',
+                    'logical_error' => 'Error, no fue posible obtener la transferencia seleccionado.',
                 ], 422);
             }
         } else { //Creating a new one
@@ -456,7 +456,7 @@ class TransferenciaController extends Controller
                 if ($backEndError) {
                     DB::rollBack(); // En caso de error, revierte las operaciones anteriores
                     return response()->json([
-                        'logical_error' => 'Uno o más productos de los que estas intentando enviar al kardex no poseen existencias suficientes para procesar la salida, por favor revisa el ajuste nuevamente.',
+                        'logical_error' => 'Uno o más productos de los que estas intentando enviar al kardex no poseen existencias suficientes para procesar la transferencia, por favor revisa la transferencia e intenta nuevamente.',
                     ], 422);
                 }
 
@@ -469,7 +469,7 @@ class TransferenciaController extends Controller
                 ], 422);
             }
             return response()->json([
-                'message'          => "Ajuste enviado al Kardex con éxito.",
+                'message'          => "Transferencia enviado al Kardex con éxito.",
             ]);
         } else {
             return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta donacion.',], 422);
