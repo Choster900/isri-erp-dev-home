@@ -33,10 +33,10 @@
 
                                     <div class="flex items-center justify-center">
                                         <div class="relative text-center text-sm">
-                                            UCP DEL INSITUTO SALVADOREÑO DE REHABILITACION INTEGRAL
+                                            UCP DEL INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor" @click="printOrdenCompraPdf"
+                                            stroke-width="1.5" stroke="currentColor" @click="printContratoPdf"
                                             class="w-5 h-5 ml-2 stroke-slate-400 hover:stroke-slate-500 cursor-pointer">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
@@ -67,7 +67,7 @@
                             <tr>
                                 <td class="border border-black  bg-black h-5 border-r-white text-white text-center text-[9pt] "
                                     colspan="3">
-                                    RAZON SOCIAL DEL SUMINISTRANTE
+                                    RAZON  SOCIAL DEL SUMINISTRANTE
                                 </td>
                                 <td class="border border-black bg-black h-5 text-white text-center text-[9pt]">
                                     {{ documentType }}
@@ -102,7 +102,7 @@
 
                             </div>
                             <div class="flex items-center">
-                                <label for="" class="text-[7pt] font-semibold mr-2">N°.ORDEN:</label>
+                                <label for="" class="text-[7pt] font-semibold mr-2"> N°. ORDEN:</label>
                                 <input type="text"
                                     :value="((arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) || {}).dataDoc || {}).documento_adquisicion?.numero_doc_adquisicion || '-'"
                                     class="w-40 text-left text-[7pt] font-medium capitalize h-5 border-x-0 border-t-0">
@@ -139,13 +139,13 @@
                                         @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deletLineaTrabajo(i)"
                                         class="uppercase border bg-black text-[8pt] text-white border-black border-t-white border-r-white text-center text-selection-disable">
 
-                                        Linea de trabajo:</td>
+                                        LÍNEA de trabajo:</td>
                                     <td colspan="5" @mouseover="docAdq.hoverToDelete = true"
                                         @click="docAdq.vShowLt = !docAdq.vShowLt"
                                         @mouseout="docAdq.hoverToDelete = false"
                                         @contextmenu.prevent="deletLineaTrabajo(i)"
                                         class="uppercase border bg-black text-[8pt] text-white border-black border-l-white text-center text-selection-disable">
-                                        Documento de adquiicion: </td>
+                                        Documento de ADQUISICIÓN: </td>
                                 </tr>
                                 <tr class="*:border-black cursor-pointer"
                                     :class="{ 'custom-pulse': docAdq.hoverToDelete }">
@@ -363,7 +363,7 @@
                             </tr>
                             <tr class="*:border *:border-black *:hover:bg-slate-200">
                                 <td class="px-1 h-auto uppercase border py-1  text-[8pt]   text-start " colspan="2">
-                                    <textarea rows="8" placeholder="OBSERVACION: "
+                                    <textarea rows="8" placeholder="OBSERVACIÓN: "
                                         v-model="observacionDetDocAdquisicion"
                                         class=" uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
                                 </td>
@@ -377,7 +377,7 @@
                             </tr>
                             <tr class="*:border *:border-black *:hover:bg-slate-200">
                                 <td class="px-1 uppercase border py-1  text-[8pt]   text-start " colspan="2">
-                                    <textarea rows="4" placeholder="LUGAR DE NOTIFICACION: "
+                                    <textarea rows="4" placeholder="LUGAR DE NOTIFICACIÓN: "
                                         v-model="notificacionDetDocAdquisicion"
                                         class="uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
                                 </td>
@@ -393,7 +393,7 @@
                                     d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z">
                                 </path>
                             </svg>
-                            <span class="ml-2">Terminar documento de adquisicion </span>
+                            <span class="ml-2">Terminar documento de adquisición </span>
                         </button>
                     </div>
 
@@ -506,7 +506,8 @@ export default {
         */
         const saveProductAdquisicion = async () => {
             const confirmed = await Swal.fire({
-                title: '<p class="text-[18pt] text-center">¿Esta seguro de guardar el anexo?</p>',
+                title: '<p class="text-[15pt]">¿Está seguro de guardar los productos en el documento?</p>',
+                text: "Al confirmar esta acción, los cambios se guardarán de manera instantánea. Tenga en cuenta que serán permanentes una vez confirmada la operación.",
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
                 confirmButtonText: "Si, Editar",
@@ -533,7 +534,8 @@ export default {
          */
         const updateProductAdquisicion = async () => {
             const confirmed = await Swal.fire({
-                title: '<p class="text-[18pt] text-center">¿Esta seguro de editar?</p>',
+                title: '<p class="text-[15pt]">¿Está seguro de actualizar los productos en el documento?</p>',
+                text: "Al confirmar esta acción, los cambios se guardarán de manera instantánea. Tenga en cuenta que serán permanentes una vez confirmada la operación.",
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
                 confirmButtonText: "Si, Editar",
@@ -551,7 +553,7 @@ export default {
             }
         }
 
-        const { printOrdenCompraPdf,exportDocumentToExcel } = useConfigPdf(
+        const { printContratoPdf,exportDocumentToExcel } = useConfigPdf(
             arrayDocAdquisicion,
             idDetDocAdquisicion,
             objectGetFromProp,
@@ -572,7 +574,7 @@ export default {
             loader,
             handleInput,
             moment,
-            printOrdenCompraPdf,
+            printContratoPdf,
             exportDocumentToExcel,
             disableLt,
             getBrandName,

@@ -259,7 +259,7 @@ export const useRecepcion = (context) => {
         detRecId: '', //id_det_recepcion_pedido
         prodId: paId, //id_prod_adquisicion
         desc: `${selectedProd.codigo_up_lt} — ${selectedProd.codigo_centro_atencion} — ${selectedProd.codigo_producto} — ${selectedProd.nombre_completo_producto} — ${selectedProd.nombre_unidad_medida} — ${selectedProd.descripcion_prod_adquisicion}`, //Acquisition product description
-        brandId: '',
+        brandId: selectedProd.id_marca,
         brandLabel: '',
         expiryDate: '',
         perishable: selectedProd.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
@@ -312,6 +312,7 @@ export const useRecepcion = (context) => {
             return;
         }
 
+        console.log(selectedProd);
         const array = createProdArray(selectedProd, paId);
 
         const lineOfWork = recDocument.value.prods.find(group => group.id_lt === selectedProd.id_lt);

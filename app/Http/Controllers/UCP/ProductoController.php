@@ -33,15 +33,22 @@ class ProductoController extends Controller
             ->orderBy($columns[$column], $dir);
 
         if ($search_value) {
-            $query->where('id_producto', 'like', '%' . $search_value['id_producto'] . '%')
-                ->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
+            $query->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
                 ->where('descripcion_producto', 'like', '%' . $search_value['descripcion_producto'] . '%')
                 ->where('codigo_producto', 'like', '%' . $search_value['codigo_producto'] . '%')
-                ->where('precio_producto', 'like', '%' . $search_value['precio_producto'] . '%')
                 ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
                 ->whereHas('unidad_medida', function ($query) use ($search_value) {
                     $query->where('nombre_unidad_medida', 'like', '%' . $search_value["unidad_medida"] . '%');
                 });
+
+            //Search by id
+            if ($search_value['id_producto']) {
+                $query->where('id_producto', $search_value['id_producto']);
+            }
+            //Search by price
+            if ($search_value['precio_producto']) {
+                $query->where('precio_producto', $search_value['precio_producto']);
+            }
         }
 
         $data = $query->paginate($length)->onEachSide(1);

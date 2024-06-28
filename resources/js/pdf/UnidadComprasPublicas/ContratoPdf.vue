@@ -599,4 +599,12 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+table.sheet0 col.col0 {
+    width: 116.37777658pt
+}
+
+table.sheet0 col.col1 {
+    width: 281.06666592pt
+}
+</style>

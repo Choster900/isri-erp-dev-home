@@ -119,7 +119,7 @@ class DonacionController extends Controller
             $products = $matchProds->map(function ($prod) {
                 return [
                     'value'             => $prod->id_producto,
-                    'label'             => $prod->codigo_producto.' — '.$prod->nombre_completo_producto,
+                    'label'             => $prod->codigo_producto.' — '.$prod->nombre_completo_producto.' — '.$prod->unidad_medida->nombre_unidad_medida,
                     'allInfo'           => $prod
                 ];
             });

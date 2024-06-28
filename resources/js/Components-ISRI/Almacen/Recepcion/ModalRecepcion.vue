@@ -421,7 +421,7 @@
                             <div class="justify-center flex w-full bg-white">
                                 <textarea v-model="recDocument.observation" placeholder=""
                                     :disabled="infoToShow.status != 1"
-                                    class="w-full text-[12px] py-1 font-[Roboto] h-full outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"
+                                    class="w-full text-[12px] py-1 font-[Roboto] h-full min-h-[45px] outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"
                                     @input="handleValidation('observation', { limit: 255 })"></textarea>
                             </div>
                         </div>

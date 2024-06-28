@@ -1,6 +1,6 @@
 import axios from "axios";
 import moment from "moment";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /**
  *
  * @returns data
@@ -43,6 +43,8 @@ export const useEvaluacion = () => {
 
     const showButtonToSend = ref([]);
 
+    const arrayEmpleados = ref([]);
+
     /**
      * Agrega id_evaluacion_personal a arreglo para validar si se guardo las respuestas
      *
@@ -64,9 +66,9 @@ export const useEvaluacion = () => {
             // Realiza la búsqueda de empleados
             const response = await axios.post(
                 "/search-employees-for-evaluations",
-                {
+                /* {
                     nombre: nombreToSearch,
-                }
+                } */
             );
             // Mapeando los centros a los que las personas que coincidieron en la busqueda
             centrosPosibleOptionsData.value = response.data.map((item) => {
@@ -75,6 +77,10 @@ export const useEvaluacion = () => {
             centrosPosibleOptionsDataCopy.value = response.data.map((item) => {
                 return item.allDataPersonas.empleado.plazas_asignadas
             })
+
+            // Enviando la data al multiselect para seleccionar empleado
+            arrayEmpleados.value = response.data
+
             flagTrueOrFalse.value = true;
             // Devuelve los datos de la respuesta
             return response.data;
@@ -85,6 +91,10 @@ export const useEvaluacion = () => {
             throw new Error("Error en la búsqueda de empleados");
         }
     };
+
+    onMounted((mount) => {
+        handleEmployeeSearch()
+    })
 
     /**
      * Crea una nueva evaluación personal.
@@ -551,5 +561,6 @@ export const useEvaluacion = () => {
         headerOptions,
         showButtonToSend,
         handleCancel,
+        arrayEmpleados,
     };
 };

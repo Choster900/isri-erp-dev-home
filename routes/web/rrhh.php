@@ -200,7 +200,20 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('rrhh.expedientes');
     Route::post('expedientes', [ArchivoAnexoController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
     Route::get('getAllTipoArchivoAnexos', function () {
-        return TipoArchivoAnexo::with('archivos_anexos')->get();
+        $results = TipoArchivoAnexo::with('archivos_anexos')->get();
+
+        $formattedResults = $results->map(function ($item) {
+            $objectData = [
+                'value' => $item->id_tipo_archivo_anexo,
+                'label' => $item->nombre_tipo_archivo_anexo,
+                'ALL'   => $item
+            ];
+
+            return $objectData;
+        });
+
+        return $formattedResults;
+
     });
     Route::post('getPersonaByName', [PersonaController::class, 'getPersonByCompleteName'])->name('expediente.getExpediente');
     Route::post('createArchivoAnexo', [ArchivoAnexoController::class, 'createArchivoAnexo'])->name('expediente.createArchivoAnexo');
