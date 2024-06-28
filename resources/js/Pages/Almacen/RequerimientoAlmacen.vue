@@ -115,7 +115,7 @@ export default {
 <template>
 
     <Head title="Producto - Requerimiento" />
-    <AppLayoutVue nameSubModule="Almacen - Requerimiento">.
+    <AppLayoutVue nameSubModule="Almacen - Requerimiento">
         <div class="sm:flex sm:justify-end sm:items-center mb-2" v-if="!canSaveReq">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2" v-if="!isLoadinRequest">
                 <GeneralButton @click="showModalRequerimientoAlmacen = true; objectRequerimientoToSendModal = []"

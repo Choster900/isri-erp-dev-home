@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="mb-4 md:mr-2 md:mb-0 basis-[20%]">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Numero contrato
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Numero contrato
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="reportInfo.contractId" :options="contracts" :searchable="true"
@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="mb-4 md:mr-2 md:mb-0 basis-[20%]">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">
                         Item de contrato
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative font-semibold flex h-[30px] w-full">

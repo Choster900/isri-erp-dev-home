@@ -53,7 +53,7 @@
                 </div>
                 <div class="min-w-[970px] bg-white">
                     <div class="grid grid-cols-[65%_35%] max-w-[97%] border-gray-500 border-x py-1">
-                        <div :class="{ 'select-err': errors.supplierId }"
+                        <div :class="{ 'select-err': errors.centerId }"
                             class="justify-start flex-row flex items-center w-full">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2 w-[18%]">
                                 Centro:
@@ -86,7 +86,7 @@
                                 <Multiselect id="doc" v-model="donInfo.supplierId" :options="suppliers" class="h-[30px]"
                                     :class="{ 'bg-red-200': errors.supplierId }" :disabled="donInfo.status != 1"
                                     :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
-                                    @input="selectProv($event)"
+                                    @change="selectProv($event)"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
                             </div>
                         </div>
