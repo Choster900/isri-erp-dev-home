@@ -331,7 +331,7 @@
                         <div class="grid grid-cols-[100%] max-w-[96%] border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white">
                                 <textarea v-model="adjustment.observation" placeholder="" :disabled="adjustment.status != 1"
-                                    class="w-full text-[12px] py-1 font-[Roboto] h-full  outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"
+                                    class="w-full text-[12px] py-1 font-[Roboto] h-full min-h-[45px] outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"
                                     @input="handleValidation('observation', { limit: 255 })"></textarea>
                             </div>
                         </div>
