@@ -1,7 +1,7 @@
 <template>
     <div class="m-1.5">
         <ProcessModal addClases=" bg-[#F9F9F9]" :show="showModal" @close="$emit('cerrar-modal')" maxWidth="5xl">
-            <div class="py-5 px-5">
+            <div class="py-5 px-5 ">
                 <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
                             @click="$emit('cerrar-modal')">
                             <path fill="currentColor"
@@ -201,7 +201,10 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4">
+
+<div  class="md:h-[550px] h-auto max-h-[700px] overflow-auto">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4  ">
 
                             <div @click="cleanData(), stateView = 1"
                                 class="bg-slate-700 border rounded-lg shadow-md p-4 h-64 flex flex-col justify-center items-center cursor-pointer hover:bg-slate-800 transition-colors duration-300">
@@ -276,6 +279,7 @@
 
 
                         </div>
+</div>
                     </div>
 
                 </div>
@@ -332,7 +336,7 @@ export default {
             urlArchivoAnexo,
             tipoMine, objectPersona,
             sizeArchivo,
-            handleFileChange,
+            handleFileChange,annexTypeData,
             downloadFile, actionOption,
             openInNewTab, personaWhoWasSelected,
             nameArchivoAnexo, idPersona, idTipoMine,
@@ -342,7 +346,7 @@ export default {
 
 
         const annexType = ref(0) // variable que maneja el index del tipo de anexo que se selecciono
-        const annexTypeData = ref([ // Objeto con todos los tipos de anexos
+       /*  const annexTypeData = ref([ // Objeto con todos los tipos de anexos
             { "value": 0, "label": "TODOS LOS ANEXOS" },
             { "value": 1, "label": "ACUERDO" },
             { "value": 2, "label": "AMONESTACION" },
@@ -358,7 +362,7 @@ export default {
             { "value": 12, "label": "PERMISO" },
             { "value": 13, "label": "SOLVENCIA PNC" },
             { "value": 14, "label": "TITULO" }
-        ])
+        ]) */
 
 
 
