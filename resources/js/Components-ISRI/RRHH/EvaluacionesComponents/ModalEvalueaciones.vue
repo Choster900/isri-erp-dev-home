@@ -333,7 +333,7 @@
                         <h2 class="flex gap-2 text-xl text-slate-800 font-medium mb-6">Evaluación de Desempeño para Personal
                             Administrativo</h2>
                         <div class="mb-1 border-b border-slate-200">
-                            <ul class="text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 ">
+                            <ul class="text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 overflow-auto">
                                 <li
                                     class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                                     <a :class="headerOptions === 'DocumentoEvalacionVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
