@@ -75,7 +75,7 @@
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Nombre del
                                         empleado <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect v-if="!opcionEmpleado || opcionEmpleado == ''" v-model="idEmpleado"
+                                      <!--   <Multiselect v-if="!opcionEmpleado || opcionEmpleado == ''" v-model="idEmpleado"
                                             :disabled="loadingEvaluacionRendimiento"
                                             @select="getPlazasByEmployeeIdAndCentroAtencionId()" :filter-results="false"
                                             :resolve-on-load="false" :delay="1000" :searchable="true"
@@ -85,7 +85,16 @@
                                             }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="async function (query) {
                                                 return await handleEmployeeSearch(query)
-                                            }" />
+                                            }" /> -->
+                                            <Multiselect v-if="!opcionEmpleado || opcionEmpleado == ''" v-model="idEmpleado"
+                                            :disabled="loadingEvaluacionRendimiento"
+                                            @select="getPlazasByEmployeeIdAndCentroAtencionId()" :filter-results="true"
+                                            :resolve-on-load="false"  :searchable="true"
+                                            :clear-on-search="true"  placeholder="Busqueda de empleado..."
+                                            :classes="{
+                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                            }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="arrayEmpleados" />
 
                                         <Multiselect v-else v-model="selectedEmpleadoValue" :filter-results="false"
                                             :disabled="true" :resolve-on-load="false" :delay="1000" :searchable="true"
@@ -479,6 +488,7 @@ export default {
         const { evaluacionPersonalProp, listDependencias, showModal } = toRefs(props);
         // Desestructuración de objetos y funciones de useEvaluacion
         const {
+            arrayEmpleados,
             showButtonToSend, addingDataToShowButton,
             clearLock, idEmpleado,
             errorsData, activeIndex,
@@ -672,6 +682,7 @@ export default {
         }
 
         return {
+            arrayEmpleados,
             showButtonToSend,
             addingDataToShowButton,
             moment, clearLock,

@@ -87,7 +87,7 @@ class EvaluacionController extends Controller
             "evaluaciones_personal.tipo_evaluacion_personal",
             "evaluaciones_personal.estado_evaluacion_personal",
             "evaluaciones_personal.periodo_evaluacion",
-            "evaluaciones_personal" => function ($query) use ($idDependencies) {
+            "evaluaciones_personal"                       => function ($query) use ($idDependencies) {
                 $query->whereIn("id_estado_evaluacion_personal", !empty($idDependencies) ? [1, 5, 6] : [1, 4, 7])
                     ->orderBy("fecha_reg_evaluacion_personal", "asc");
                 return $query;
@@ -99,7 +99,7 @@ class EvaluacionController extends Controller
         // Aplicar el filtro de plazas_asignadas
         $query->whereHas("plazas_asignadas", function ($query) use ($idDependencies, $idDependenciWhereIAm) {
             if (!empty($idDependencies)) {
-                $combinedDependencies = array_merge($idDependencies,  $idDependenciWhereIAm);
+                $combinedDependencies = array_merge($idDependencies, $idDependenciWhereIAm);
                 $query->whereIn("id_dependencia", $combinedDependencies);
             } else {
                 $query->whereIn("id_dependencia", $idDependenciWhereIAm);
@@ -183,12 +183,12 @@ class EvaluacionController extends Controller
         $dependencies = Dependencia::with(['jefatura.empleado.plazas_asignadas'])
             ->whereIn('dep_id_dependencia', $depIds)
             ->whereHas('jefatura', function ($query) use ($nombre) {
-                $query->where(function ($query) use ($nombre) {
-                    $query->whereRaw(
-                        "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( ?)",
-                        [$nombre]
-                    );
-                });
+                /*  $query->where(function ($query) use ($nombre) {
+                     $query->whereRaw(
+                         "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( ?)",
+                         [$nombre]
+                     );
+                 }); */
             })->get();
 
         // Filtrar y obtener jefaturas activas
@@ -218,13 +218,13 @@ class EvaluacionController extends Controller
                             $query->where('id_persona', $idPersona);
                         });
                     });
-            })
-            ->where(function ($query) use ($request) {
-                $query->whereRaw(
-                    "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( ? )",
-                    [$request->nombre]
-                );
-            })
+            })->where("id_persona", "!=" , $idPersona)
+            /*  ->where(function ($query) use ($request) {
+                 $query->whereRaw(
+                     "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( ? )",
+                     [$request->nombre]
+                 );
+             }) */
             ->get();
         // Fusionar resultados únicos de jefaturas y empleados
         $mergedResults = $personasJefeByDependencia->merge($results)->unique('id_persona');
@@ -248,7 +248,7 @@ class EvaluacionController extends Controller
      */
     function getPlazaAsignadaByUserAndDependencia(Request $request)
     {
-        try { 
+        try {
 
             // Obtener parámetros de la solicitud
             $employeeId = $request->employeeId;
@@ -356,16 +356,16 @@ class EvaluacionController extends Controller
                         'centro_atencion',
                         'dependencia',
                     ])->where('id_empleado', $employeeId)
-                    ->where('id_centro_atencion', $idCentroAtencion)
-                    ->get()
+                        ->where('id_centro_atencion', $idCentroAtencion)
+                        ->get()
                     : PlazaAsignada::with([
                         'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
                         'centro_atencion',
                         'dependencia',
                     ])->where('id_empleado', $employeeId)
-                    ->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
-                    ->where('id_centro_atencion', $idCentroAtencion)
-                    ->get();
+                        ->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
+                        ->where('id_centro_atencion', $idCentroAtencion)
+                        ->get();
             } else {
 
                 // Obtener plazas asignadas sin evaluaciones
@@ -375,17 +375,17 @@ class EvaluacionController extends Controller
                         'centro_atencion',
                         'dependencia',
                     ])->where('id_empleado', $employeeId)
-                    ->where('id_centro_atencion', $idCentroAtencion)
-                    ->doesntHave("plaza_evaluada")
-                    ->get()
+                        ->where('id_centro_atencion', $idCentroAtencion)
+                        ->doesntHave("plaza_evaluada")
+                        ->get()
                     : PlazaAsignada::with([
                         'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
                         'centro_atencion',
                         'dependencia',
                     ])->where('id_empleado', $employeeId)
-                    ->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
-                    ->where('id_centro_atencion', $idCentroAtencion)
-                    ->get();
+                        ->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
+                        ->where('id_centro_atencion', $idCentroAtencion)
+                        ->get();
             }
 
             // Obtener evaluaciones de rendimiento con información de tipo de plaza
@@ -515,7 +515,7 @@ class EvaluacionController extends Controller
             $evaluacionInsertedId = EvaluacionPersonal::insertGetId($evaluacionPersonalArray);
             // Datos para las plazas evaluadas
             $plazas = [];
-            foreach ($request->plazasAsignadas as $key => $value) {
+            foreach ( $request->plazasAsignadas as $key => $value ) {
                 $plazaEvaluada = [
                     'id_plaza_asignada'        => $value["value"],
                     'id_evaluacion_personal'   => $evaluacionInsertedId,
@@ -535,7 +535,7 @@ class EvaluacionController extends Controller
                 "plazas_asignadas.centro_atencion.dependencias",
                 "plazas_asignadas.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
                 "plazas_asignadas.detalle_plaza.plaza",
-                "evaluaciones_personal" => function ($query) use ($evaluacionInsertedId) {
+                "evaluaciones_personal"                       => function ($query) use ($evaluacionInsertedId) {
                     $query->find($evaluacionInsertedId)
                         ->orderBy("fecha_reg_evaluacion_personal", "asc");
                     return $query;
@@ -625,7 +625,7 @@ class EvaluacionController extends Controller
             DB::beginTransaction();
 
             // Itera sobre las respuestas de rendimiento en la solicitud
-            foreach ($request->responseRendimiento as $key => $value) {
+            foreach ( $request->responseRendimiento as $key => $value ) {
                 // Construye un arreglo con los detalles de la evaluación personal
                 $detalleEvaluacionPersonal = [
                     'id_evaluacion_personal'       => $request->idEvaluacionPersonal,
