@@ -48,17 +48,18 @@ class AjusteEntradaController extends Controller
         }
 
         if ($search_value) {
-            $query->where('id_requerimiento', 'like', '%' . $search_value['id_requerimiento'] . '%')
-                ->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%')
+            $query->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%')
                 ->where('num_requerimiento', 'like', '%' . $search_value['num_requerimiento'] . '%')
                 ->where('fecha_requerimiento', 'like', '%' . $search_value['fecha_requerimiento'] . '%')
                 ->where('id_estado_req', 'like', '%' . $search_value['id_estado_req'] . '%');
-
+            //Search by id
+            if ($search_value['id_requerimiento']) {
+                $query->where('id_requerimiento', $search_value['id_requerimiento']);
+            }
             //Search by Healthcare center
             if ($search_value['id_centro_atencion']) {
                 $query->where('id_centro_atencion', $search_value['id_centro_atencion']);
             }
-
             //Search by reason
             if ($search_value['motivo']) {
                 $query->whereHas(
