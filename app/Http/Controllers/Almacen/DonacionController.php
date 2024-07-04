@@ -46,11 +46,14 @@ class DonacionController extends Controller
         }
 
         if ($search_value) {
-            $query->where('id_recepcion_pedido', 'like', '%' . $search_value['id_recepcion_pedido'] . '%') //Search by reception id
-                ->where('acta_recepcion_pedido', 'like', '%' . $search_value['acta_recepcion_pedido'] . '%') //Search by Acta
+            $query->where('acta_recepcion_pedido', 'like', '%' . $search_value['acta_recepcion_pedido'] . '%') //Search by Acta
                 ->where('id_estado_recepcion_pedido', 'like', '%' . $search_value['id_estado_recepcion_pedido'] . '%') //Search by reception status
                 ->where('fecha_recepcion_pedido', 'like', '%' . $search_value['fecha_recepcion_pedido'] . '%') //Search by reception date
                 ->where('monto_recepcion_pedido', 'like', '%' . $search_value['monto_recepcion_pedido'] . '%'); //Search by reception amount
+            //Search by id
+            if ($search_value['id_recepcion_pedido']) {
+                $query->where('id_recepcion_pedido', $search_value['id_recepcion_pedido']);
+            }
             //Search by supplier
             if ($search_value['proveedor']) {
                 $query->whereHas(
@@ -119,7 +122,7 @@ class DonacionController extends Controller
             $products = $matchProds->map(function ($prod) {
                 return [
                     'value'             => $prod->id_producto,
-                    'label'             => $prod->codigo_producto.' — '.$prod->nombre_completo_producto.' — '.$prod->unidad_medida->nombre_unidad_medida,
+                    'label'             => $prod->codigo_producto . ' — ' . $prod->nombre_completo_producto . ' — ' . $prod->unidad_medida->nombre_unidad_medida,
                     'allInfo'           => $prod
                 ];
             });
