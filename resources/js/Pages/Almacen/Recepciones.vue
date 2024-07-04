@@ -217,7 +217,7 @@ export default {
                     { value: "2", label: "ORDEN" },
                 ]
             },
-            { width: "20%", label: "Doc. Adq.", name: "numero_documento", type: "text" },
+            { width: "20%", label: "Numero", name: "numero_documento", type: "text" },
             { width: "15%", label: "Monto", name: "monto_recepcion_pedido", type: "text" },
             { width: "10%", label: "fecha", name: "fecha_recepcion_pedido", type: "date" },
             {

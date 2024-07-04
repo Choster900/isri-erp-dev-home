@@ -222,7 +222,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/alm/productos',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/productos', 'Almacen/Productos');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/productos', 'Almacen/ProductosAlmacen');
         }
     )->name('alm.productos');
 });

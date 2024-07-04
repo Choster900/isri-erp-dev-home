@@ -1,6 +1,6 @@
 <template>
-    <Head title="Catalogo - Productos" />
-    <AppLayoutVue nameSubModule="UCP - Productos" :colorSide="' bg-[#343a40] '">
+    <Head title="Mantenimiento - Productos" />
+    <AppLayoutVue nameSubModule="Almacen - Productos">
         <div v-if="isLoadingTop"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">
@@ -9,10 +9,7 @@
             </div>
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
-            <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalProd = true; prodId = 0;" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Crear producto" icon="add" />
-            </div>
+            
         </div>
 
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -138,7 +135,7 @@
         </div>
         <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
-        <modal-productos-vue v-if="showModalProd" :showModalProd="showModalProd" :prodId="prodId"
+        <ModalProductosAlmacenVue v-if="showModalProd" :showModalProd="showModalProd" :prodId="prodId"
             @cerrar-modal="showModalProd = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
@@ -150,14 +147,14 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import Pagination from "@/Components-ISRI/Pagination.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import ModalProductosVue from '@/Components-ISRI/UCP/ModalProductos.vue';
+import ModalProductosAlmacenVue from '@/Components-ISRI/Almacen/ProductosAlmacen/ModalProductosAlmacen.vue';
 
 import { ref, toRefs } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosVue, Pagination },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosAlmacenVue, Pagination },
     props: {
         menu: {
             type: Object,
