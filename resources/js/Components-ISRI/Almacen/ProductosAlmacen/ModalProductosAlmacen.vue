@@ -17,7 +17,7 @@
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
                     <span class="text-[16px] font-medium text-black font-[Roboto]">{{ prodId > 0 ? 'Editar producto' :
-            'Crear producto' }}</span>
+                        'Crear producto' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -27,46 +27,7 @@
             </div>
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.purchaseProcedureId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Proceso de compra
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.purchaseProcedureId" :options="purchaseProcedures" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione proceso de compra" />
-                    </div>
-                    <InputError v-for="(item, index) in errors.purchaseProcedureId" :key="index" class="mt-2"
-                        :message="item" />
-                </div>
-                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Especifico
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.budgetAccountId" :options="budgetAccounts" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione especifico" />
-                    </div>
-                    <InputError v-for="(item, index) in errors.budgetAccountId" :key="index" class="mt-2"
-                        :message="item" />
-                </div>
-            </div>
-
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.unspscId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Catalogo Unspsc
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.unspscId" :options="catUnspsc" :searchable="true"
-                            :loading="isLoadingUnspsc" :internal-search="false" @open="openUnspsc()" @select="selectUnspsc($event)"
-                            @clear="baseOption = []" @deselect="baseOption = []"
-                            @search-change="handleSearchChange($event)" :clear-on-search="true" :filter-results="false"
-                            :resolve-on-load="true" :noOptionsText="'Escriba para buscar...'" ref="selectCatUn"
-                            placeholder="Seleccione unspsc" />
-                    </div>
-                    <InputError v-for="(item, index) in errors.unspscId" :key="index" class="mt-2" :message="item" />
-                </div>
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.catPercId > 0, }">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.catPercId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Código perc
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
@@ -76,62 +37,22 @@
                     </div>
                     <InputError v-for="(item, index) in errors.catPercId" :key="index" class="mt-2" :message="item" />
                 </div>
-                <div class="mb-4 md:mr-0 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.catNicspId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuenta Nicsp
+
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.catPercId > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Sub Almacen
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.catNicspId" :options="catNicsp" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione nicsp" />
+                        <Multiselect v-model="prod.subWarehouseId" :options="subWarehouses" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione Sub Almacen" />
                     </div>
-                    <InputError v-for="(item, index) in errors.catNicspId" :key="index" class="mt-2" :message="item" />
+                    <InputError v-for="(item, index) in errors.subWarehouseId" :key="index" class="mt-2"
+                        :message="item" />
                 </div>
             </div>
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
-                    <input-text label="Nombre producto" :withIcon="false" id="phone1" v-model="prod.name" type="text"
-                        placeholder="Escriba nombre" :required="true" :addClases="'h-[35px]'"
-                        :validation="{ limit: 85, upper: true }">
-                    </input-text>
-                    <InputError v-for="(item, index) in errors.name" :key="index" class="mt-2" :message="item" />
-                </div>
-                <div class="mb-4 md:mr-0 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.mUnitId > 0 }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Unidad de medida
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.mUnitId" :options="unitsMeasmt" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione unidad" />
-                    </div>
-                    <InputError v-for="(item, index) in errors.mUnitId" :key="index" class="mt-2" :message="item" />
-                </div>
-            </div>
-
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-0 md:mb-0 basis-full" style="border: none; background-color: transparent;">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Concepto adicional
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <textarea v-model="prod.description" id="descripcion" name="descripcion"
-                        placeholder="Escriba concepto adicional"
-                        :class="prod.description != '' ? 'bg-gray-200' : ''"
-                        class="w-full h-14 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
-                        @input="handleValidation('description', { limit: 290, upper:true })" style="border-radius: 4px;">
-                    </textarea>
-                    <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
-                </div>
-            </div>
-
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                    <input-text label="Precio referencia" :withIcon="false" id="price" v-model="prod.price" type="text"
-                        placeholder="Escriba precio" :required="true" :addClases="'h-[35px]'" :dSign="true"
-                        :validation="{ limit: 10, amount: true }">
-                    </input-text>
-                    <InputError v-for="(item, index) in errors.price" :key="index" class="mt-2" :message="item" />
-                </div>
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3 justify-center text-center">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 justify-center text-center">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Perecedero
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
@@ -145,24 +66,9 @@
                         class="mr-3" id="checbox2" />
                     <InputError v-for="(item, index) in errors.perishable" :key="index" class="mt-2" :message="item" />
                 </div>
-                <div class="mb-4 md:mr-0 md:mb-0 basis-1/3 justify-center text-center">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuadro bienes y
-                        servicios
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <label for="checbox3" class="text-sm font-semibold text-gray-600 ml-4 mr-1">SI</label>
-                    <checkbox :checked="prod.gAndS == 1 ? true : false"
-                        @click="(prod.gAndS == 0 || prod.gAndS == -1) ? prod.gAndS = 1 : prod.gAndS = -1" class="mr-3"
-                        id="checbox3" />
-                    <label for="checbox4" class="text-sm font-semibold text-gray-600 ml-4 mr-1">NO</label>
-                    <checkbox :checked="prod.gAndS == 0 ? true : false"
-                        @click="(prod.gAndS == 1 || prod.gAndS == -1) ? prod.gAndS = 0 : prod.gAndS = -1" class="mr-3"
-                        id="checbox4" />
-                    <InputError v-for="(item, index) in errors.gAndS" :key="index" class="mt-2" :message="item" />
-                </div>
             </div>
 
-            <div class="md:flex my-6 flex-row justify-end mx-8">
+            <div class="md:flex my-6 flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
                 <button v-if="prodId > 0" @click="updateProduct(prod)"
@@ -177,7 +83,7 @@
 </template>
 
 <script>
-import { useProducto } from '@/Composables/UCP/Producto/useProducto.js';
+import { useProductoAlmacen } from '@/Composables/Almacen/ProductoAlmacen/useProductoAlmacen.js';
 import InputError from "@/Components/InputError.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
@@ -207,9 +113,9 @@ export default {
 
         const {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption,
+            budgetAccounts, unitsMeasmt, catPerc, subWarehouses, catNicsp, baseOption,
             asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct, openUnspsc, selectUnspsc
-        } = useProducto(context);
+        } = useProductoAlmacen(context);
 
         const {
             validateInput
@@ -232,7 +138,7 @@ export default {
 
         return {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption,
+            budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption, subWarehouses,
             handleSearchChange, handleValidation, storeProduct, updateProduct, openUnspsc, selectUnspsc
         }
     }

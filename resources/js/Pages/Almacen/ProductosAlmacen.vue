@@ -1,4 +1,5 @@
 <template>
+
     <Head title="Mantenimiento - Productos" />
     <AppLayoutVue nameSubModule="Almacen - Productos">
         <div v-if="isLoadingTop"
@@ -9,7 +10,7 @@
             </div>
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
-            
+
         </div>
 
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -26,12 +27,12 @@
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Productos: <span class="text-slate-400 font-medium">{{
                         tableData.total
-                    }}</span></h2>
+                            }}</span></h2>
                 </div>
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true" :sortIcons="true"
-                    :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    :sortIcons="true" :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     :inputsToValidate="inputsToValidate" @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
                         <tr v-for="prod in dataToShow" :key="prod.id_producto" class="hover:bg-gray-200">
@@ -88,20 +89,13 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <div @click="changeStatus(prod.id_producto, prod.estado_producto)"
-                                            v-if="permits.eliminar == 1"
+                                        <div @click="showModalProd = true; prodId = prod.id_producto"
+                                            v-if="prod.estado_producto == 0"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="ml-0.5 mr-2 w-5 h-5"
-                                                :class="prod.estado_producto == 1 ? 'text-red-800' : 'text-green-800'">
-                                                <span class="text-xs ">
-                                                    <icon-m
-                                                        :iconName="prod.estado_producto == 1 ? 'desactivate' : 'activate'">
-                                                    </icon-m>
-                                                </span>
+                                            <div class="text-blue-800 w-[25px] h-[25px] mr-2">
+                                                <icon-m :iconName="'see'"></icon-m>
                                             </div>
-                                            <div class="font-semibold">
-                                                {{ prod.estado_producto == 1 ? 'Desactivar' : 'Activar' }}
-                                            </div>
+                                            <div class="font-semibold pt-0.5">Ver</div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -113,7 +107,8 @@
                             <td colspan="8" class="text-center">
                                 <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
-                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se
+                                    carga la
                                     información.</p>
                             </td>
                         </tr>
@@ -123,7 +118,8 @@
                             <td colspan="8" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
-                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en
+                                    este
                                     momento.</p>
                             </td>
                         </tr>

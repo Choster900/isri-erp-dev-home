@@ -3,6 +3,7 @@
 use App\Http\Controllers\Almacen\AjusteEntradaController;
 use App\Http\Controllers\Almacen\AjusteSalidaController;
 use App\Http\Controllers\Almacen\DonacionController;
+use App\Http\Controllers\Almacen\ProductoAlmacenController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
@@ -225,4 +226,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/productos', 'Almacen/ProductosAlmacen');
         }
     )->name('alm.productos');
+    Route::get('get-info-modal-prod-almacen/{id}', [ProductoAlmacenController::class, 'getInfoModalProdAlmacen'])->name('productoAlmacen.getInfoModalProdAlmacen');
 });

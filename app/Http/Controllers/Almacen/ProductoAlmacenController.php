@@ -12,7 +12,7 @@ use App\Models\SubAlmacen;
 use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
 
-class ProductosAlmacenController extends Controller
+class ProductoAlmacenController extends Controller
 {
     public function getInfoModalProdAlmacen(Request $request, $id)
     {
@@ -29,7 +29,7 @@ class ProductosAlmacenController extends Controller
             ->get();
         $unitsMeasmt = UnidadMedida::select('id_unidad_medida as value', 'nombre_unidad_medida as label')
             ->where('estado_unidad_medida', 1)->get();
-        $subWarehouse = SubAlmacen::select('id_sub_almacen as value', 'nombre_sub_almacen as label')
+        $subWarehouses = SubAlmacen::select('id_sub_almacen as value', 'nombre_sub_almacen as label')
             ->where('estado_sub_almacen', 1)->get();
 
         return response()->json([
@@ -39,7 +39,7 @@ class ProductosAlmacenController extends Controller
             'unitsMeasmt'               => $unitsMeasmt,
             'catPerc'                   => $catPerc,
             'catNicsp'                  => $catNicsp,
-            'subWarehouse'             => $subWarehouse
+            'subWarehouses'              => $subWarehouses
         ]);
     }
 }
