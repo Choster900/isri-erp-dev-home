@@ -23,6 +23,14 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
+
+    Route::get(
+        '/alm/sub-almacen',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/sub-almacen', 'Almacen/Recepciones');
+        }
+    )->name('alm.sub-almacen');
+
     //Normal receptions
     Route::get(
         '/alm/recepciones',
