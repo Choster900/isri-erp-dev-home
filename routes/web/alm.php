@@ -227,4 +227,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.productos');
     Route::get('get-info-modal-prod-almacen/{id}', [ProductoAlmacenController::class, 'getInfoModalProdAlmacen'])->name('productoAlmacen.getInfoModalProdAlmacen');
+    Route::post('update-product-almacen', [ProductoAlmacenController::class, 'updateProductAlmacen'])->name('productoAlmacen.updateProductAlmacen');
 });

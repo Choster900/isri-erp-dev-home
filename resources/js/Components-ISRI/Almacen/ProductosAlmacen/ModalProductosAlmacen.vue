@@ -26,7 +26,7 @@
                 </svg>
             </div>
 
-            <div class="mx-4 my-4 p-3 rounded-lg shadow-lg " style="border : 5px solid #d1d5db;">
+            <div class="mx-4 p-3 my-[25px] rounded-lg shadow-lg " style="border : 5px solid #d1d5db;">
                 <div class="flex flex-wrap mb-2">
                     <div class="w-full sm:w-1/3">
                         <p class="font-[MuseoSans] text-[13px] text-gray-500">
@@ -37,10 +37,10 @@
                         </p>
                     </div>
                     <div class="w-full sm:w-1/3 relative">
-                        <p class="font-[MuseoSans] text-[13px] text-gray-500" @mouseover="showTooltipCAT = true"
-                            @mouseout="showTooltipCAT = false">
+                        <p class="font-[MuseoSans] text-[13px] text-gray-500">
                             Creado:
-                            <span class="font-[MuseoSans] text-[13px] text-black font-bold underline">
+                            <span class="font-[MuseoSans] text-[13px] text-black font-bold underline"
+                                @mouseover="showTooltipCAT = true" @mouseout="showTooltipCAT = false">
                                 {{ moment(prod.createdAt).fromNow() }}
                                 <span v-if="showTooltipCAT" class="tooltip">
                                     {{ moment(prod.createdAt).format('DD/MM/YYYY, HH:mm:ss') }}
@@ -49,10 +49,10 @@
                         </p>
                     </div>
                     <div class="w-full sm:w-1/3 relative">
-                        <p class="font-[MuseoSans] text-[13px] text-gray-500" @mouseover="showTooltipUAT = true"
-                            @mouseout="showTooltipUAT = false">
+                        <p class="font-[MuseoSans] text-[13px] text-gray-500">
                             Modificado:
-                            <span class="font-[MuseoSans] text-[13px] text-black font-bold underline">
+                            <span class="font-[MuseoSans] text-[13px] text-black font-bold underline"
+                                @mouseover="showTooltipUAT = true" @mouseout="showTooltipUAT = false">
                                 {{ prod.updatedAt ? moment(prod.updatedAt).fromNow() : 'N/A' }}
                                 <span v-if="showTooltipUAT" class="tooltip">
                                     {{ prod.updatedAt ? moment(prod.updatedAt).format('DD/MM/YYYY, HH:mm:ss') : 'N/A' }}
@@ -85,7 +85,7 @@
                 </div>
             </div>
 
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-4 pt-[20px]">
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-4">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.catPercId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Código perc
                         <span class="text-red-600 font-extrabold">*</span>
@@ -96,7 +96,6 @@
                     </div>
                     <InputError v-for="(item, index) in errors.catPercId" :key="index" class="mt-2" :message="item" />
                 </div>
-
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.catPercId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Sub Almacen
                         <span class="text-red-600 font-extrabold">*</span>
@@ -132,10 +131,7 @@
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
                 <button v-if="prodId > 0" @click="updateProduct(prod)"
                     class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
-                <button v-else @click="storeProduct(prod)"
-                    class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
             </div>
-
 
         </ProcessModal>
     </div>

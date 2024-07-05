@@ -153,7 +153,7 @@ export const useProductoAlmacen = (context) => {
             showCloseButton: true
         }).then(async (result) => {
             if (result.isConfirmed) {
-                saveObject(obj, '/update-product');
+                saveObject(obj, '/update-product-almacen');
             }
         });
     };
