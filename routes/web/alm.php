@@ -3,25 +3,16 @@
 use App\Http\Controllers\Almacen\AjusteEntradaController;
 use App\Http\Controllers\Almacen\AjusteSalidaController;
 use App\Http\Controllers\Almacen\DonacionController;
+use App\Http\Controllers\Almacen\ProductoAlmacenController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
 use App\Http\Controllers\Almacen\SubAlmacenController;
 use App\Http\Controllers\Almacen\TransferenciaController;
-use App\Models\CatalogoCtaPresupuestal;
-use App\Models\CentroAtencion;
-use App\Models\DetalleExistenciaAlmacen;
-use App\Models\DetalleRequerimiento;
-use App\Models\ExistenciaAlmacen;
-use App\Models\PlazaAsignada;
 use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
 
@@ -233,4 +224,14 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.reportePerc');
     Route::post('get-reporte-perc-report', [ReporteAlmacenController::class, 'getReportePerc'])->name('reporte.get-perc-report');
     Route::post('get-report-excel-perc', [ReporteAlmacenController::class, 'getPercExcelReport'])->name('reporte.get-perc-report');
+
+     //Products catalog for almacen
+     Route::get(
+        '/alm/productos',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/productos', 'Almacen/ProductosAlmacen');
+        }
+    )->name('alm.productos');
+    Route::get('get-info-modal-prod-almacen/{id}', [ProductoAlmacenController::class, 'getInfoModalProdAlmacen'])->name('productoAlmacen.getInfoModalProdAlmacen');
+    Route::post('update-product-almacen', [ProductoAlmacenController::class, 'updateProductAlmacen'])->name('productoAlmacen.updateProductAlmacen');
 });
