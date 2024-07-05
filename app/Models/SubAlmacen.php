@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SubAlmacen extends Model
 {
@@ -22,4 +23,14 @@ class SubAlmacen extends Model
         'usuario_sub_almacen',
         'ip_sub_almacen',
     ];
+
+    /**
+     * Get the empleado that owns the SubAlmacen
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function empleado(): BelongsTo
+    {
+        return $this->belongsTo(Empleado::class, 'id_empleado', 'id_empleado');
+    }
 }

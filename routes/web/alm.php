@@ -7,6 +7,7 @@ use App\Http\Controllers\Almacen\ProductoAlmacenController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
+use App\Http\Controllers\Almacen\SubAlmacenController;
 use App\Http\Controllers\Almacen\TransferenciaController;
 use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
@@ -18,9 +19,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/alm/sub-almacen',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/sub-almacen', 'Almacen/Recepciones');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/sub-almacen', 'Almacen/SubAlmacen');
         }
     )->name('alm.sub-almacen');
+    Route::post('sub-almacen', [SubAlmacenController::class, 'getSubAlmacenes'])->name('mantenimiento.subAlmacen');
+    Route::post('find-employee-sub-almacen', [SubAlmacenController::class, 'findEmployeeByName'])->name('mantenimiento.findEmployeeByName');
+    Route::post('save-sub-almacen', [SubAlmacenController::class, 'saveSubAlmacen'])->name('mantenimiento.saveSubAlmacen');
+
 
     //Normal receptions
     Route::get(
@@ -73,14 +78,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-number-requerimiento',
         function (Request $request) {
-            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_tipo_req', 1)->first(); }
+            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_tipo_req', 1)->first();
+        }
     )->name('donacion.getObjectForRequerimientoAlmacen');
     Route::post('get-centro-produccion-by-users-centro', [RequerimientoAlmacenController::class, 'getCentroProduccionByUsersCentro'])->name('donacion.get-centro-produccion-by-centro');
-    Route::post('get-centro-produccion-by-centro',[RequerimientoAlmacenController::class,'getProductionCenterByCenter'] )->name('donacion.get-centro-produccion-by-centro');
+    Route::post('get-centro-produccion-by-centro', [RequerimientoAlmacenController::class, 'getProductionCenterByCenter'])->name('donacion.get-centro-produccion-by-centro');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
     Route::post('update-requerimiento-almacen', [RequerimientoAlmacenController::class, 'updateRequerimientoAlmacen'])->name('donacion.updateRequerimientoAlmacen');
     Route::post('get-product-searched-almacen', [RequerimientoAlmacenController::class, 'getProductByNameOrCode'])->name('donacion.productSearchedAlmacen');
-    Route::post('get-centro-by-user',[RequerimientoAlmacenController::class,'getAttentionCentersByUser']  )->name('bieneservicios.get-centro-by-user');
+    Route::post('get-centro-by-user', [RequerimientoAlmacenController::class, 'getAttentionCentersByUser'])->name('bieneservicios.get-centro-by-user');
     Route::post('get-product-by-proy-financiado', [RequerimientoAlmacenController::class, 'getProductByFundedProjectCenterAndWorkLine'])->name('bieneservicios.get-product-by-proy-financiad');
     Route::post('update-state-requerimiento', [RequerimientoAlmacenController::class, 'updateStateRequerimiento'])->name('bieneservicios.get-product-by-proy-financiad');
     //Financial report
@@ -97,7 +103,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-excel-document-reporte-financiero', [ReporteAlmacenController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
     Route::post('get-reporte-consumo', [ReporteAlmacenController::class, 'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
     Route::post('get-excel-document-reporte-consumo', [ReporteAlmacenController::class, 'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
-   /*  Route::post('get-cuenta-by-number', function (Request $request) {
+    /*  Route::post('get-cuenta-by-number', function (Request $request) {
         $cuentas = CatalogoCtaPresupuestal::where("id_ccta_presupuestal", "like", '%' . $request->numeroCuenta . '%')->get();
         // Formatear resultados para respuesta JSON
         return $cuentas->map(function ($item) {
@@ -128,7 +134,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-consumo', 'Almacen/ReporteConsumo');
         }
     )->name('alm.reporteConsumo');
-    Route::post('get-cuenta-by-number',[ReporteAlmacenController::class,'getBudgetaryAccountsByAccountNumber'])->name('reporte.get-cuenta');
+    Route::post('get-cuenta-by-number', [ReporteAlmacenController::class, 'getBudgetaryAccountsByAccountNumber'])->name('reporte.get-cuenta');
     //Outgoing adjustment
     Route::get(
         '/alm/ajuste-salida',
@@ -219,12 +225,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-reporte-perc-report', [ReporteAlmacenController::class, 'getReportePerc'])->name('reporte.get-perc-report');
     Route::post('get-report-excel-perc', [ReporteAlmacenController::class, 'getPercExcelReport'])->name('reporte.get-perc-report');
 
-    //Products catalog for almacen
-    Route::get(
+     //Products catalog for almacen
+     Route::get(
         '/alm/productos',
         function (Request $request) {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/productos', 'Almacen/ProductosAlmacen');
         }
     )->name('alm.productos');
     Route::get('get-info-modal-prod-almacen/{id}', [ProductoAlmacenController::class, 'getInfoModalProdAlmacen'])->name('productoAlmacen.getInfoModalProdAlmacen');
+    Route::post('update-product-almacen', [ProductoAlmacenController::class, 'updateProductAlmacen'])->name('productoAlmacen.updateProductAlmacen');
 });
