@@ -309,7 +309,7 @@ class BienesServiciosController extends Controller
             "documento_adquisicion.proceso_compra"
         ])
             ->where("estado_det_doc_adquisicion", 1)
-            ->where("visible_ucp_doc_adquisicion", 1)
+            ->where("visible_ucp_det_doc_adquisicion", 1)
             ->whereDoesntHave("productos_adquisiciones");
 
         // Si el tipo de documento es "contrato", añadir una condición adicional a la consulta

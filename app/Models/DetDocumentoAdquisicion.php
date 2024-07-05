@@ -30,7 +30,7 @@ class DetDocumentoAdquisicion extends Model
         'fecha_mod_det_doc_adquisicion',
         'usuario_det_doc_adquisicion',
         'ip_det_doc_adquisicion',
-        'visible_ucp_doc_adquisicion',
+        'visible_ucp_det_doc_adquisicion',
     ];
 
     public function documento_adquisicion()
