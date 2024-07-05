@@ -10,6 +10,8 @@ export const useProductoAlmacen = (context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const isLoadingUnspsc = ref(false)
+    const showTooltipCAT =  ref(false)
+    const showTooltipUAT =  ref(false)
     const errors = ref([]);
     const baseOption = ref([])
 
@@ -26,8 +28,14 @@ export const useProductoAlmacen = (context) => {
     const prod = ref({
         id: '',
         name: '',
+        fullName: '',
+        code: '',
+        unitM : '',
+        purchaseProcedure: '',
         description: '',
         mUnitId: '',
+        createdAt: '',
+        updatedAt: '',
         price: '',
         status: '',
         budgetAccountId: '',
@@ -78,6 +86,12 @@ export const useProductoAlmacen = (context) => {
 
         prod.value.id = product.id_producto
         prod.value.name = product.nombre_producto
+        prod.value.code = product.codigo_producto
+        prod.value.fullName = product.nombre_completo_producto
+        prod.value.unitM = product.unidad_medida.nombre_unidad_medida
+        prod.value.createdAt = product.fecha_reg_producto
+        prod.value.updatedAt = product.fecha_mod_producto
+        prod.value.purchaseProcedure = product.proceso_compra.id_proceso_compra + ' - ' + product.proceso_compra.nombre_proceso_compra
         prod.value.description = product.descripcion_producto
         prod.value.mUnitId = product.unidad_medida.id_unidad_medida
         prod.value.price = '$' + product.precio_producto
@@ -200,7 +214,7 @@ export const useProductoAlmacen = (context) => {
 
     return {
         errors, isLoadingRequest, prod, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-        budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption, subWarehouses,
+        budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption, subWarehouses, showTooltipCAT, showTooltipUAT,
         asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct, openUnspsc, selectUnspsc
     }
 }

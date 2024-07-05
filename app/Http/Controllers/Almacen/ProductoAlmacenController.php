@@ -16,14 +16,14 @@ class ProductoAlmacenController extends Controller
 {
     public function getInfoModalProdAlmacen(Request $request, $id)
     {
-        $prod = Producto::with(['unidad_medida', 'catalogo_unspsc'])->find($id);
+        $prod = Producto::with(['unidad_medida', 'catalogo_unspsc', 'proceso_compra'])->find($id);
 
         $purchaseProcedures = ProcesoCompra::selectRaw('id_proceso_compra as value, concat(id_proceso_compra," - ",nombre_proceso_compra) as label')->get();
         $budgetAccounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(codigo_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('estado_ccta_presupuestal', 1)
             ->where('compra_ccta_presupuestal', 1)
             ->get();
-        $catPerc = CatalogoPerc::selectRaw('id_catalogo_perc as value, concat(codigo_catalogo_perc," - ",nombre_catalogo_perc) as label')->get();
+        $catPerc = CatalogoPerc::selectRaw('id_catalogo_perc as value, concat(IFNULL(codigo_catalogo_perc,"")," - ",nombre_catalogo_perc) as label')->get();
         $catNicsp = CatalogoCtaNicsp::selectRaw('id_ccta_nicsp as value, concat(codigo_ccta_nicsp," - ",nombre_ccta_nicsp) as label')
             ->whereRaw('LENGTH(codigo_ccta_nicsp) >= 7')
             ->get();

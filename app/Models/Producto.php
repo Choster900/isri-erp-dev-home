@@ -51,4 +51,9 @@ class Producto extends Model
     {
         return $this->belongsTo('App\Models\CatalogoCtaPresupuestal','id_ccta_presupuestal','id_ccta_presupuestal');
     }
+
+    public function proceso_compra()
+    {
+        return $this->belongsTo('App\Models\ProcesoCompra','id_proceso_compra','id_proceso_compra');
+    }
 }

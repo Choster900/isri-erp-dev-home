@@ -10,7 +10,7 @@
             </div>
         </div>
         <ProcessModal v-else maxWidth='3xl' :show="showModalProd" @close="$emit('cerrar-modal')" class="bg-red-400">
-            <div class="flex items-center justify-between py-3 px-8 border-b border-gray-400 border-opacity-70">
+            <div class="flex items-center justify-between py-3 px-4 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
                     <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Producto</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
@@ -26,7 +26,66 @@
                 </svg>
             </div>
 
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+            <div class="mx-4 my-4 p-3 rounded-lg shadow-lg " style="border : 5px solid #d1d5db;">
+                <div class="flex flex-wrap mb-2">
+                    <div class="w-full sm:w-1/3">
+                        <p class="font-[MuseoSans] text-[13px] text-gray-500">
+                            Código:
+                            <span class="font-[MuseoSans] text-[13px] text-black font-bold underline">
+                                {{ prod.code }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="w-full sm:w-1/3 relative">
+                        <p class="font-[MuseoSans] text-[13px] text-gray-500" @mouseover="showTooltipCAT = true"
+                            @mouseout="showTooltipCAT = false">
+                            Creado:
+                            <span class="font-[MuseoSans] text-[13px] text-black font-bold underline">
+                                {{ moment(prod.createdAt).fromNow() }}
+                                <span v-if="showTooltipCAT" class="tooltip">
+                                    {{ moment(prod.createdAt).format('DD/MM/YYYY, HH:mm:ss') }}
+                                </span>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="w-full sm:w-1/3 relative">
+                        <p class="font-[MuseoSans] text-[13px] text-gray-500" @mouseover="showTooltipUAT = true"
+                            @mouseout="showTooltipUAT = false">
+                            Modificado:
+                            <span class="font-[MuseoSans] text-[13px] text-black font-bold underline">
+                                {{ prod.updatedAt ? moment(prod.updatedAt).fromNow() : 'N/A' }}
+                                <span v-if="showTooltipUAT" class="tooltip">
+                                    {{ prod.updatedAt ? moment(prod.updatedAt).format('DD/MM/YYYY, HH:mm:ss') : 'N/A' }}
+                                </span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <p class="font-[MuseoSans] text-[13px] text-black font-semibold mb-1">
+                    {{ prod.id + " - " + prod.fullName + " - " + prod.unitM }}
+                </p>
+
+                <div class="w-full flex">
+                    <div class="w-1/3">
+                        <p class="font-[MuseoSans] text-[13px] text-gray-500">
+                            Precio referencia
+                        </p>
+                        <p class="font-[MuseoSans] text-[13px] text-black font-bold">
+                            {{ prod.price }}
+                        </p>
+                    </div>
+                    <div class="w-2/3">
+                        <p class="font-[MuseoSans] text-[13px] text-gray-500">
+                            Proceso de compra
+                        </p>
+                        <p class="font-[MuseoSans] text-[13px] text-black font-bold">
+                            {{ prod.purchaseProcedure }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-4 pt-[20px]">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.catPercId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Código perc
                         <span class="text-red-600 font-extrabold">*</span>
@@ -92,6 +151,7 @@ import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM
 import TimePickerM from "@/Components-ISRI/ComponentsToForms/TimePickerM.vue";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
 
+import moment from 'moment';
 import { toRefs, onMounted, ref, watch } from 'vue';
 
 export default {
@@ -114,6 +174,7 @@ export default {
         const {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
             budgetAccounts, unitsMeasmt, catPerc, subWarehouses, catNicsp, baseOption,
+            showTooltipCAT, showTooltipUAT,
             asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct, openUnspsc, selectUnspsc
         } = useProductoAlmacen(context);
 
@@ -138,7 +199,8 @@ export default {
 
         return {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption, subWarehouses,
+            budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption, subWarehouses, moment,
+            showTooltipCAT, showTooltipUAT,
             handleSearchChange, handleValidation, storeProduct, updateProduct, openUnspsc, selectUnspsc
         }
     }
@@ -159,6 +221,22 @@ export default {
     background-color: #E5E7EB;
 }
 
+.tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    color: #000;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;
+    /* Espacio entre el texto y el tooltip */
+}
 
 /* .select-err .multiselect-wrapper input {
     background-color: #FECACA;
