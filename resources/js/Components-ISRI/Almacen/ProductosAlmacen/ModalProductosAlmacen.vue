@@ -65,8 +65,8 @@
                     {{ prod.id + " - " + prod.fullName + " - " + prod.unitM }}
                 </p>
 
-                <div class="w-full flex">
-                    <div class="w-1/3">
+                <div class="w-full flex flex-wrap">
+                    <div class="w-full sm:w-1/3">
                         <p class="font-[MuseoSans] text-[13px] text-gray-500">
                             Precio referencia
                         </p>
@@ -74,7 +74,7 @@
                             {{ prod.price }}
                         </p>
                     </div>
-                    <div class="w-2/3">
+                    <div class="w-full sm:w-2/3">
                         <p class="font-[MuseoSans] text-[13px] text-gray-500">
                             Proceso de compra
                         </p>
@@ -145,7 +145,6 @@ import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 import TimePickerM from "@/Components-ISRI/ComponentsToForms/TimePickerM.vue";
-import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 import moment from 'moment';
 import { toRefs, onMounted, ref, watch } from 'vue';
@@ -168,24 +167,10 @@ export default {
         const { prodId } = toRefs(props)
 
         const {
-            isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts, unitsMeasmt, catPerc, subWarehouses, catNicsp, baseOption,
-            showTooltipCAT, showTooltipUAT,
-            asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct, openUnspsc, selectUnspsc
+            isLoadingRequest, prod, errors, catPerc, 
+            subWarehouses, showTooltipCAT, showTooltipUAT,
+            getInfoForModalProd, updateProduct
         } = useProductoAlmacen(context);
-
-        const {
-            validateInput
-        } = useValidateInput()
-
-        const handleValidation = (input, validation) => {
-            prod.value[input] = validateInput(prod.value[input], validation)
-
-        }
-
-        const handleSearchChange = async (query) => {
-            await asyncFindUnspsc(query);
-        }
 
         onMounted(
             async () => {
@@ -194,10 +179,9 @@ export default {
         )
 
         return {
-            isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption, subWarehouses, moment,
-            showTooltipCAT, showTooltipUAT,
-            handleSearchChange, handleValidation, storeProduct, updateProduct, openUnspsc, selectUnspsc
+            isLoadingRequest, prod, errors, catPerc, 
+            subWarehouses, moment, showTooltipCAT, showTooltipUAT,
+            updateProduct
         }
     }
 }
