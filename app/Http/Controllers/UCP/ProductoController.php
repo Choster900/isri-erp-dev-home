@@ -64,7 +64,7 @@ class ProductoController extends Controller
             ->where('estado_ccta_presupuestal', 1)
             ->where('compra_ccta_presupuestal', 1)
             ->get();
-        $catPerc = CatalogoPerc::selectRaw('id_catalogo_perc as value, concat(codigo_catalogo_perc," - ",nombre_catalogo_perc) as label')->get();
+        $catPerc = CatalogoPerc::selectRaw('id_catalogo_perc as value, concat(IFNULL(codigo_catalogo_perc,"")," - ",nombre_catalogo_perc) as label')->get();
         $catNicsp = CatalogoCtaNicsp::selectRaw('id_ccta_nicsp as value, concat(codigo_ccta_nicsp," - ",nombre_ccta_nicsp) as label')
             ->whereRaw('LENGTH(codigo_ccta_nicsp) >= 7')
             ->get();
