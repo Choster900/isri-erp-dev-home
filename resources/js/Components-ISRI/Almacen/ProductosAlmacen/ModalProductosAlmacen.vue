@@ -92,7 +92,7 @@
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
                         <Multiselect v-model="prod.catPercId" :options="catPerc" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione perc" />
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione perc" :disabled="prod.status === 0" />
                     </div>
                     <InputError v-for="(item, index) in errors.catPercId" :key="index" class="mt-2" :message="item" />
                 </div>
@@ -102,7 +102,7 @@
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
                         <Multiselect v-model="prod.subWarehouseId" :options="subWarehouses" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione Sub Almacen" />
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione Sub Almacen" :disabled="prod.status === 0"/>
                     </div>
                     <InputError v-for="(item, index) in errors.subWarehouseId" :key="index" class="mt-2"
                         :message="item" />
@@ -115,11 +115,11 @@
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <label for="checbox1" class="text-sm font-semibold text-gray-600 ml-4 mr-1">SI</label>
-                    <checkbox :checked="prod.perishable == 1 ? true : false"
+                    <checkbox :disabled="prod.status === 0" :checked="prod.perishable == 1 ? true : false"
                         @click="(prod.perishable == 0 || prod.perishable == -1) ? prod.perishable = 1 : prod.perishable = -1"
                         class="mr-3" id="checbox1" />
                     <label for="checbox2" class="text-sm font-semibold text-gray-600 ml-4 mr-1">NO</label>
-                    <checkbox :checked="prod.perishable == 0 ? true : false"
+                    <checkbox :disabled="prod.status === 0" :checked="prod.perishable == 0 ? true : false"
                         @click="(prod.perishable == 1 || prod.perishable == -1) ? prod.perishable = 0 : prod.perishable = -1"
                         class="mr-3" id="checbox2" />
                     <InputError v-for="(item, index) in errors.perishable" :key="index" class="mt-2" :message="item" />
@@ -129,7 +129,7 @@
             <div class="md:flex my-6 flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <button v-if="prodId > 0" @click="updateProduct(prod)"
+                <button v-if="prod.status === 1" @click="updateProduct(prod)"
                     class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
             </div>
 
