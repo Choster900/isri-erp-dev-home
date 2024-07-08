@@ -188,7 +188,7 @@ class RecepcionController extends Controller
                     drp.id_prod_adquisicion,
                     rp.id_mes_recepcion,
                     SUM(drp.cant_det_recepcion_pedido) AS contador,
-                    SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido) AS contador_monto
+                    ROUND(SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido),2) AS contador_monto
                 FROM
                     recepcion_pedido rp
                 INNER JOIN detalle_recepcion_pedido drp 
