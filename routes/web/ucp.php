@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UCP\BienesServiciosController;
+use App\Http\Controllers\UCP\MarcaUcpController;
 use App\Http\Controllers\UCP\ProductoController;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
@@ -75,4 +76,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ucp.documento-adquisicion-ucp');
 
+    Route::get(
+        '/ucp/marcas',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/marcas', 'UCP/MarcasUcp');
+        }
+    )->name('ucp.marcas');
+    Route::post('marcas-ucp', [MarcaUcpController::class, 'getMarcasUcp'])->name('marcas.getMarcasUcp');
 });
