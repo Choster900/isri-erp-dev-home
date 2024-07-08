@@ -154,7 +154,8 @@ class RecepcionController extends Controller
                 DB::raw('pendiente.nombre_det_doc_adquisicion as label'),
                 DB::raw('pendiente.id_det_doc_adquisicion as value')
             )
-            ->whereRaw('(pendiente.diferencia_monto > 0 AND pendiente.id_proceso_compra = 5) OR (pendiente.id_proceso_compra != 5 AND pendiente.diferencia > 0)')
+            //->whereRaw('(pendiente.diferencia_monto > 0 AND pendiente.id_proceso_compra = 5) OR (pendiente.id_proceso_compra != 5 AND pendiente.diferencia > 0)')
+            ->whereRaw('pendiente.diferencia_monto > 0')
             ->groupBy('pendiente.id_doc_adquisicion');
 
         //We evaluate if the user is not admin to apply filter
@@ -188,7 +189,7 @@ class RecepcionController extends Controller
                     drp.id_prod_adquisicion,
                     rp.id_mes_recepcion,
                     SUM(drp.cant_det_recepcion_pedido) AS contador,
-                    SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido) AS contador_monto
+                    ROUND(SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido),2) AS contador_monto
                 FROM
                     recepcion_pedido rp
                 INNER JOIN detalle_recepcion_pedido drp 

@@ -196,7 +196,7 @@ class DocumentoAdquisicionController extends Controller
                     'fecha_reg_det_doc_adquisicion'       => Carbon::now(),
                     'usuario_det_doc_adquisicion'         => $request->user()->nick_usuario,
                     'ip_det_doc_adquisicion'              => $request->ip(),
-                    'visible_ucp_doc_adquisicion'         => $request->comesFrom == 'ucp' ? 1 : 0 // Si se agrega desde tesoreria lo ponemos como 0 y si se agrega desde ucp 1
+                    'visible_ucp_det_doc_adquisicion'         => $request->comesFrom == 'ucp' ? 1 : 0 // Si se agrega desde tesoreria lo ponemos como 0 y si se agrega desde ucp 1
                 ]);
                 $new_item->save();
             }
@@ -333,7 +333,7 @@ class DocumentoAdquisicionController extends Controller
                                 'fecha_reg_det_doc_adquisicion'       => Carbon::now(),
                                 'usuario_det_doc_adquisicion'         => $request->user()->nick_usuario,
                                 'ip_det_doc_adquisicion'              => $request->ip(),
-                                'visible_ucp_doc_adquisicion'         => $request->comesFrom == 'ucp' ? 1 : 0 // Si se agrega desde tesoreria lo ponemos como 0 y si se agrega desde ucp 1
+                                'visible_ucp_det_doc_adquisicion'         => $request->comesFrom == 'ucp' ? 1 : 0 // Si se agrega desde tesoreria lo ponemos como 0 y si se agrega desde ucp 1
 
                             ]);
                             $new_item->save();
