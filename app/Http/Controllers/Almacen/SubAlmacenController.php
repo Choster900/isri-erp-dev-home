@@ -59,6 +59,27 @@ class SubAlmacenController extends Controller
         }
     }
 
+    function updateSubAlmacen(Request $request)
+    {
+
+        try {
+            DB::beginTransaction();
+            $v_requerimiento = SubAlmacen::where("id_sub_almacen",$request->idSubAlmacen)->update([
+                'nombre_sub_almacen'    => $request->nombreSubAlmacen,
+                'id_empleado'           => $request->idEmpleado,
+                'estado_sub_almacen'    => 1,
+                'fecha_reg_sub_almacen' => Carbon::now(),
+                'usuario_sub_almacen'   => $request->user()->nick_usuario,
+                'ip_sub_almacen'        => $request->ip(),
+            ]);
+            DB::commit();
+            return $v_requerimiento;
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json($th->getMessage(), 500);
+        }
+    }
+
     function findEmployeeByName(Request $request)
     {
         $empleado = Empleado::whereHas('persona', function ($query) use ($request) {
