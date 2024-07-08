@@ -154,7 +154,8 @@ class RecepcionController extends Controller
                 DB::raw('pendiente.nombre_det_doc_adquisicion as label'),
                 DB::raw('pendiente.id_det_doc_adquisicion as value')
             )
-            ->whereRaw('(pendiente.diferencia_monto > 0 AND pendiente.id_proceso_compra = 5) OR (pendiente.id_proceso_compra != 5 AND pendiente.diferencia > 0)')
+            //->whereRaw('(pendiente.diferencia_monto > 0 AND pendiente.id_proceso_compra = 5) OR (pendiente.id_proceso_compra != 5 AND pendiente.diferencia > 0)')
+            ->whereRaw('pendiente.diferencia_monto > 0')
             ->groupBy('pendiente.id_doc_adquisicion');
 
         //We evaluate if the user is not admin to apply filter
