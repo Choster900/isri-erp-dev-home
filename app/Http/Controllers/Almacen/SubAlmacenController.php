@@ -24,11 +24,21 @@ class SubAlmacenController extends Controller
         $v_dir = $request->input('dir');
         $data = $request->input('search');
 
-        $v_query = SubAlmacen::with(["empleado.persona"])
+        $v_query = SubAlmacen::with(["empleado.persona"])->where("estado_sub_almacen", 1)
             ->orderBy($v_columns[$v_column + 1], $v_dir);
         if ($data) {
             $v_query->where('id_sub_almacen', 'like', '%' . $data["id_sub_almacen"] . '%')
                 ->where('nombre_sub_almacen', 'like', '%' . $data["nombre_sub_almacen"] . '%');
+
+
+            if (isset($data['responsable_sub_almacen'])) {
+                $v_query->whereHas('empleado.persona', function ($query) use ($data) {
+                    $query->whereRaw(
+                        "MATCH (pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST (?)",
+                        [$data['responsable_sub_almacen']]
+                    );
+                });
+            }
         }
 
         $v_requerimientos = $v_query->paginate($v_length)->onEachSide(1);
@@ -50,6 +60,43 @@ class SubAlmacenController extends Controller
                 'fecha_reg_sub_almacen' => Carbon::now(),
                 'usuario_sub_almacen'   => $request->user()->nick_usuario,
                 'ip_sub_almacen'        => $request->ip(),
+            ]);
+            DB::commit();
+            return $v_requerimiento;
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json($th->getMessage(), 500);
+        }
+    }
+
+    function updateSubAlmacen(Request $request)
+    {
+
+        try {
+            DB::beginTransaction();
+            $v_requerimiento = SubAlmacen::where("id_sub_almacen", $request->idSubAlmacen)->update([
+                'nombre_sub_almacen'    => $request->nombreSubAlmacen,
+                'id_empleado'           => $request->idEmpleado,
+                'estado_sub_almacen'    => 1,
+                'fecha_mod_sub_almacen' => Carbon::now(),
+                'usuario_sub_almacen'   => $request->user()->nick_usuario,
+                'ip_sub_almacen'        => $request->ip(),
+            ]);
+            DB::commit();
+            return $v_requerimiento;
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json($th->getMessage(), 500);
+        }
+    }
+
+    function deleteSubAlmacen(Request $request)
+    {
+
+        try {
+            DB::beginTransaction();
+            $v_requerimiento = SubAlmacen::where("id_sub_almacen", $request->idSubAlmacen)->update([
+                'estado_sub_almacen' => 0,
             ]);
             DB::commit();
             return $v_requerimiento;
