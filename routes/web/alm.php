@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('find-employee-sub-almacen', [SubAlmacenController::class, 'findEmployeeByName'])->name('mantenimiento.findEmployeeByName');
     Route::post('save-sub-almacen', [SubAlmacenController::class, 'saveSubAlmacen'])->name('mantenimiento.saveSubAlmacen');
     Route::post('update-sub-almacen', [SubAlmacenController::class, 'updateSubAlmacen'])->name('mantenimiento.saveSubAlmacen');
+    Route::post('delete-sub-almacen', [SubAlmacenController::class, 'deleteSubAlmacen'])->name('mantenimiento.saveSubAlmacen');
 
 
     //Normal receptions
