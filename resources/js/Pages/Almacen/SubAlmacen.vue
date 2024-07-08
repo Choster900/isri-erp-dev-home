@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">
-                        Transferencias:
+                        Sub Almacen:
                         <span class="text-slate-400 font-medium">
                             {{ tableData.total }}
                         </span>
