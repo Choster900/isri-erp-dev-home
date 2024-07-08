@@ -60,7 +60,7 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Ver</div>
                                         </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                        <div @click="deleteSubAlmacen(obj.id_sub_almacen)" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-red-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'trash'"></icon-m>
                                             </div>
@@ -112,8 +112,10 @@ import { toRefs, ref } from 'vue';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 import { useSubAlmacen } from '@/Composables/Almacen/Mantenimiento/useSubAlmacen.js';
 import Datatable from "@/Components-ISRI/Datatable.vue";
+import Swal from 'sweetalert2';
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalSubAlmacen from "@/Components-ISRI/Almacen/Mantenimiento/ModalSubAlmacen.vue"
+import { executeRequest } from '@/plugins/requestHelpers';
 export default {
     components: { Datatable, IconM, ModalSubAlmacen },
 
@@ -148,10 +150,54 @@ export default {
 
         const { } = useSubAlmacen();
 
+
+        const deleteSubAlmacenRequest = async (idSubAlmacen) => {
+            try {
+                // Realiza la búsqueda de empleados
+                const response = await axios.post(
+                    "/delete-sub-almacen",
+                    {
+                        idSubAlmacen,
+                    }
+                );
+
+                // Devuelve los datos de la respuesta
+                return response.data;
+            } catch (error) {
+                // Manejo de errores específicos
+                console.error("Error al obtener empleados por nombre:", error);
+                // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+                throw new Error("Error en la búsqueda de empleados");
+            }
+        };
+
+
+        const deleteSubAlmacen = async (idSubAlmacen) => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[15pt]">¿Está seguro de borrar Sub Almacen?</p>',
+                text: "Al confirmar esta acción, los cambios se guardarán de manera instantánea. Tenga en cuenta que serán permanentes una vez confirmada la operación.",
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Actualizar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+                await executeRequest(
+                    deleteSubAlmacenRequest(idSubAlmacen),
+                    "El Sub Almacen se ha borrado correctamente!"
+                );
+                getDataToShow()
+            }
+        }
+
         return {
             columns,
             modalIsOpen, dataSendModal,
             links, sortKey, sortOrders,
+            deleteSubAlmacen,
             isLoadinRequest, emptyObject,
             dataToShow, tableData, perPage,
             getDataToShow, handleData, sortBy
