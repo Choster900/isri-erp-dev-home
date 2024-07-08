@@ -101,7 +101,7 @@
 
 
         <ModalSubAlmacen :dataSubAlmacen="dataSendModal" @close-modal="modalIsOpen = false"
-            :ModalIsOpen="modalIsOpen" />
+            :ModalIsOpen="modalIsOpen" @actualizar-datatable="modalIsOpen=false; getDataToShow()"/>
     </AppLayoutVue>
 
 </template>
