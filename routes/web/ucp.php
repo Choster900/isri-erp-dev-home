@@ -83,4 +83,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ucp.marcas');
     Route::post('marcas-ucp', [MarcaUcpController::class, 'getMarcasUcp'])->name('marcas.getMarcasUcp');
+
+    Route::get(
+        '/ucp/proceso-compra',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/proceso-compra', 'UCP/ProcesoCompra');
+        }
+    )->name('ucp.proceso-compras');
 });
