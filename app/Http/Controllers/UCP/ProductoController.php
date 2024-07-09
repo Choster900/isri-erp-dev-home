@@ -40,17 +40,16 @@ class ProductoController extends Controller
                     $query->where('nombre_unidad_medida', 'like', '%' . $search_value["unidad_medida"] . '%');
                 });
 
+            //Search by id
+            if ($search_value['id_producto']) {
+                $query->where('id_producto', $search_value['id_producto']);
+            }
             //Search by description
             if ($search_value['descripcion_producto']) {
                 $terms = explode(' ', $search_value['descripcion_producto']);
                 foreach ($terms as $term) {
                     $query->where('descripcion_producto', 'like', '%' . $term . '%');
                 }
-            }
-
-            //Search by id
-            if ($search_value['id_producto']) {
-                $query->where('id_producto', $search_value['id_producto']);
             }
             //Search by price
             if ($search_value['precio_producto']) {

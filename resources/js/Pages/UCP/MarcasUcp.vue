@@ -10,7 +10,7 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalProd = true; brandId = 0;" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalBrand = true; objId = 0;" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Crear marca" icon="add" />
             </div>
         </div>
@@ -73,7 +73,7 @@
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <div @click="showModalProd = true; brandId = brand.id_marca"
+                                        <div @click="showModalBrand = true; objId = brand.id_marca"
                                             v-if="permits.actualizar === 1 && brand.estado_marca == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-600 w-[22px] h-[22px] mr-2">
@@ -126,10 +126,10 @@
             </div>
 
         </div>
-        <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
+        <Pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
-        <modal-productos-vue v-if="showModalProd" :showModalProd="showModalProd" :brandId="brandId"
-            @cerrar-modal="showModalProd = false" @get-table="getDataToShow(tableData.currentPage)" />
+        <ModalMarcasUcpVue v-if="showModalBrand" :showModalBrand="showModalBrand" :objId="objId"
+            @cerrar-modal="showModalBrand = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -140,14 +140,14 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import Pagination from "@/Components-ISRI/Pagination.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import ModalProductosVue from '@/Components-ISRI/UCP/ModalProductos.vue';
+import ModalMarcasUcpVue from '@/Components-ISRI/UCP/ModalMarcasUcp.vue';
 
 import { ref, toRefs } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosVue, Pagination },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalMarcasUcpVue, Pagination },
     props: {
         menu: {
             type: Object,
@@ -158,15 +158,15 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const showModalProd = ref(false)
+        const showModalBrand = ref(false)
 
-        const brandId = ref(0)
+        const objId = ref(0)
 
         const columns = [
-            { width: "15%", label: "ID", name: "id_marca", type: "text" },
+            { width: "11%", label: "ID", name: "id_marca", type: "text" },
             { width: "35%", label: "Nombre", name: "nombre_marca", type: "text" },
-            { width: "15%", label: "Fecha registro", name: "fecha_reg_marca", type: "date" },
-            { width: "15%", label: "Fecha modificación", name: "fecha_mod_marca", type: "date" },
+            { width: "17%", label: "Fecha registro", name: "fecha_reg_marca", type: "date" },
+            { width: "17%", label: "Fecha modificación", name: "fecha_mod_marca", type: "date" },
             {
                 width: "10%", label: "Estado", name: "estado_marca", type: "select",
                 options: [
@@ -201,7 +201,7 @@ export default {
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         return {
-            permits, dataToShow, showModalProd, tableData, perPage, brandId, inputsToValidate,
+            permits, dataToShow, showModalBrand, tableData, perPage, objId, inputsToValidate,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement, changeStatus
         };
