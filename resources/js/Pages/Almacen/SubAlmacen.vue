@@ -26,11 +26,11 @@
                         <span class="text-slate-400 font-medium">
                             {{ tableData.total }}
                         </span>
-                    </h2>
+                    </h2>4
                 </div>
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                <Datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     :sortIcons="true" :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
@@ -93,7 +93,7 @@
                             </td>
                         </tr>
                     </tbody>
-                </datatable>
+                </Datatable>
 
             </div>
 
