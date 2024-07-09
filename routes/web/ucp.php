@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\UCP\BienesServiciosController;
 use App\Http\Controllers\UCP\MarcaUcpController;
+use App\Http\Controllers\UCP\ProcesoCompraController;
 use App\Http\Controllers\UCP\ProductoController;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
@@ -90,4 +91,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/proceso-compra', 'UCP/ProcesoCompra');
         }
     )->name('ucp.proceso-compras');
+    Route::post('proceso-compra', [ProcesoCompraController::class, 'getProcesosCompras'])->name('marcas.getProcesosCompras');
+    Route::post('save-proceso-compra', [ProcesoCompraController::class, 'saveProcesoCompra'])->name('marcas.saveProcesoCompra');
+    Route::post('update-proceso-compra', [ProcesoCompraController::class, 'updateProcesoCompra'])->name('marcas.saveProcesoCompra');
+
 });

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProcesoCompra extends Model
 {
@@ -27,5 +28,15 @@ class ProcesoCompra extends Model
     public function empleado()
     {
         return $this->belongsTo(Empleado::class, 'id_empleado', 'id_empleado');
+    }
+
+    /**
+     * Get the tipo_proceso_compra that owns the ProcesoCompra
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function tipo_proceso_compra(): BelongsTo
+    {
+        return $this->belongsTo(TipoProcesoCompra::class, 'id_tipo_proceso_compra', 'id_tipo_proceso_compra');
     }
 }
