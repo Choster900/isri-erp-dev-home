@@ -27,14 +27,14 @@
                             class="w-full py-4 ms-2 text-sm font-medium text-gray-900">Servicio</label>
                     </div>
                 </div>
-                <!-- {{ tipoProcesoCompra }}
-                {{ nombreProcesoCompra }} -->
+
                 <!-- Buttons -->
                 <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                    <GeneralButton @click="updateProcesoCompra()" color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
-                    <GeneralButton @click="saveSubAlmacen()" color="bg-green-700  hover:bg-green-800" text="Agregar"
-                        icon="add" />
-                    <div class="mb-4 md:mr-2 md:mb-0 px-1">
+                    <GeneralButton v-if="dataProcesoCompra" @click="updateProcesoCompra()"
+                        color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
+                    <GeneralButton v-else @click="saveSubAlmacen()" color="bg-green-700  hover:bg-green-800"
+                        text="Agregar" icon="add" />
+                    <div class="mb-4 md:mr-2 md:mb-0 px-1" @click="$emit('close-modal')">
                         <GeneralButton text="Cancelar" icon="defaultBruh" />
                     </div>
                 </div>
@@ -74,9 +74,9 @@ export default {
                 nombreProcesoCompra.value = newValue.nombre_proceso_compra
                 tipoProcesoCompra.value = newValue.id_tipo_proceso_compra
             } else {
-                idEmpleado.value = null
-                idSubAlmacen.value = null
-                nombreSubAlmacen.value = null
+                idProcesoCompra.value = null
+                nombreProcesoCompra.value = null
+                tipoProcesoCompra.value = null
 
             }
         })
@@ -161,14 +161,14 @@ export default {
 
 
 
-           /**
-         * editando sub almacen
-         *
-         * @param {string} productCode - codigo del producto a buscar.
-         * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-         * @throws {Error} - Error al obtener empleados por nombre.
-         */
-         const updateProcesoCompra = async () => {
+        /**
+      * editando sub almacen
+      *
+      * @param {string} productCode - codigo del producto a buscar.
+      * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+      * @throws {Error} - Error al obtener empleados por nombre.
+      */
+        const updateProcesoCompra = async () => {
             const confirmed = await Swal.fire({
                 title: '<p class="text-[15pt]">¿Está seguro de editar el proceso de compra?</p>',
                 text: "Al confirmar esta acción, los cambios se guardarán de manera instantánea. Tenga en cuenta que serán permanentes una vez confirmada la operación.",
@@ -194,6 +194,7 @@ export default {
             ModalIsOpen,
             nombreProcesoCompra,
             tipoProcesoCompra,
+            dataProcesoCompra,
 
             updateProcesoCompra,
             saveSubAlmacen,

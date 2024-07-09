@@ -6,10 +6,9 @@
 
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="modalIsOpen = true" color="bg-green-700  hover:bg-green-800"
-                    text="Crear Proceso de Compra" icon="add" />
+                <GeneralButton @click="modalIsOpen = true; dataToSendModal = obj"
+                    color="bg-green-700  hover:bg-green-800" text="Crear Proceso de Compra" icon="add" />
             </div>
-            {{ modalIsOpen }}
         </div>
 
 
