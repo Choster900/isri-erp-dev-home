@@ -15,6 +15,7 @@ class Marca extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'id_tipo_marca',
         'nombre_marca',
         'fecha_reg_marca',
         'fecha_mod_marca',
