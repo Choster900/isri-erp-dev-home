@@ -34,12 +34,19 @@ class ProductoController extends Controller
 
         if ($search_value) {
             $query->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
-                ->where('descripcion_producto', 'like', '%' . $search_value['descripcion_producto'] . '%')
                 ->where('codigo_producto', 'like', '%' . $search_value['codigo_producto'] . '%')
                 ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
                 ->whereHas('unidad_medida', function ($query) use ($search_value) {
                     $query->where('nombre_unidad_medida', 'like', '%' . $search_value["unidad_medida"] . '%');
                 });
+
+            //Search by description
+            if ($search_value['descripcion_producto']) {
+                $terms = explode(' ', $search_value['descripcion_producto']);
+                foreach ($terms as $term) {
+                    $query->where('descripcion_producto', 'like', '%' . $term . '%');
+                }
+            }
 
             //Search by id
             if ($search_value['id_producto']) {
@@ -65,7 +72,7 @@ class ProductoController extends Controller
             ->where('compra_ccta_presupuestal', 1)
             ->get();
         $catPerc = CatalogoPerc::selectRaw('id_catalogo_perc as value, concat(IFNULL(codigo_catalogo_perc,"")," - ",nombre_catalogo_perc) as label')
-        ->where('estado_catalogo_perc', 1)->get();
+            ->where('estado_catalogo_perc', 1)->get();
         $catNicsp = CatalogoCtaNicsp::selectRaw('id_ccta_nicsp as value, concat(codigo_ccta_nicsp," - ",nombre_ccta_nicsp) as label')
             ->whereRaw('LENGTH(codigo_ccta_nicsp) >= 7')
             ->get();
