@@ -26,11 +26,11 @@
                         <span class="text-slate-400 font-medium">
                             {{ tableData.total }}
                         </span>
-                    </h2>
+                    </h2>4
                 </div>
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                <Datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     :sortIcons="true" :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
@@ -93,8 +93,57 @@
                             </td>
                         </tr>
                     </tbody>
-                </datatable>
+                </Datatable>
 
+            </div>
+
+            <div v-if="!emptyObject" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
+                <div>
+                    <nav class="flex justify-between" role="navigation" aria-label="Navigation">
+                        <div class="grow text-center">
+                            <ul class="inline-flex text-sm font-medium -space-x-px">
+                                <li v-for="link in links" :key="link.label">
+                                    <span v-if="link.label === 'Anterior'"
+                                        :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
+                                        <a @click="getDataToShow(link.url)"
+                                            class="btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+                                                </svg>
+                                                <span class="hidden sm:inline ml-1">Anterior</span>
+                                            </div>
+                                        </a>
+                                    </span>
+                                    <span v-else-if="(link.label == 'Siguiente')"
+                                        :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
+                                        <div class="flex-1 text-right ml-2">
+                                            <a @click="getDataToShow(link.url)"
+                                                class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
+
+                                                <div class="flex items-center">
+                                                    <span class="hidden sm:inline">Siguiente&nbsp;</span> <svg
+                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                                    </svg>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </span>
+                                    <span class="cursor-pointer mt-3" v-else @click="getDataToShow(link.url)"
+                                        :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
+                                            class=" w-5">{{ link.label }}</span>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
             </div>
 
         </div>
