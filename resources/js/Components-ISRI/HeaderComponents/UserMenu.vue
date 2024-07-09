@@ -4,7 +4,7 @@
             @click.prevent="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen" aria-haspopup="true">
 
             <div class="size-8 rounded-full text-lg flex items-center justify-center bg-[#001c48] text-blue-300">
-                <span class="uppercase text-xl text-white">{{ dynamicUsername }}</span>
+                <span class="uppercase text- text-white ">{{ dynamicUsername }}</span>
                 <!--  <lord-icon
                     src="https://cdn.lordicon.com/bhfjfgqz.json"
                     trigger="hover"
@@ -15,7 +15,7 @@
 
             <div class="flex items-center truncate gap-1">
                 <span class="truncate ml-2 text-sm font-medium group-hover:text-slate-800">
-                    Usuario: <span class="font-bold">{{ $page.props.auth.user.nick_usuario }}</span>
+                    <span class="font-bold">{{ $page.props.auth.user.nick_usuario }}</span>
                 </span>
                 <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
                     <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z"></path>
@@ -34,7 +34,7 @@
                 class="origin-top-right z-10 absolute top-full min-w-44 w-52 bg-white border border-slate-200 py-1.5 rounded shadow-lg  mt-1 right-0">
                 <div class="pt-0.5 pb-1 px-3 mb-1 border-slate-200">
                     <div class="font-bold text-slate-800">{{ $page.props.auth.user.name }}</div>
-                    <div class="text-xs text-slate-500"><span class="font-bold pr-1">Rol</span>{{
+                    <div class="text-xs text-slate-500"><span class="font-bold pr-1"></span>{{
                 $page.props.menu ? $page.props.menu.rol : 'Bienvenido al sistema ISRI'
             }}</div>
 
@@ -56,7 +56,17 @@
                     </li>
                     <li>
                         <DropdownLink :href="route('logout')" method="post" as="button"
-                            class="font-semibold text-sm text-indigo-500 flex items-center py-1 px-3  hover:text-indigo-700">
+                            class="font-semibold text-sm text-indigo-500 flex items-center py-1 px-3 gap-2 hover:text-indigo-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                class="size-5">
+                                <path fill-rule="evenodd"
+                                    d="M17 4.25A2.25 2.25 0 0 0 14.75 2h-5.5A2.25 2.25 0 0 0 7 4.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v11.5a.75.75 0 0 1-.75.75h-5.5a.75.75 0 0 1-.75-.75v-2a.75.75 0 0 0-1.5 0v2A2.25 2.25 0 0 0 9.25 18h5.5A2.25 2.25 0 0 0 17 15.75V4.25Z"
+                                    clip-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M1 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H1.75A.75.75 0 0 1 1 10Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+
                             Cerrar Sesión
                         </DropdownLink>
                     </li>
