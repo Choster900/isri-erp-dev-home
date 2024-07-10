@@ -38,7 +38,7 @@ class ProductoAlmacenController extends Controller
         $customMessages = [
             'catPercId.required'                => 'Debe seleccionar PERC.',
             'subWarehouseId.required'           => 'Debe seleccionar sub almacen.',
-            'perishable.not_in'              => 'Debe seleccionar si es perecedero.',
+            'perishable.not_in'                 => 'Debe seleccionar si es perecedero.',
         ];
         // Validate the request data with custom error messages and custom rule
         $validatedData = Validator::make($request->all(), [

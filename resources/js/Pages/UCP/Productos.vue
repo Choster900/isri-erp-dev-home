@@ -84,6 +84,14 @@
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div @click="showModalProd = true; prodId = prod.id_producto"
+                                            v-if="prod.estado_producto == 0"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-blue-800 w-[25px] h-[25px] mr-2">
+                                                <icon-m :iconName="'see'"></icon-m>
+                                            </div>
+                                            <div class="font-semibold pt-0.5">Ver</div>
+                                        </div>
+                                        <div @click="showModalProd = true; prodId = prod.id_producto"
                                             v-if="permits.actualizar === 1 && prod.estado_producto == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-600 w-[22px] h-[22px] mr-2">

@@ -24,6 +24,7 @@ export const useProducto = (context) => {
         description: '',
         mUnitId: '',
         price: '',
+        status: '',
         budgetAccountId: '',
         purchaseProcedureId: '',
         unspscId: '',
@@ -89,6 +90,7 @@ export const useProducto = (context) => {
         prod.value.id = product.id_producto
         prod.value.name = product.nombre_producto
         prod.value.description = product.descripcion_producto
+        prod.value.status = product.estado_producto
         prod.value.mUnitId = product.unidad_medida.id_unidad_medida
         prod.value.price = '$' + product.precio_producto
         prod.value.budgetAccountId = product.id_ccta_presupuestal

@@ -8,6 +8,7 @@ use App\Models\TipoMarca;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class MarcaUcpController extends Controller
 {
@@ -57,6 +58,17 @@ class MarcaUcpController extends Controller
 
     public function saveBrandUcp(Request $request)
     {
+        //Define the custom messages
+        $customMessages = [
+            'id_tipo_marca.required'                    => 'Debe seleccionar tipo marca.',
+            'nombre_marca.required'                     => 'Debe escribir el nombre de la marca.',
+        ];
+        // Validate the request data with custom error messages and custom rule
+        $validatedData = Validator::make($request->all(), [
+            'id_tipo_marca'                             => 'required',
+            'nombre_marca'                              => 'required',
+        ], $customMessages)->validate();
+
         DB::beginTransaction();
         try {
             $brand = new Marca([
@@ -84,6 +96,17 @@ class MarcaUcpController extends Controller
 
     public function updateBrandUcp(Request $request)
     {
+        //Define the custom messages
+        $customMessages = [
+            'id_tipo_marca.required'                    => 'Debe seleccionar tipo marca.',
+            'nombre_marca.required'                     => 'Debe escribir el nombre de la marca.',
+        ];
+        // Validate the request data with custom error messages and custom rule
+        $validatedData = Validator::make($request->all(), [
+            'id_tipo_marca'                             => 'required',
+            'nombre_marca'                              => 'required',
+        ], $customMessages)->validate();
+
         $brand = Marca::find($request->id_marca);
         if ($brand->estado_marca == 0) {
             return response()->json(['logical_error' => 'Error, la marca seleccionada ha sido deshabilitada.'], 422);
@@ -93,7 +116,6 @@ class MarcaUcpController extends Controller
                 $brand->update([
                     'id_tipo_marca'                 => $request->id_tipo_marca,
                     'nombre_marca'                  => $request->nombre_marca,
-                    'estado_marca'                  => 1,
                     'fecha_mod_marca'               => Carbon::now(),
                     'usuario_marca'                 => $request->user()->nick_usuario,
                     'ip_marca'                      => $request->ip(),
