@@ -1,13 +1,10 @@
 <template>
 
-    <Head title="Kardex - Transferencias" />
-    <AppLayoutVue nameSubModule="Almacen - Sub Almacen">
-        <div class="sm:flex sm:justify-end sm:items-center mb-2">
-            <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton color="bg-green-700  hover:bg-green-800" text="Crear Sub Almacen" icon="add"
-                    @click="modalIsOpen = true; dataSendModal = null" />
-            </div>
-        </div>
+    <Head title="Catalogos - Proceso Compra" />
+    <AppLayoutVue nameSubModule="Catalogos - Proceso Compra" :colorSide="' bg-[#343a40] '">
+
+
+
 
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
             <header class="px-5 py-4">
@@ -22,11 +19,11 @@
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">
-                        Sub Almacen:
+                        Procesos de compra:
                         <span class="text-slate-400 font-medium">
                             {{ tableData.total }}
                         </span>
-                    </h2>4
+                    </h2>
                 </div>
             </header>
             <div class="overflow-x-auto">
@@ -37,34 +34,44 @@
                         <tr v-for="obj in dataToShow" :key="obj.id_sub_almacen" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
-                                    {{ obj.id_sub_almacen }}
+                                    {{ obj.id_proceso_compra }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
-                                    {{ obj.nombre_sub_almacen }}
+                                    {{ obj.tipo_proceso_compra.nombre_tipo_proceso_compra }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
-                                    {{ obj.empleado.persona.nombre_apellido }}
+                                    {{ obj.id_empleado ? obj.empleado.persona.nombre_completo : '-' }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="space-x-1 text-center">
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                    {{ obj.nombre_proceso_compra }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="space-x-1">
                                     <DropDownOptions>
-                                        <div @click="dataSendModal = obj; modalIsOpen = true"
-                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-blue-800 w-[25px] h-[25px] mr-2">
-                                                <icon-m :iconName="'see'"></icon-m>
+
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click.stop="dataToSendModal = obj; modalIsOpen = true">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+                                                        fill="currentColor" class="size-6">
+                                                        <path fill-rule="evenodd"
+                                                            d="M10.47 2.22a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06l-2.25 2.25a.75.75 0 1 1-1.06-1.06l.97-.97H5.75a.75.75 0 0 1 0-1.5h5.69l-.97-.97a.75.75 0 0 1 0-1.06Zm-4.94 6a.75.75 0 0 1 0 1.06l-.97.97h5.69a.75.75 0 0 1 0 1.5H4.56l.97.97a.75.75 0 1 1-1.06 1.06l-2.25-2.25a.75.75 0 0 1 0-1.06l2.25-2.25a.75.75 0 0 1 1.06 0Z"
+                                                            clip-rule="evenodd" />
+                                                    </svg>
+
+                                                </span>
                                             </div>
-                                            <div class="font-semibold pt-0.5">Ver</div>
-                                        </div>
-                                        <div @click="deleteSubAlmacen(obj.id_sub_almacen)" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-red-700 w-[24px] h-[24px] mr-1">
-                                                <icon-m :iconName="'trash'"></icon-m>
+                                            <div class="font-semibold text-xs pl-2">Asignar o cambiar empleado a proceso
+                                                de compra
                                             </div>
-                                            <div class="font-semibold pt-0.5">Eliminar</div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -149,8 +156,10 @@
         </div>
 
 
-        <ModalSubAlmacen :dataSubAlmacen="dataSendModal" @close-modal="modalIsOpen = false"
-            :ModalIsOpen="modalIsOpen" @actualizar-datatable="modalIsOpen=false; getDataToShow()"/>
+        <ModalProcesoCompra @close-modal="modalIsOpen = false" :ModalIsOpen="modalIsOpen"
+            :dataProcesoCompra="dataToSendModal" @actualizar-datatable="getDataToShow(); modalIsOpen = false" />
+
+
     </AppLayoutVue>
 
 </template>
@@ -159,15 +168,11 @@
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { toRefs, ref } from 'vue';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-import { useSubAlmacen } from '@/Composables/Almacen/Mantenimiento/useSubAlmacen.js';
-import Datatable from "@/Components-ISRI/Datatable.vue";
-import Swal from 'sweetalert2';
-import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import ModalSubAlmacen from "@/Components-ISRI/Almacen/Mantenimiento/ModalSubAlmacen.vue"
-import { executeRequest } from '@/plugins/requestHelpers';
+import Datatable from '@/Components-ISRI/Datatable.vue';
+import IconM from '@/Components-ISRI/ComponentsToForms/IconM.vue';
+import ModalProcesoCompra from "../../Components-ISRI/Almacen/Mantenimiento/ModalProcesoCompra.vue"
 export default {
-    components: { Datatable, IconM, ModalSubAlmacen },
-
+    components: { Datatable, IconM, ModalProcesoCompra },
     props: {
         menu: { type: Object, default: () => ({}) },
     },
@@ -175,18 +180,21 @@ export default {
 
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-        const modalIsOpen = ref(false)
-        const dataSendModal = ref(null)
+        const modalIsOpen = ref(false);
+        const dataToSendModal = ref(null);
+
+
 
         const columns = [
-            { width: "13%", label: "Id", name: "id_sub_almacen", type: "text" },
-            { width: "13%", label: "Nombre", name: "nombre_sub_almacen", type: "text" },
-            { width: "13%", label: "Responsable", name: "responsable_sub_almacen", type: "text" },
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "5%", label: "Id", name: "id_proceso_compra", type: "text" },
+            { width: "5%", label: "Tipo Proceso", name: "id_tipo_proceso_compra", type: "text" },
+            { width: "13%", label: "Responsable", name: "id_empleado", type: "text" },
+            { width: "14%", label: "Nombre de proceso", name: "id_empleado", type: "text" },
+            { width: "1%", label: "Acciones", name: "Acciones" },
         ];
 
-        const requestUrl = "/sub-almacen"
-        const columntToSort = "id_sub_almacen"
+        const requestUrl = "/get-proceso-compra-for-almacen"
+        const columntToSort = "id_proceso_compra"
         const dir = 'desc'
 
         const {
@@ -197,62 +205,17 @@ export default {
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
 
-        const { } = useSubAlmacen();
-
-
-        const deleteSubAlmacenRequest = async (idSubAlmacen) => {
-            try {
-                // Realiza la búsqueda de empleados
-                const response = await axios.post(
-                    "/delete-sub-almacen",
-                    {
-                        idSubAlmacen,
-                    }
-                );
-
-                // Devuelve los datos de la respuesta
-                return response.data;
-            } catch (error) {
-                // Manejo de errores específicos
-                console.error("Error al obtener empleados por nombre:", error);
-                // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
-                throw new Error("Error en la búsqueda de empleados");
-            }
-        };
-
-
-        const deleteSubAlmacen = async (idSubAlmacen) => {
-            const confirmed = await Swal.fire({
-                title: '<p class="text-[15pt]">¿Está seguro de borrar Sub Almacen?</p>',
-                text: "Al confirmar esta acción, los cambios se guardarán de manera instantánea. Tenga en cuenta que serán permanentes una vez confirmada la operación.",
-                icon: "question",
-                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Actualizar",
-                confirmButtonColor: "#001b47",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true,
-            });
-            if (confirmed.isConfirmed) {
-                await executeRequest(
-                    deleteSubAlmacenRequest(idSubAlmacen),
-                    "El Sub Almacen se ha borrado correctamente!"
-                );
-                getDataToShow()
-            }
-        }
-
         return {
-            columns,
-            modalIsOpen, dataSendModal,
+            columns, dataToSendModal,
             links, sortKey, sortOrders,
-            deleteSubAlmacen,
             isLoadinRequest, emptyObject,
             dataToShow, tableData, perPage,
+            modalIsOpen,
             getDataToShow, handleData, sortBy
+
+
         }
     }
 }
 </script>
-
-<style lang="scss" scoped></style>
+<style></style>

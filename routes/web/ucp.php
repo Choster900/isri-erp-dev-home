@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\UCP\BienesServiciosController;
+use App\Http\Controllers\UCP\MarcaUcpController;
+use App\Http\Controllers\UCP\ProcesoCompraController;
 use App\Http\Controllers\UCP\ProductoController;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
@@ -75,4 +77,27 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ucp.documento-adquisicion-ucp');
 
+    Route::get(
+        '/ucp/marcas',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/marcas', 'UCP/MarcasUcp');
+        }
+    )->name('ucp.marcas');
+    Route::post('marcas-ucp', [MarcaUcpController::class, 'getMarcasUcp'])->name('marcaUcp.getMarcasUcp');
+    Route::get('get-info-modal-brand-ucp/{id}', [MarcaUcpController::class, 'getInfoModalBrandUcp'])->name('marcaUcp.getInfoModalBrandUcp');
+    Route::post('save-brand-ucp', [MarcaUcpController::class, 'saveBrandUcp'])->name('marcaUcp.saveBrandUcp');
+    Route::post('update-brand-ucp', [MarcaUcpController::class, 'updateBrandUcp'])->name('marcaUcp.updateBrandUcp');
+    Route::post('change-status-brand-ucp', [MarcaUcpController::class, 'changeStatusProduct'])->name('marcaUcp.changeStatusBrandUcp');
+
+    
+    Route::get(
+        '/ucp/proceso-compra',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/proceso-compra', 'UCP/ProcesoCompra');
+        }
+    )->name('ucp.proceso-compras');
+    Route::post('proceso-compra', [ProcesoCompraController::class, 'getProcesosCompras'])->name('marcas.getProcesosCompras');
+    Route::post('save-proceso-compra', [ProcesoCompraController::class, 'saveProcesoCompra'])->name('marcas.saveProcesoCompra');
+    Route::post('update-proceso-compra', [ProcesoCompraController::class, 'updateProcesoCompra'])->name('marcas.saveProcesoCompra');
+    
 });
