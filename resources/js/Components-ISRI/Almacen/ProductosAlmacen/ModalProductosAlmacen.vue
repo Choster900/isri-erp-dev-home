@@ -9,14 +9,15 @@
                 </h1>
             </div>
         </div>
-        <ProcessModal v-else maxWidth='3xl' :show="showModalProd" @close="$emit('cerrar-modal')" class="bg-red-400">
+        <ProcessModal v-else maxWidth='3xl' :show="showModalProd" :center="true" @close="$emit('cerrar-modal')" class="bg-red-400">
             <div class="flex items-center justify-between py-3 px-4 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
                     <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Producto</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ prodId > 0 ? 'Editar producto' :
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ prodId > 0 ? (prod.status
+                        != 1 ? 'Ver producto' : 'Editar producto') :
                         'Crear producto' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"

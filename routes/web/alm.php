@@ -9,6 +9,7 @@ use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
 use App\Http\Controllers\Almacen\SubAlmacenController;
 use App\Http\Controllers\Almacen\TransferenciaController;
+use App\Http\Controllers\UCP\ProcesoCompraController;
 use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
 use Illuminate\Support\Facades\Route;
@@ -227,8 +228,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-reporte-perc-report', [ReporteAlmacenController::class, 'getReportePerc'])->name('reporte.get-perc-report');
     Route::post('get-report-excel-perc', [ReporteAlmacenController::class, 'getPercExcelReport'])->name('reporte.get-perc-report');
 
-     //Products catalog for almacen
-     Route::get(
+    //Products catalog for almacen
+    Route::get(
         '/alm/productos',
         function (Request $request) {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/productos', 'Almacen/ProductosAlmacen');
@@ -236,4 +237,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.productos');
     Route::get('get-info-modal-prod-almacen/{id}', [ProductoAlmacenController::class, 'getInfoModalProdAlmacen'])->name('productoAlmacen.getInfoModalProdAlmacen');
     Route::post('update-product-almacen', [ProductoAlmacenController::class, 'updateProductAlmacen'])->name('productoAlmacen.updateProductAlmacen');
+
+
+    Route::get(
+        '/alm/proceso-compra',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/proceso-compra', 'Almacen/ProcesoCompra');
+        }
+    )->name('alm.proceso-compras');
+    Route::post('get-proceso-compra-for-almacen', [ProcesoCompraController::class, 'getProcesosComprasForAlmacen'])->name('procesoCompra.getProcesosComprasForAlmacen');
+    Route::post('find-employee-by-name-for-warehouse', [ProcesoCompraController::class, 'findEmployeeByName'])->name('procesoCompra.getProcesosComprasForAlmacen');
+    Route::post('update-employee-in-proceso-compra', [ProcesoCompraController::class, 'updateProcesoCompraEmployee'])->name('procesoCompra.getProcesosComprasForAlmacen');
 });
