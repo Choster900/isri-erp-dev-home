@@ -50,12 +50,12 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[20%]">
                                 <div class="font-medium text-slate-800 text-center max-h-[125px] overflow-y-auto">
-                                    {{ brand.fecha_reg_marca }}
+                                    {{ moment(brand.fecha_reg_marca).format("DD/MM/YYYY") }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ brand.fecha_mod_marca }}
+                                    {{ brand.fecha_mod_marca ? moment(brand.fecha_mod_marca).format("DD/MM/YYYY") : 'N/A' }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -141,6 +141,7 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import Pagination from "@/Components-ISRI/Pagination.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalMarcasUcpVue from '@/Components-ISRI/UCP/ModalMarcasUcp.vue';
+import moment from 'moment';
 
 import { ref, toRefs } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
@@ -202,7 +203,7 @@ export default {
 
         return {
             permits, dataToShow, showModalBrand, tableData, perPage, objId, inputsToValidate,
-            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
+            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns, moment,
             getDataToShow, handleData, sortBy, changeStatusElement, changeStatus
         };
     },

@@ -137,7 +137,8 @@
                     </svg>
                 </template>
             </div>
-            <input :type="type" :id="id" :required="required" :value="modelValue" :placeholder="placeholder" :class="[{
+            <input :type="type" :id="id" :required="required" :value="modelValue" :placeholder="placeholder" :disabled="disabled"
+             :class="[{
                 'border border-red-400': hasError,
                 'border border-gray-300': !hasError,
                 'bg-gray-50 pl-12': withIcon,
@@ -180,6 +181,10 @@ export default {
         addClasesLabel: {
             type: String,
             default: ''
+        },
+        disabled : {
+            type: Boolean,
+            default: false
         },
         type: {
             type: String,
