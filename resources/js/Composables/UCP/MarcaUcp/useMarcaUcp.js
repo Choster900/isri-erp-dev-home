@@ -13,9 +13,13 @@ export const useMarcaUcp = (context) => {
     const showTooltipUAT =  ref(false)
     const errors = ref([]);
 
-    //Product info
+    //Options
+    const brandTypes = ref([])
+
+    //Brand info
     const objDB = ref({
         id_marca: '',
+        id_tipo_marca: '',
         nombre_marca: '',
         fecha_reg_marca: '',
         fecha_mod_marca: '',
@@ -28,6 +32,7 @@ export const useMarcaUcp = (context) => {
             const response = await axios.get(
                 `/get-info-modal-brand-ucp/${id}`
             );
+            brandTypes.value = response.data.brandTypes
             id > 0 ? setModalValues(response.data.brand) : ''
         } catch (err) {
             if (err.response.data.logical_error) {
@@ -125,7 +130,8 @@ export const useMarcaUcp = (context) => {
     };
 
     return {
-        errors, isLoadingRequest, objDB, showTooltipCAT, showTooltipUAT,
+        isLoadingRequest, objDB, errors, brandTypes,
+        showTooltipCAT, showTooltipUAT,
         getInfoForModalBrandUcp, storeObject, updateObject
     }
 }

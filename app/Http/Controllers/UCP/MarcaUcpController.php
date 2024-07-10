@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UCP;
 
 use App\Http\Controllers\Controller;
 use App\Models\Marca;
+use App\Models\TipoMarca;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,10 +47,11 @@ class MarcaUcpController extends Controller
     public function getInfoModalBrandUcp(Request $request, $id)
     {
         $brand = Marca::find($id);
-        
+        $brandTypes = TipoMarca::select('id_tipo_marca as value','nombre_tipo_marca as label')->get();
 
         return response()->json([
-            'brand'                      => $brand ?? [],
+            'brand'                         => $brand ?? [],
+            'brandTypes'                    => $brandTypes
         ]);
     }
 

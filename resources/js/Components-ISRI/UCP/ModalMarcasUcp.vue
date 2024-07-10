@@ -9,15 +9,16 @@
                 </h1>
             </div>
         </div>
-        <ProcessModal v-else maxWidth='xl' :show="showModalBrand" :center="true" @close="$emit('cerrar-modal')" class="bg-red-400">
+        <ProcessModal v-else maxWidth='xl' :show="showModalBrand" :center="true" @close="$emit('cerrar-modal')"
+            class="bg-red-400">
             <div class="flex items-center justify-between py-3 px-8 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
                     <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Marca</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
-                        <IconM :iconName="'nextSvgVector'"/>
+                        <IconM :iconName="'nextSvgVector'" />
                     </div>
                     <span class="text-[16px] font-medium text-black font-[Roboto]">{{ objId > 0 ? 'Editar marca' :
-            'Crear marca' }}</span>
+                        'Crear marca' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -27,12 +28,27 @@
             </div>
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-full" :class="{ 'selected-opt': objDB.id_tipo_marca > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Tipo marca
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="objDB.id_tipo_marca" :options="brandTypes" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione proceso de compra" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.id_tipo_marca" :key="index" class="mt-2"
+                        :message="item" />
+                </div>
+            </div>
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                    <input-text label="Nombre marca" :withIcon="false" id="phone1" v-model="objDB.nombre_marca" type="text"
-                        placeholder="Escriba nombre" :required="true" :addClases="'h-[35px]'"
+                    <input-text label="Nombre marca" :withIcon="false" id="phone1" v-model="objDB.nombre_marca"
+                        type="text" placeholder="Escriba nombre" :required="true" :addClases="'h-[35px]'"
                         :validation="{ limit: 85, upper: true }">
                     </input-text>
-                    <InputError v-for="(item, index) in errors.nombre_marca" :key="index" class="mt-2" :message="item" />
+                    <InputError v-for="(item, index) in errors.nombre_marca" :key="index" class="mt-2"
+                        :message="item" />
                 </div>
             </div>
 
@@ -77,7 +93,8 @@ export default {
         const { objId } = toRefs(props)
 
         const {
-            isLoadingRequest, objDB, errors,
+            isLoadingRequest, objDB, errors, brandTypes,
+            showTooltipCAT, showTooltipUAT,
             getInfoForModalBrandUcp, storeObject, updateObject
         } = useMarcaUcp(context);
 
@@ -86,7 +103,7 @@ export default {
         } = useValidateInput()
 
         const handleValidation = (input, validation) => {
-            objDB.value[input] = validateInput(prod.value[input], validation)
+            objDB.value[input] = validateInput(objDB.value[input], validation)
         }
 
         onMounted(
@@ -96,7 +113,8 @@ export default {
         )
 
         return {
-            isLoadingRequest, objDB, errors, 
+            isLoadingRequest, objDB, errors, brandTypes,
+            showTooltipCAT, showTooltipUAT,
             handleValidation, storeObject, updateObject
         }
     }
