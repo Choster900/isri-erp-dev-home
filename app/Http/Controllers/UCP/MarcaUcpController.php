@@ -47,7 +47,7 @@ class MarcaUcpController extends Controller
     public function getInfoModalBrandUcp(Request $request, $id)
     {
         $brand = Marca::find($id);
-        $brandTypes = TipoMarca::select('id_tipo_marca as value','nombre_tipo_marca as label')->get();
+        $brandTypes = TipoMarca::select('id_tipo_marca as value', 'nombre_tipo_marca as label')->get();
 
         return response()->json([
             'brand'                         => $brand ?? [],
@@ -55,23 +55,23 @@ class MarcaUcpController extends Controller
         ]);
     }
 
-    public function saveProduct(Request $request)
+    public function saveBrandUcp(Request $request)
     {
         DB::beginTransaction();
         try {
-            $product = new Marca([
-                'id_tipo_marca'                 => $request->purchaseProcedureId,
-                'id_tipo_marca'                 => $request->unspscId,
-                'estado_producto'               => 1,
-                'fecha_reg_producto'            => Carbon::now(),
-                'usuario_producto'              => $request->user()->nick_usuario,
-                'ip_producto'                   => $request->ip(),
+            $brand = new Marca([
+                'id_tipo_marca'                 => $request->id_tipo_marca,
+                'nombre_marca'                  => $request->nombre_marca,
+                'estado_marca'                  => 1,
+                'fecha_reg_marca'               => Carbon::now(),
+                'usuario_marca'                 => $request->user()->nick_usuario,
+                'ip_marca'                      => $request->ip(),
             ]);
-            $product->save();
+            $brand->save();
 
             DB::commit(); // Confirma las operaciones en la base de datos
             return response()->json([
-                'message'          => 'Producto guardado con éxito.',
+                'message'          => 'Marca guardada con éxito.',
             ]);
         } catch (\Throwable $th) {
             DB::rollBack(); // En caso de error, revierte las operaciones anteriores
@@ -79,6 +79,65 @@ class MarcaUcpController extends Controller
                 'logical_error' => 'Ha ocurrido un error con sus datos.',
                 'error' => $th->getMessage(),
             ], 422);
+        }
+    }
+
+    public function updateBrandUcp(Request $request)
+    {
+        $brand = Marca::find($request->id_marca);
+        if ($brand->estado_marca == 0) {
+            return response()->json(['logical_error' => 'Error, la marca seleccionada ha sido deshabilitada.'], 422);
+        } else {
+            DB::beginTransaction();
+            try {
+                $brand->update([
+                    'id_tipo_marca'                 => $request->id_tipo_marca,
+                    'nombre_marca'                  => $request->nombre_marca,
+                    'estado_marca'                  => 1,
+                    'fecha_mod_marca'               => Carbon::now(),
+                    'usuario_marca'                 => $request->user()->nick_usuario,
+                    'ip_marca'                      => $request->ip(),
+                ]);
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => 'Marca actualizada con éxito.',
+                ]);
+            } catch (\Throwable $th) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $th->getMessage(),
+                ], 422);
+            }
+        }
+    }
+
+    public function changeStatusProduct(Request $request)
+    {
+        $brand = Marca::find($request->id);
+        if ($request->status == $brand->estado_marca) {
+            DB::beginTransaction();
+            try {
+                $brand->update([
+                    'estado_marca'                           => $brand->estado_marca == 1 ? 0 : 1,
+                    'fecha_mod_marca'                        => Carbon::now(),
+                    'usuario_marca'                          => $request->user()->nick_usuario,
+                    'ip_marca'                               => $request->ip(),
+                ]);
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Acción ejecutada con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
+            }
+        } else {
+            return response()->json(['logical_error' => 'Error, esta marca ya ha sido ' . $brand->estado_marca == 1 ? 'activada.' : 'desactivada.',], 422);
         }
     }
 }
