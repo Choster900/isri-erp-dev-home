@@ -4,7 +4,7 @@
         <div class="py-5">
             <div class="flex-row justify-center items-center mb-7 mx-4">
 
-                <div class="mb-4 md:flex flex-row justify-items-start mx-8">
+                <div class=" md:flex flex-row justify-items-start mx-8">
                     <div class="  mb-7 w-full">
                         <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Nombre del
                             empleado <span class="text-red-600 font-extrabold">*</span></label>
@@ -15,12 +15,13 @@
                                 :resolve-on-load="false" :delay="1000" :searchable="true" :clear-on-search="true"
                                 :min-chars="1" placeholder="Busqueda de empleado..." :classes="{
         placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+        container: 'relative mx-auto w-full flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
+        dropdown: 'max-h-20 absolute -left-px -right-px bottom-0 transform translate-y-full border border-gray-300 -mt-px overflow-y-scroll z-50 bg-white flex flex-col rounded-b',
+        dropdownTop: '-translate-y-full top-px bottom-auto rounded-b-none rounded-t',
+        dropdownHidden: 'hidden',
     }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
-                                noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="buscarpornombre ?
-
-        async function (query) { return await handleEmployeeSearch(query) } : objectEmployee
-
-        " />
+                                noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
+                                :options="dataEmployees" />
                         </div>
 
                     </div>
@@ -28,12 +29,12 @@
 
 
                 <!-- Buttons -->
-                <div class="mt-4 mb-4 md:flex flex-row justify-center">
+                <div class="-my-5 md:flex flex-row justify-center">
                     <GeneralButton v-if="dataProcesoCompra" @click="updateProcesoCompra()"
                         color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
                     <GeneralButton v-else @click="saveSubAlmacen()" color="bg-green-700  hover:bg-green-800"
                         text="Agregar" icon="add" />
-                    <div class="mb-4 md:mr-2 md:mb-0 px-1" @click="$emit('close-modal')">
+                    <div class=" md:mr-2 md:mb-0 px-1" @click="$emit('close-modal')">
                         <GeneralButton text="Cancelar" icon="defaultBruh" />
                     </div>
                 </div>
@@ -46,7 +47,7 @@
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
 import Swal from 'sweetalert2';
-import { toRefs, reactive, ref, watch, computed } from 'vue';
+import { toRefs, reactive, ref, watch, computed, onMounted } from 'vue';
 import { executeRequest } from '@/plugins/requestHelpers';
 import RadioButton from "../../../Components-ISRI/ComponentsToForms/RadioButton.vue"
 export default {
@@ -64,6 +65,8 @@ export default {
         const tipoProcesoCompra = ref(null)
         const idProcesoCompra = ref(null)
         const idEmpleado = ref(null)
+
+        const dataEmployees = ref([])
 
 
 
@@ -93,6 +96,36 @@ export default {
             }
             return [];
         });
+
+
+
+        /**
+   * Busca empleados por nombre para evaluaciones.
+   *
+   * @param {string} nombreToSearch - Nombre a buscar.
+   * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+   * @throws {Error} - Error al obtener empleados por nombre.
+   */
+        const getEmployeesByAlmacenDependencie = async (nombreToSearch) => {
+            try {
+                // Realiza la búsqueda de empleados
+                const response = await axios.get(
+                    "/getEmployeeByDependencia",
+                );
+
+                // Devuelve los datos de la respuesta
+                dataEmployees.value = response.data
+            } catch (error) {
+                // Manejo de errores específicos
+                console.error("Error al obtener empleados por nombre:", error);
+                // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+                throw new Error("Error en la búsqueda de empleados");
+            }
+        };
+
+        onMounted(() => {
+            getEmployeesByAlmacenDependencie()
+        })
 
 
         /**
@@ -245,6 +278,7 @@ export default {
             idEmpleado,
             objectEmployee,
             buscarpornombre,
+            dataEmployees,
 
             updateProcesoCompra,
             saveSubAlmacen,
