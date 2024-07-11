@@ -27,7 +27,6 @@
                             class="w-full py-4 ms-2 text-sm font-medium text-gray-900">Servicio</label>
                     </div>
                 </div>
-                {{ dataProcesoCompra }}
                 <!-- Buttons -->
                 <div class="mt-4 mb-4 md:flex flex-row justify-center">
                     <GeneralButton v-if="dataProcesoCompra != ''" @click="updateProcesoCompra()"
