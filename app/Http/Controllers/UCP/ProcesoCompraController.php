@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UCP;
 
 use App\Http\Controllers\Controller;
 use App\Models\Empleado;
+use App\Models\PlazaAsignada;
 use App\Models\ProcesoCompra;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -97,9 +98,9 @@ class ProcesoCompraController extends Controller
         try {
             DB::beginTransaction();
             $v_requerimiento = ProcesoCompra::create([
-                'id_tipo_proceso_compra'    => $request->tipoProcesoCompra,
-                'id_empleado'           => null, // enviamos null por que es en UCP solo se va a poder agregar desde almacen
-                'nombre_proceso_compra'    => $request->nombreProcesoCompra,
+                'id_tipo_proceso_compra' => $request->tipoProcesoCompra,
+                'id_empleado'            => null, // enviamos null por que es en UCP solo se va a poder agregar desde almacen
+                'nombre_proceso_compra'  => $request->nombreProcesoCompra,
                 /*   'fecha_reg_sub_almacen' => Carbon::now(),
                 'usuario_sub_almacen'   => $request->user()->nick_usuario,
                 'ip_sub_almacen'        => $request->ip(), */
@@ -118,8 +119,8 @@ class ProcesoCompraController extends Controller
         try {
             DB::beginTransaction();
             $v_requerimiento = ProcesoCompra::where("id_proceso_compra", $request->idProcesoCompra)->update([
-                'id_tipo_proceso_compra'    => $request->tipoProcesoCompra,
-                'nombre_proceso_compra'    => $request->nombreProcesoCompra,
+                'id_tipo_proceso_compra' => $request->tipoProcesoCompra,
+                'nombre_proceso_compra'  => $request->nombreProcesoCompra,
                 /* 'fecha_mod_sub_almacen' => Carbon::now(),
                 'usuario_sub_almacen'   => $request->user()->nick_usuario,
                 'ip_sub_almacen'        => $request->ip(), */
@@ -138,7 +139,7 @@ class ProcesoCompraController extends Controller
         try {
             DB::beginTransaction();
             $v_requerimiento = ProcesoCompra::where("id_proceso_compra", $request->idProcesoCompra)->update([
-                'id_empleado'    => $request->idEmpleado,
+                'id_empleado' => $request->idEmpleado,
                 /* 'fecha_mod_sub_almacen' => Carbon::now(),
                 'usuario_sub_almacen'   => $request->user()->nick_usuario,
                 'ip_sub_almacen'        => $request->ip(), */
@@ -186,5 +187,24 @@ class ProcesoCompraController extends Controller
         });
 
         return response()->json($formattedResults);
+    }
+
+    // Get employees by almacen
+    function getEmployeeByDependencia()
+    {
+        $employees = PlazaAsignada::with(["empleado.persona"])->where("id_dependencia", 21)->get();
+
+
+
+        $formattedResults = $employees->map(function ($item) {
+            return [
+                'value'           => $item->empleado->persona->id_persona,
+                'label'           => $item->empleado->persona->nombre_completo,
+                'allDataPersonas' => $item->persona,
+            ];
+        });
+
+        return response()->json($formattedResults);
+
     }
 }
