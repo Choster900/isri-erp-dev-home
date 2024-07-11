@@ -16,16 +16,16 @@ const props = defineProps({
     },
     center: {
         type: Boolean,
-        default:false
+        default: false,
     },
     rounded: {
         type: Boolean,
-        default: false
+        default: false,
     },
-    addClases: {
+    addClasses: {
         type: String,
-        default: ' bg-white '
-    }
+        default: ' bg-white ',
+    },
 });
 
 const emit = defineEmits(['close']);
@@ -77,30 +77,28 @@ const maxWidthClass = computed(() => {
 });
 
 const isRounded = computed(() => {
-    const res = props.rounded ? ' rounded-lg' : ''
-    return res
-})
+    return props.rounded ? ' rounded-lg' : '';
+});
 </script>
 
 <template>
     <teleport to="body">
         <transition leave-active-class="duration-200">
-            <div v-show="show" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50" v-bind:class="{'flex items-center justify-center':center}" scroll-region>
-                <transition enter-active-class="ease-out duration-500" enter-from-class="opacity-0"
-                    enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
-                    leave-to-class="opacity-0">
+            <div v-show="show" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50" v-bind:class="{'flex items-center justify-center':center}">
+                <transition enter-active-class="ease-out duration-500" enter-from-class="opacity-0" enter-to-class="opacity-100"
+                            leave-active-class="ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
                     <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-                        <div class="absolute inset-0 bg-gray-900 opacity-75" />
+                        <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
                     </div>
                 </transition>
 
                 <transition enter-active-class="ease-out duration-500" enter-from-class="opacity-0 translate-y-[-100%]"
-                    enter-to-class="opacity-100 translate-y-0" leave-active-class="ease-in duration-200"
-                    leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-[-100%]">
+                            enter-to-class="opacity-100 translate-y-0" leave-active-class="ease-in duration-200"
+                            leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-[-100%]">
                     <div v-show="show"
-                        class="mb-6 rounded- overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                        :class="maxWidthClass+isRounded+addClases">
-                        <slot />
+                         class="mb-6 overflow-hidden shadow-xl transform transition-all w-full max-w-full sm:mx-auto"
+                         :class="[maxWidthClass, isRounded, addClasses]">
+                        <slot></slot>
                     </div>
                 </transition>
             </div>
