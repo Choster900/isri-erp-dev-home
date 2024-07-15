@@ -99,7 +99,7 @@ class AjusteSalidaController extends Controller
 
             $matchStock = DetalleExistenciaAlmacen::with([
                 'centro_atencion',
-                'existencia_almacen.producto',
+                'existencia_almacen.producto.unidad_medida',
                 'existencia_almacen.proyecto_financiado',
                 'linea_trabajo',
                 'marca'
@@ -127,6 +127,7 @@ class AjusteSalidaController extends Controller
                     'label' => $detailStock->existencia_almacen->producto->codigo_producto
                         . ' — ' . $detailStock->existencia_almacen->proyecto_financiado->codigo_proy_financiado
                         . ' — ' . $detailStock->existencia_almacen->producto->nombre_completo_producto
+                        . ' — ' . $detailStock->existencia_almacen->producto->unidad_medida->nombre_unidad_medida
                         . ' — UP/LT: ' . ($detailStock->linea_trabajo->codigo_up_lt ?? 'Sin UP/LT')
                         . ' — Centro: ' . $detailStock->centro_atencion->codigo_centro_atencion
                         . ' — Marca: ' . ($detailStock->marca->nombre_marca ?? 'Sin marca')
@@ -164,7 +165,7 @@ class AjusteSalidaController extends Controller
     {
         $matchStock = DetalleExistenciaAlmacen::with([
             'centro_atencion',
-            'existencia_almacen.producto',
+            'existencia_almacen.producto.unidad_medida',
             'existencia_almacen.proyecto_financiado',
             'linea_trabajo',
             'marca'
@@ -194,7 +195,14 @@ class AjusteSalidaController extends Controller
 
             return [
                 'value' => $detailStock->id_det_existencia_almacen,
-                'label' => "$producto->codigo_producto — $proyectoFinanciado->codigo_proy_financiado — $producto->nombre_completo_producto — UP/LT: " . ($lineaTrabajo->codigo_up_lt ?? 'Sin UP/LT') . " — Centro: $centroAtencion->codigo_centro_atencion — Marca: " . ($marca->nombre_marca ?? 'Sin marca') . ' — Vencimiento: ' . ($detailStock->fecha_vcto_det_existencia_almacen ? Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y') : 'Sin fecha.'),
+                'label' => $producto->codigo_producto ." — ". 
+                $proyectoFinanciado->codigo_proy_financiado ." — ". 
+                $producto->nombre_completo_producto ." — ". 
+                $producto->unidad_medida->nombre_unidad_medida ." — UP/LT: " . 
+                ($lineaTrabajo->codigo_up_lt ?? 'Sin UP/LT') . 
+                " — Centro: $centroAtencion->codigo_centro_atencion — Marca: " . 
+                ($marca->nombre_marca ?? 'Sin marca') . ' — Vencimiento: ' . 
+                ($detailStock->fecha_vcto_det_existencia_almacen ? Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y') : 'Sin fecha.'),
                 'allInfo' => $detailStock
             ];
         });
