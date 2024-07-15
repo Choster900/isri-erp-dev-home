@@ -592,13 +592,13 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 table.sheet0 col.col0 {
     width: 116.37777658pt
 }
 
 table.sheet0 col.col1 {
-    width: 281.06666592pt
+    width: 381.06666592pt
 }
 
 /* Define las clases de animación */

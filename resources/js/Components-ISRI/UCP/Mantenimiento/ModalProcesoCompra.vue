@@ -27,10 +27,9 @@
                             class="w-full py-4 ms-2 text-sm font-medium text-gray-900">Servicio</label>
                     </div>
                 </div>
-
                 <!-- Buttons -->
                 <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                    <GeneralButton v-if="dataProcesoCompra" @click="updateProcesoCompra()"
+                    <GeneralButton v-if="dataProcesoCompra != ''" @click="updateProcesoCompra()"
                         color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
                     <GeneralButton v-else @click="saveSubAlmacen()" color="bg-green-700  hover:bg-green-800"
                         text="Agregar" icon="add" />
@@ -55,7 +54,7 @@ export default {
     components: { Modal, TextInput, RadioButton },
     props: {
         ModalIsOpen: { type: Boolean, default: false, },
-        dataProcesoCompra: { type: Object, default: () => ({}) }
+        dataProcesoCompra: { type: Object, default: () => [] }
     },
     setup(props, { emit }) {
 
