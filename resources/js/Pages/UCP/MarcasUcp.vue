@@ -48,6 +48,11 @@
                                     {{ brand.nombre_marca }}
                                 </div>
                             </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[18%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ brand.tipo_marca.nombre_tipo_marca }}
+                                </div>
+                            </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[20%]">
                                 <div class="font-medium text-slate-800 text-center max-h-[125px] overflow-y-auto">
                                     {{ moment(brand.fecha_reg_marca).format("DD/MM/YYYY") }}
@@ -164,10 +169,17 @@ export default {
         const objId = ref(0)
 
         const columns = [
-            { width: "11%", label: "ID", name: "id_marca", type: "text" },
-            { width: "35%", label: "Nombre", name: "nombre_marca", type: "text" },
-            { width: "17%", label: "Fecha registro", name: "fecha_reg_marca", type: "date" },
-            { width: "17%", label: "Fecha modificación", name: "fecha_mod_marca", type: "date" },
+            { width: "8%", label: "ID", name: "id_marca", type: "text" },
+            { width: "30%", label: "Nombre", name: "nombre_marca", type: "text" },
+            {
+                width: "18%", label: "tipo", name: "id_tipo_marca", type: "select",
+                options: [
+                    { value: "1", label: "BIENES DE USO" },
+                    { value: "2", label: "BIENES DE CONSUMO" },
+                ]
+            },
+            { width: "12%", label: "Registrado", name: "fecha_reg_marca", type: "date" },
+            { width: "12%", label: "Modificado", name: "fecha_mod_marca", type: "date" },
             {
                 width: "10%", label: "Estado", name: "estado_marca", type: "select",
                 options: [
