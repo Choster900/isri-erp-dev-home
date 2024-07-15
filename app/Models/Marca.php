@@ -37,4 +37,13 @@ class Marca extends Model
     {
         return $this->hasMany(ProductoAdquisicion::class, 'id_marca', 'id_marca');
     }
+    /**
+     * Get the TipoMarca model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function tipo_marca()
+    { //                                               FK                PK
+        return $this->belongsTo(TipoMarca::class, 'id_tipo_marca', 'id_tipo_marca');
+    }
 }

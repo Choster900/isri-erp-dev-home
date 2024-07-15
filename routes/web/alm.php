@@ -246,6 +246,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.proceso-compras');
     Route::post('get-proceso-compra-for-almacen', [ProcesoCompraController::class, 'getProcesosComprasForAlmacen'])->name('procesoCompra.getProcesosComprasForAlmacen');
-    Route::post('find-employee-by-name-for-warehouse', [ProcesoCompraController::class, 'findEmployeeByName'])->name('procesoCompra.getProcesosComprasForAlmacen');
-    Route::post('update-employee-in-proceso-compra', [ProcesoCompraController::class, 'updateProcesoCompraEmployee'])->name('procesoCompra.getProcesosComprasForAlmacen');
+    Route::post('find-employee-by-name-for-warehouse', [ProcesoCompraController::class, 'findEmployeeByName'])->name('procesoCompra.findEmployeeByName');
+    Route::post('update-employee-in-proceso-compra', [ProcesoCompraController::class, 'updateProcesoCompraEmployee'])->name('procesoCompra.updateProcesoCompraEmployee');
+    Route::get('getEmployeeByDependencia', [ProcesoCompraController::class, 'getEmployeeByDependencia'])->name('procesoCompra.getEmployeeByDependencia');
 });

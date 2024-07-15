@@ -8,6 +8,15 @@ import axios from 'axios';
 import moment from 'moment';
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
+import { useToCalculate } from '@/Composables/General/useToCalculate.js';
+
+
+
+        const { round2Decimals } = useToCalculate()
+       /*  return{
+            round2Decimals,
+        } */
+
 </script>
 <template>
     <Head title="Proceso - Quedan" />
@@ -74,8 +83,10 @@ import html2pdf from 'html2pdf.js'
                                                     detalle.numero_factura_det_quedan
                                                 }}<br>
                                                 <span class="font-medium">MONTO: </span> ${{
-                                                    (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
-                                                    (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
+                                                    round2Decimals((parseFloat(detalle.servicio_factura_det_quedan) || 0) +
+                                                    (parseFloat(detalle.producto_factura_det_quedan) || 0))
+
+                                                    }}
                                             </p>
                                         </div>
                                         <template v-if="i < data.detalle_quedan.length - 1">
@@ -151,7 +162,7 @@ import html2pdf from 'html2pdf.js'
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             title="Genera un comprobante de retencion para este quedan"
-                                            v-if="data.monto_isr_quedan > 0"
+                                            v-if="data.monto_iva_quedan > 0"
                                             @click.stop="generarComprobanteRetencionPdf(data)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
@@ -495,6 +506,8 @@ export default {
         this.getListForSelect()
         this.getPermissions(this)
     },
+
+
 
 };
 </script>

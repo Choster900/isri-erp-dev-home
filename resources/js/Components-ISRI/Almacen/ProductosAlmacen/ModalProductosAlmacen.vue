@@ -127,7 +127,7 @@
                 </div>
             </div>
 
-            <div class="md:flex my-6 flex-row justify-center mx-8">
+            <div class="flex flex-wrap justify-center my-6 mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
                 <button v-if="prod.status === 1" @click="updateProduct(prod)"
