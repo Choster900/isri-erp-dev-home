@@ -14,7 +14,7 @@ class MarcaUcpController extends Controller
 {
     public function getMarcasUcp(Request $request)
     {
-        $columns = ['id_marca', 'nombre_marca', 'fecha_reg_marca', 'fecha_mod_marca', 'estado_marca'];
+        $columns = ['id_marca', 'nombre_marca', 'id_tipo_marca', 'fecha_reg_marca', 'fecha_mod_marca', 'estado_marca'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -22,6 +22,9 @@ class MarcaUcpController extends Controller
         $search_value = $request->search;
 
         $query = Marca::select('*')
+            ->with([
+                'tipo_marca',
+            ])
             ->orderBy($columns[$column], $dir);
 
         if ($search_value) {
@@ -32,6 +35,10 @@ class MarcaUcpController extends Controller
             //Search by id
             if ($search_value['id_marca']) {
                 $query->where('id_marca', $search_value['id_marca']);
+            }
+            //Search by id_tipo_marca
+            if ($search_value['id_tipo_marca']) {
+                $query->where('id_tipo_marca', $search_value['id_tipo_marca']);
             }
             //Search by fecha_mod_marca
             if ($search_value['fecha_mod_marca'] == 'N/A' || $search_value['fecha_mod_marca'] == 'n/a') {
