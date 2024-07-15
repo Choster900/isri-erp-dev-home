@@ -69,7 +69,7 @@ export default {
         const dataEmployees = ref([])
 
         watch(dataSubAlmacen, (newValue, oldValue) => {
-
+            
             if (newValue != null) {
                 idEmpleado.value = newValue.empleado.persona.id_persona
                 idSubAlmacen.value = newValue.id_sub_almacen

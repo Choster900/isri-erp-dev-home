@@ -26,7 +26,7 @@
                         <span class="text-slate-400 font-medium">
                             {{ tableData.total }}
                         </span>
-                    </h2>
+                    </h2>4
                 </div>
             </header>
             <div class="overflow-x-auto">
