@@ -85,7 +85,7 @@ class TransferenciaController extends Controller
 
             $matchStock = DetalleExistenciaAlmacen::with([
                 'centro_atencion',
-                'existencia_almacen.producto',
+                'existencia_almacen.producto.unidad_medida',
                 'existencia_almacen.proyecto_financiado',
                 'linea_trabajo',
                 'marca'
@@ -113,6 +113,7 @@ class TransferenciaController extends Controller
                     'label' => $detailStock->existencia_almacen->producto->codigo_producto
                         . ' — ' . $detailStock->existencia_almacen->proyecto_financiado->codigo_proy_financiado
                         . ' — ' . $detailStock->existencia_almacen->producto->nombre_completo_producto
+                        . ' — ' . $detailStock->existencia_almacen->producto->unidad_medida->nombre_unidad_medida
                         . ' — UP/LT: ' . ($detailStock->linea_trabajo->codigo_up_lt ?? 'Sin UP/LT')
                         . ' — Centro: ' . $detailStock->centro_atencion->codigo_centro_atencion
                         . ' — Marca: ' . ($detailStock->marca->nombre_marca ?? 'Sin marca')
