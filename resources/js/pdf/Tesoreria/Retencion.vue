@@ -34,21 +34,20 @@
                                 </div>
                             </td>
                             <td class="border-r border-white border-b text-left" colspan="2">
-                                <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt] text-white">
-                                    GIRO:
-                                    <!-- <span class="font-extrabold text-[8px]">{{ dataQuedan.proveedor.giro.nombre_giro }}</span> -->
+                                <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt] text-black">
+                                    <span class="font-extrabold text-[8px]">{{ dataQuedan.proveedor.giro.nombre_giro }}</span>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td class="border-l border-r border-white border-b text-left" colspan="2">
-                                <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt] text-white">
-                                    N.I.T: <span class="font-extrabold">{{ dataQuedan.proveedor.nit_proveedor }}</span>
+                                <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt] text-black">
+                                    <span class="font-extrabold">{{ dataQuedan.proveedor.nit_proveedor || dataQuedan.proveedor.dui_proveedor }}</span>
                                 </div>
                             </td>
                             <td class="border-r border-white border-b text-left" colspan="4">
-                                <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt] text-white">
-                                    N.R.C.: <span class="font-extrabold">{{ dataQuedan.proveedor.nrc_proveedor }}</span>
+                                <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt] text-black">
+                                     <span class="font-extrabold">{{ dataQuedan.proveedor.nrc_proveedor }}</span>
                                 </div>
                             </td>
                         </tr>
@@ -82,16 +81,17 @@
                                 </div>
                             </td>
                             <td v-else class=" border-l border-r border-white border-b">&nbsp;</td>
-                            <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-r border-white border-b text-left"
+                            <td  class=" border-r border-white border-b text-left"
                                 colspan="4">
                                 <div style="margin-top: -12px; margin-left: -12px;"
-                                    class="py-[9px] text-[8pt] font-bold uppercase">
-                                    {{ truncateText(dataQuedan.detalle_quedan[i - 1].descripcion_det_quedan, 100) }}
+                                    class="py-[9px] text-[8pt] font-bold uppercase text-black">
+                                   <!--  {{ truncateText(dataQuedan.detalle_quedan[i - 1].descripcion_det_quedan, 100) }} -->
+                           {{ dataQuedan.detalle_quedan[i - 1]?.numero_factura_det_quedan }}
 
                                 </div>
                             </td>
-                            <td v-else class=" border-r border-white border-b" colspan="4">&nbsp;</td>
-                            <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-r border-white border-b ">
+                          <!--   <td v-else class=" border-r border-white border-b" colspan="4">&nbsp;- {{ truncateText(dataQuedan.detalle_quedan[i - 1]?.descripcion_det_quedan, 100) }}</td>
+                          -->   <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-r border-white border-b ">
                                 <div style="margin-top: -12px;" class="pr-2 py-[9px] text-[8pt] flex justify-between">
                                     <span class="text-left text-white">
                                         $
@@ -253,8 +253,14 @@
 
         </div>
     </div>
+
+<!--
+    <pre>
+
+    {{dataQuedan}}
+    </pre> -->
 </template>
-  
+
 <script>
 export default {
     props: {
@@ -293,10 +299,9 @@ export default {
     }
 }
 </script>
-  
+
 <style scoped>
 * {
     font-family: Arial, Helvetica, sans-serif;
 }
 </style>
-  

@@ -346,7 +346,9 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         :title="errors[`detalle_quedan.${rowIndex}.numero_acta_det_quedan`]"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
+                                                        {{ rowsData[rowIndex]['numero_acta_det_quedan'] }}
                                                         </td>
+
                                                     <td v-else-if="cellIndex == 'monto'" class="border-2 border-black">
                                                         <table>
                                                             <tr>
