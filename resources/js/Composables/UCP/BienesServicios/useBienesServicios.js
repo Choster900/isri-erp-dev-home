@@ -152,11 +152,11 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
 
             if (selectedProduct) {
                 // Desestructura la información del producto
-                const { unidad_medida, precio_producto, nombre_producto, id_ccta_presupuestal, nombre_completo_producto } = selectedProduct.allDataProducto;
+                const { unidad_medida, precio_producto, nombre_producto, id_ccta_presupuestal, nombre_completo_producto ,codigo_producto} = selectedProduct.allDataProducto;
 
                 // Actualiza el peso del producto en arrayProductoAdquisicion
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].pesoProducto = unidad_medida.id_unidad_medida;
-                arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].detalleProducto = id_ccta_presupuestal + '-' + nombre_completo_producto + ' - ' + unidad_medida.nombre_unidad_medida;
+                arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].detalleProducto = codigo_producto + '-' + nombre_completo_producto + ' - ' + unidad_medida.nombre_unidad_medida;
 
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].especifico = id_ccta_presupuestal;
 
@@ -608,7 +608,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                     idProdAdquisicion: index.id_prod_adquisicion,
                     especifico: producto.id_ccta_presupuestal,
                     idProducto: producto.id_producto,
-                    detalleProducto: producto.id_ccta_presupuestal + '-' + producto.nombre_completo_producto + ' - ' + producto.unidad_medida.nombre_unidad_medida,
+                    detalleProducto: producto.codigo_producto + '-' + producto.nombre_completo_producto + ' - ' + producto.unidad_medida.nombre_unidad_medida,
                     pesoProducto: producto.unidad_medida.id_unidad_medida,
                     idCentroAtencion: index.id_centro_atencion,
                     detalleCentro: index.centro_atencion.nombre_centro_atencion,
