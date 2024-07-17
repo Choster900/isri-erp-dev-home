@@ -64,6 +64,8 @@ export const useRecepcion = (context) => {
 
     const getInfoForModalRecep = async (id) => {
         if (id > 0) {
+            console.log(round2Decimals(1.72499999));
+            console.log(round2Decimals(1.72500000));
             await startReception(id)
         } else {
             try {
