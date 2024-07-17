@@ -791,11 +791,12 @@ class RecepcionController extends Controller
                 foreach ($detalles as $detalle) {
                     $res = 0;
                     $costXQty = $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
-                    if ($detalle->producto->fraccionado_producto) {
-                        $res = downwardRounding($costXQty);
-                    } else {
-                        $res = round($costXQty, 4);
-                    }
+                    $res = round($costXQty, 2);
+                    // if ($detalle->producto->fraccionado_producto) {
+                    //     $res = downwardRounding($costXQty);
+                    // } else {
+                    //     $res = round($costXQty, 4);
+                    // }
                     $total += $res;
                 }
                 // Agregar los campos comunes
@@ -823,11 +824,12 @@ class RecepcionController extends Controller
                     $total = $det->sum(function ($detalle) {
                         $res = 0;
                         $costXQty = $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
-                        if ($detalle->producto->fraccionado_producto) {
-                            $res = downwardRounding($costXQty);
-                        } else {
-                            $res = round($costXQty, 4);
-                        }
+                        $res = round($costXQty, 2);
+                        // if ($detalle->producto->fraccionado_producto) {
+                        //     $res = downwardRounding($costXQty);
+                        // } else {
+                        //     $res = round($costXQty, 4);
+                        // }
                         return $res;
                     });
 

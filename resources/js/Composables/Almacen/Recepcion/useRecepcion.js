@@ -60,10 +60,12 @@ export const useRecepcion = (context) => {
         formatDateVue3DP
     } = useFormatDateTime()
 
-    const { round2Decimals, downwardRounding } = useToCalculate();
+    const { round2Decimals } = useToCalculate();
 
     const getInfoForModalRecep = async (id) => {
         if (id > 0) {
+            console.log(round2Decimals(1.72499999));
+            console.log(round2Decimals(1.72500000));
             await startReception(id)
         } else {
             try {
@@ -384,7 +386,7 @@ export const useRecepcion = (context) => {
                 }
             }
         })
-        return round2Decimals(acumulado).toFixed(2)
+        return round2Decimals(acumulado)
     }
 
     const hasActiveProds = (indexLt) => {
@@ -459,8 +461,8 @@ export const useRecepcion = (context) => {
         const qtyTotal = isGas
             ? (prodProcedure.cant_prod_adquisicion * prodProcedure.costo_prod_adquisicion) - acumulado
             : prodProcedure.cant_prod_adquisicion - acumulado;
-
-        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal).toFixed(2) : recDocument.value.prods[indexLt].productos[index].fractionated ? qtyTotal.toFixed(2) : qtyTotal;
+        //                                       GAS(MONEY)                                                                           STOCK(2 decimals)     STOCK(0 decimals)                        
+        const formattedQtyTotal = isGas ? round2Decimals(qtyTotal) : recDocument.value.prods[indexLt].productos[index].fractionated ? qtyTotal.toFixed(2) : qtyTotal;
 
         recDocument.value.prods[indexLt].productos[index].avails = formattedQtyTotal;
 
@@ -570,8 +572,8 @@ export const useRecepcion = (context) => {
                 }
             }
         }
-        recDocument.value.total = round2Decimals(sum).toFixed(2);
-        return round2Decimals(sum).toFixed(2);
+        recDocument.value.total = round2Decimals(sum)
+        return round2Decimals(sum)
     });
 
     const ordenC = computed(() => {
@@ -616,7 +618,7 @@ export const useRecepcion = (context) => {
                 if (recDocument.value.isGas) {
                     if (prod.total && prod.qty) {
                         if (prod.total > 0 && prod.qty > 0) {
-                            prod.cost = (prod.total / prod.qty).toFixed(6)
+                            prod.cost = (prod.total / prod.qty).toFixed(6) //6 decimals when is GAS
                         } else {
                             prod.cost = '0.00'
                         }
@@ -625,7 +627,7 @@ export const useRecepcion = (context) => {
                     }
                 } else {
                     let prevRes = prod.qty * prod.cost
-                    prod.total = prod.fractionated === 1 ? downwardRounding(prevRes) : prevRes.toFixed(2)
+                    prod.total = round2Decimals(prevRes)
                 }
             })
         });

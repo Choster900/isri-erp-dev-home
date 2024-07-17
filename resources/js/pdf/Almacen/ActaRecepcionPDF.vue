@@ -158,9 +158,7 @@
                     <!-- Total -->
                     <div class="w-[15%] flex justify-center items-center">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            ${{ prod.producto.fraccionado_producto == 1 ?
-                            downwardRounding(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido)
-                            : round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido).toFixed(2) }}
+                            ${{ round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido) }}
                         </p>
                     </div>
                 </div>
@@ -353,7 +351,7 @@ export default {
 
         const calculateTotal = (lts) => {
             const total = lts.reduce((acc, e) => acc + parseFloat(e.total), 0)
-            return round2Decimals(total).toFixed(2)
+            return round2Decimals(total)
         }
         const floatToInt = (value) => {
             // Primero, convertimos el valor a un número flotante
