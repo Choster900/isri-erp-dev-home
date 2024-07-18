@@ -31,6 +31,7 @@ class DetDocumentoAdquisicion extends Model
         'usuario_det_doc_adquisicion',
         'ip_det_doc_adquisicion',
         'visible_ucp_det_doc_adquisicion',
+        'tipo_costo_det_doc_adquisicion',
     ];
 
     public function documento_adquisicion()
