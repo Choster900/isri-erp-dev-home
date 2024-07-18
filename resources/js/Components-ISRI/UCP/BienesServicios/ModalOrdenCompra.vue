@@ -12,7 +12,7 @@
 
                 </div>
                 <div class="mx-6 mt-2"></div>
-                <div class="mx-4 overflow-y-auto h-[650px] py-3 pl-2 pr-4 mt-4">
+                <div class="mx-4     py-3 pl-2 pr-4 mt-4">
                     <table class="w-full sheet0 " border="0" cellpadding="0" cellspacing="0">
                         <col class="col0">
                         <col class="col1">
@@ -41,6 +41,8 @@
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
                                         </svg>
+
+
                                     </div>
                                 </td>
                             </tr>
@@ -51,6 +53,35 @@
                                         <div class="relative text-center text-sm">
                                             ORDEN DE COMPRA DE BIENES Y SERVICIOS
                                         </div>
+                                        <span v-if="estadoDocAdq === 1">|</span>
+                                        <div class="flex items-center space-x-3 " v-if="estadoDocAdq === 1">
+                                            <div class="text-sm text-slate-500 font-medium">P.UNIT</div>
+                                            <div class="form-switch">
+                                                <input type="checkbox" id="toggle" class="sr-only"
+                                                    v-model="tipoCostoDetDocAdquisicion">
+                                                <label class="bg-slate-400" for="toggle">
+                                                    <span class="bg-white shadow-sm" aria-hidden="true"></span>
+                                                    <span class="sr-only">P.UNIT</span>
+                                                </label>
+                                            </div>
+                                            <div class="text-sm text-slate-500 font-medium">P.TOTAL</div>
+                                        </div>
+                                        <Tooltip bg="dark" position="right" :key="weekIndex" class="" v-if="estadoDocAdq === 1">
+                                            <template v-slot:message>
+                                                <div class="text-[8pt] w-56">
+                                                    <div class="font-medium text-slate-200 mb-0.5 leading-tight">
+                                                        What's New!
+                                                    </div>
+                                                    <p class="text-[7pt] text-slate-400 leading-tight">
+                                                        Ahora puede optar por gestionar el total del documento
+                                                        utilizando el precio unitario del producto o el monto total del
+                                                        producto. Los campos marcados en <span
+                                                            class="text-red-500">ROJO</span> se bloquearán
+                                                        automáticamente.
+                                                    </p>
+                                                </div>
+                                            </template>
+                                        </Tooltip>
                                     </div>
                                 </td>
                             </tr>
@@ -58,7 +89,7 @@
                             <tr>
                                 <td class="border border-black  bg-black h-5 border-r-white text-white text-center text-[9pt] "
                                     colspan="3">
-                                    RAZON  SOCIAL DEL SUMINISTRANTE
+                                    RAZON SOCIAL DEL SUMINISTRANTE
                                 </td>
                                 <td class="border border-black bg-black h-5 text-white text-center text-[9pt]">
                                     {{ documentType }}
@@ -213,7 +244,7 @@
                                     </td>
 
                                     <td class=" w-12 relative "
-                                        :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.cantProdAdquisicion`] }">
+                                        :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.cantProdAdquisicion`], }">
                                         <input type="text" v-model="detalle.cantProdAdquisicion"
                                             :disabled="estadoDocAdq !== 1"
                                             @input="handleInput(i, j); detalle.cantProdAdquisicion = detalle.cantProdAdquisicion.replace(/\D/g, '')"
@@ -223,25 +254,28 @@
                                             placeholder="0" min="0" max="1000" />
                                     </td>
                                     <td class=" relative text-center"
-                                        :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.costoProdAdquisicion`] }">
+                                        :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.costoProdAdquisicion`], 'bg-red-300 transition-opacity-100 duration-1000': showGrayBackground && estadoDocAdq == 1, ' transition-opacity-100 duration-1000': !showGrayBackground && estadoDocAdq == 1, 'cursor-not-allowed': tipoCostoDetDocAdquisicion }">
                                         <div class="flex justify-center space-x-1 absolute top-0 left-0 ">
                                             <input type="text" v-model="detalle.costoProdAdquisicion"
-                                                :disabled="estadoDocAdq !== 1"
-                                                :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
+                                                :disabled="estadoDocAdq !== 1 || tipoCostoDetDocAdquisicion"
+                                                :class="estadoDocAdq !== 1 || tipoCostoDetDocAdquisicion ? 'cursor-not-allowed' : 'cursor-pointer '"
                                                 @input="handleInput(i, j); detalle.costoProdAdquisicion = detalle.costoProdAdquisicion.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
-                                                class="w-full bg-transparent border-none  text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
+                                                class="w-full bg-transparent border-none  text-center  text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                                                 placeholder="0.00" min="0" max="1000" />
                                         </div>
 
                                     </td>
-                                    <td class="relative text-center w-20">
-                                        <span class="absolute top-1 left-0 w-full flex flex-col items-center">
-                                            {{ detalle.valorTotalProduct !== undefined ?
-                detalle.valorTotalProduct.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }) : '00.00' }}
-                                        </span>
+                                    <td class="relative text-center w-20"
+                                        :class="{ 'bg-red-300 transition-opacity-100 duration-1000': showGrayBackgroundTotal && estadoDocAdq == 1, ' transition-opacity-100 duration-1000': !showGrayBackgroundTotal && estadoDocAdq == 1, 'cursor-not-allowed': !tipoCostoDetDocAdquisicion }">
+                                        <div class="flex justify-center space-x-1 absolute top-0 left-0 ">
+
+                                            <input type="text" v-model="detalle.valorTotalProduct"
+                                                :disabled="estadoDocAdq !== 1 || !tipoCostoDetDocAdquisicion"
+                                                :class="estadoDocAdq !== 1 || !tipoCostoDetDocAdquisicion ? 'cursor-not-allowed' : 'cursor-pointer '"
+                                                @input="handleInput(i, j); detalle.valorTotalProduct = detalle.valorTotalProduct.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
+                                                class="w-full bg-transparent border-none  text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
+                                                placeholder="0.00" min="0" max="1000" />
+                                        </div>
                                     </td>
 
                                 </tr>
@@ -400,11 +434,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import { toRefs } from 'vue';
 import { useBienesServicios } from '@/Composables/UCP/BienesServicios/useBienesServicios.js';
 import Swal from 'sweetalert2';
-import Tooltip from '@/Components-ISRI/Tooltip.vue';
+import Tooltip from '@/Components-ISRI/TooltipAlwaysOpen.vue';
 import moment from 'moment';
 import { executeRequest } from '@/plugins/requestHelpers';
 import { useConfigPdf } from '@/Composables/UCP/BienesServicios/useConfigPdf';
-
 export default {
     // Indica que este componente utiliza el componente ProcessModal
     components: { ProcessModal, Tooltip },
@@ -438,6 +471,7 @@ export default {
             disableLt,
             arrayMarca,
             addingRows,
+            showGrayBackground,
             totProductos,
             letterNumber,
             estadoDocAdq,
@@ -446,6 +480,7 @@ export default {
             deleteProductAdq,
             errorsValidation,
             getBrandName,
+            productoTotalCosto,
             arrayLineaTrabajo,
             objectGetFromProp,
             arrayUnidadMedida,
@@ -455,6 +490,8 @@ export default {
             arrayDocAdquisicion,
             addinDocAdquisicion,
             arrayCentroAtencion,
+            tipoCostoDetDocAdquisicion,
+            showGrayBackgroundTotal,
             getCenterName,
             productDataSearched,
             ArrayProductFiltered,
@@ -551,6 +588,7 @@ export default {
             handleInput,
             moment,
             printOrdenCompraPdf,
+            showGrayBackgroundTotal,
             documentNumber,
             providerBusinessName,
             disableLt,
@@ -562,6 +600,7 @@ export default {
             totProductos,
             getBrandName,
             letterNumber,
+            productoTotalCosto,
             calculateTotal,
             deleteProductAdq,
             errorsValidation,
@@ -571,6 +610,7 @@ export default {
             arrayLineaTrabajo,
             arrayUnidadMedida,
             addinDocAdquisicion,
+            showGrayBackground,
             productDataSearched,
             arrayCentroAtencion,
             arrayDocAdquisicion,
@@ -583,6 +623,7 @@ export default {
             arrayWhenIsEditingDocAdq,
             updateProductAdquisicion,
             arrayProductoAdquisicion,
+            tipoCostoDetDocAdquisicion,
             recepcionDetDocAdquisicion,
             arrayProductsWhenIsEditable,
             observacionDetDocAdquisicion,
@@ -699,5 +740,20 @@ td {
     to {
         transform: rotate(360deg);
     }
+}
+
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: background-color 1s ease;
+}
+
+.fade-enter,
+.fade-leave-to
+
+/* .fade-leave-active in <2.1.8 */
+    {
+    background-color: rgba(255, 255, 255, 0);
+    /* start with a transparent background */
 }
 </style>

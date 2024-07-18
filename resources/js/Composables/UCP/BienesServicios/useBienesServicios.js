@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { useToCalculate } from "@/Composables/General/useToCalculate";
 /**
  * Hook personalizado para la gestión de bienes y servicios.
  * Este hook se encarga de realizar operaciones relacionadas con la gestión de bienes y servicios,
@@ -42,6 +43,11 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
 
     const letterNumber = ref(null)
     const totProductos = ref(null)
+
+    const tipoCostoDetDocAdquisicion = ref(null)
+    const productoTotalCosto = ref(null)
+
+    const { round2Decimals } = useToCalculate()
 
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
@@ -152,7 +158,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
 
             if (selectedProduct) {
                 // Desestructura la información del producto
-                const { unidad_medida, precio_producto, nombre_producto, id_ccta_presupuestal, nombre_completo_producto ,codigo_producto} = selectedProduct.allDataProducto;
+                const { unidad_medida, precio_producto, nombre_producto, id_ccta_presupuestal, nombre_completo_producto, codigo_producto } = selectedProduct.allDataProducto;
 
                 // Actualiza el peso del producto en arrayProductoAdquisicion
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].pesoProducto = unidad_medida.id_unidad_medida;
@@ -197,27 +203,36 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
     };
 
     /**
-     * Calcula el valor total del producto en la fila especificada.
-     * @param {number} docAdq - Índice del documento de adquisición.
-     * @param {number} detalleDocAdq - Índice del detalle del documento de adquisición.
-     */
+ * Calcula el valor total del producto en la fila especificada.
+ * @param {number} docAdq - Índice del documento de adquisición.
+ * @param {number} detalleDocAdq - Índice del detalle del documento de adquisición.
+ */
     const calculateTotal = (docAdq, detalleDocAdq) => {
         try {
             // Obtén el producto en la fila especificada
             const producto = arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq];
 
             // Desestructura las propiedades necesarias del producto
-            const { cantProdAdquisicion, costoProdAdquisicion } = producto;
+            const { cantProdAdquisicion, costoProdAdquisicion, valorTotalProduct } = producto;
 
-            // Realiza el cálculo del valor total y asigna al producto
-            const valorTotal = cantProdAdquisicion * costoProdAdquisicion;
-            arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq].valorTotalProduct = valorTotal;
-            calculateTotalProductValue()
+            // Realiza el cálculo del valor total o del costo según el tipo de costo
+            if (!tipoCostoDetDocAdquisicion.value) {
+                // Calculo del valor total
+                producto.valorTotalProduct = cantProdAdquisicion * costoProdAdquisicion;
+            } else {
+                console.log(valorTotalProduct / cantProdAdquisicion);
+                // Calculo del costo unitario
+                producto.costoProdAdquisicion = round2Decimals(valorTotalProduct / cantProdAdquisicion)
+            }
+
+            // Actualiza el valor total de los productos
+            calculateTotalProductValue();
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola.
             console.error("Error al calcular el valor total del producto:", error);
         }
     };
+
 
 
     /**
@@ -227,27 +242,20 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
      * Additionally, it formats the total to two decimal places and calls `getTextForNumber` with the total sum.
      */
     const calculateTotalProductValue = () => {
-        // Array to store all product details
-        let suma = [];
-
-        // Iterate through each product in the acquisition array
-        arrayProductoAdquisicion.value.forEach(element => {
-            // Iterate through each detail of the current product
-            element.detalleDoc.forEach(element2 => {
-                // Add the detail to the suma array
-                suma.push(element2);
-            });
-        });
+        // Flatten the array of product details
+        const productDetails = arrayProductoAdquisicion.value.flatMap(element => element.detalleDoc);
 
         // Calculate the total sum of all product values
-        let sumaTotal = suma.reduce((acumulador, producto) => acumulador + producto.valorTotalProduct, 0);
+        const totalSum = productDetails.reduce((accumulator, product) => parseFloat(accumulator) + parseFloat(product.valorTotalProduct), 0);
 
-        // Update the total products value, formatted to two decimal places
-        totProductos.value = sumaTotal.toFixed(2);
-
+        // Round the total sum to two decimal places and update the total products value
+        const roundedTotal = round2Decimals(totalSum);
+        totProductos.value = roundedTotal;
+        console.log(totProductos.value);
         // Call the function to get the text representation of the total sum
-        getTextForNumber(sumaTotal);
+        getTextForNumber(roundedTotal);
     };
+
 
 
     const loadingNumberLetter = ref(false)
@@ -332,6 +340,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                 const response = await axios.post("/update-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
                     idDetDocAdquisicion: idDetDocAdquisicion.value,
+                    tipoCostoDetDocAdquisicion: tipoCostoDetDocAdquisicion.value,
                     notificacionDetDocAdquisicion: notificacionDetDocAdquisicion.value,
                     recepcionDetDocAdquisicion: recepcionDetDocAdquisicion.value,
                     observacionDetDocAdquisicion: observacionDetDocAdquisicion.value,
@@ -508,6 +517,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             });
             totProductos.value = null
             letterNumber.value = null
+            tipoCostoDetDocAdquisicion.value = null
         }
     });
 
@@ -520,6 +530,9 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             observacionDetDocAdquisicion.value = objectGetFromProp.value.observacion_det_doc_adquisicion
             recepcionDetDocAdquisicion.value = objectGetFromProp.value.recepcion_det_doc_adquisicion
             notificacionDetDocAdquisicion.value = objectGetFromProp.value.notificacion_det_doc_adquisicion
+
+            console.log(objectGetFromProp.value);
+            tipoCostoDetDocAdquisicion.value = objectGetFromProp.value.tipo_costo_det_doc_adquisicion == 1 ? false : true
 
             let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
             // Utilizando un conjunto para rastrear los id_lt únicos
@@ -617,7 +630,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                     costoProdAdquisicion: index.costo_prod_adquisicion,
                     descripcionProdAdquisicion: index.descripcion_prod_adquisicion,
                     estadoProdAdquisicion: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
-                    valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
+                    valorTotalProduct: round2Decimals(index.cant_prod_adquisicion * index.costo_prod_adquisicion),
                     amountsPerMonthList: newArray
                 });
             });
@@ -741,9 +754,29 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
     };
 
 
+    const showGrayBackground = ref(false);
+    const showGrayBackgroundTotal = ref(false);
+    watch(() => tipoCostoDetDocAdquisicion.value, (newVal) => {
+        if (newVal) {
+            showGrayBackground.value = true;
+            setTimeout(() => {
+                showGrayBackground.value = false;
+            }, 1000); // 1000 milisegundos = 1 segundo
+        }else{
+            showGrayBackgroundTotal.value = true;
+            setTimeout(() => {
+                showGrayBackgroundTotal.value = false;
+            }, 1000); // 1000 milisegundos = 1 segundo
+        }
+    });
+
     return {
+        showGrayBackgroundTotal,
+        showGrayBackground,
         handleDataCalendarUpdate,
+        productoTotalCosto,
         getCenterName,
+        tipoCostoDetDocAdquisicion,
         getBrandName,
         documentType,
         documentNumber,

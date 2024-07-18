@@ -119,6 +119,7 @@ class BienesServiciosController extends Controller
             $detalles = $request->productAdq;
             $idDetDocAdquisicion = $request->idDetDocAdquisicion;
             $notificacionDetDocAdquisicion = $request->notificacionDetDocAdquisicion;
+            $tipoCostoDetDocAdquisicion = $request->tipoCostoDetDocAdquisicion ? 0 : 1;
             $recepcionDetDocAdquisicion = $request->recepcionDetDocAdquisicion;
             $observacionDetDocAdquisicion = $request->observacionDetDocAdquisicion;
             $usuario = $request->user()->nick_usuario;
@@ -171,6 +172,7 @@ class BienesServiciosController extends Controller
                 "observacion_det_doc_adquisicion"  => $observacionDetDocAdquisicion,
                 "recepcion_det_doc_adquisicion"    => $recepcionDetDocAdquisicion,
                 "notificacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
+                "tipo_costo_det_doc_adquisicion"   => $tipoCostoDetDocAdquisicion,
             ]);
 
             DB::commit();
@@ -188,6 +190,7 @@ class BienesServiciosController extends Controller
             $detalles = $request->productAdq;
             $idDetDocAdquisicion = $request->idDetDocAdquisicion;
             $notificacionDetDocAdquisicion = $request->notificacionDetDocAdquisicion;
+            $tipoCostoDetDocAdquisicion = $request->tipoCostoDetDocAdquisicion ? 0 : 1;
             $recepcionDetDocAdquisicion = $request->recepcionDetDocAdquisicion;
             $observacionDetDocAdquisicion = $request->observacionDetDocAdquisicion;
             $usuario = $request->user()->nick_usuario;
@@ -301,6 +304,7 @@ class BienesServiciosController extends Controller
                 "observacion_det_doc_adquisicion"  => $observacionDetDocAdquisicion,
                 "recepcion_det_doc_adquisicion"    => $recepcionDetDocAdquisicion,
                 "notificacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
+                "tipo_costo_det_doc_adquisicion"   => $tipoCostoDetDocAdquisicion
             ]);
 
             return response()->json(["message" => "Actualización exitosa"]);
