@@ -45,7 +45,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
     const totProductos = ref(null)
 
     const tipoCostoDetDocAdquisicion = ref(null)
-    const productoTotalCosto = ref(null)
 
     const { round2Decimals } = useToCalculate()
 
@@ -774,7 +773,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
         showGrayBackgroundTotal,
         showGrayBackground,
         handleDataCalendarUpdate,
-        productoTotalCosto,
         getCenterName,
         tipoCostoDetDocAdquisicion,
         getBrandName,
