@@ -333,8 +333,8 @@ export const useDonacion = (context) => {
                 }
             }
         }
-        donInfo.value.total = sum.toFixed(2);
-        return sum.toFixed(2);
+        donInfo.value.total = round2Decimals(sum) // sum.toFixed(2);
+        return round2Decimals(sum) // sum.toFixed(2);
     });
 
     // Observa cambios en las propiedades qty y cost de cada producto
@@ -342,7 +342,7 @@ export const useDonacion = (context) => {
         newValue.prods.forEach((prod) => {
             let prevRes = prod.qty * prod.cost
             //prod.total = prod.fractionated === 1 ? prevRes.toFixed(4) : prevRes.toFixed(2)
-            prod.total = round2Decimals(prevRes).toFixed(2)
+            prod.total = round2Decimals(prevRes)
         });
     }, { deep: true });
 

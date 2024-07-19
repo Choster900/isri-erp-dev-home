@@ -60,6 +60,35 @@
                                         <div class="relative text-center text-sm">
                                             CONTRATO DE BIENES Y SERVICIOS
                                         </div>
+                                        <span v-if="estadoDocAdq === 1">|</span>
+                                        <div class="flex items-center space-x-3 " v-if="estadoDocAdq === 1">
+                                            <div class="text-sm text-slate-500 font-medium">P.UNIT</div>
+                                            <div class="form-switch">
+                                                <input type="checkbox" id="toggle" class="sr-only"
+                                                    v-model="tipoCostoDetDocAdquisicion">
+                                                <label class="bg-slate-400" for="toggle">
+                                                    <span class="bg-white shadow-sm" aria-hidden="true"></span>
+                                                    <span class="sr-only">P.UNIT</span>
+                                                </label>
+                                            </div>
+                                            <div class="text-sm text-slate-500 font-medium">P.TOTAL</div>
+                                        </div>
+                                        <Tooltip bg="dark" position="right" :key="weekIndex" class="" v-if="estadoDocAdq === 1">
+                                            <template v-slot:message>
+                                                <div class="text-[8pt] w-56">
+                                                    <div class="font-medium text-slate-200 mb-0.5 leading-tight">
+                                                        What's New!
+                                                    </div>
+                                                    <p class="text-[7pt] text-slate-400 leading-tight">
+                                                        Ahora puede optar por gestionar el total del documento
+                                                        utilizando el precio unitario del producto o el monto total del
+                                                        producto. Los campos marcados en <span
+                                                            class="text-red-500">ROJO</span> se bloquearán
+                                                        automáticamente.
+                                                    </p>
+                                                </div>
+                                            </template>
+                                        </Tooltip>
                                     </div>
                                 </td>
                             </tr>
@@ -238,28 +267,31 @@
                                             {{ detalle.cantProdAdquisicion }}
                                         </span>
                                     </td>
-                                    <td class=" relative text-center "
-                                        :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.costoProdAdquisicion`] }">
+                                    <td class=" relative text-center"
+                                        :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.costoProdAdquisicion`], 'bg-red-300 transition-opacity-100 duration-1000': showGrayBackground && estadoDocAdq == 1, ' transition-opacity-100 duration-1000': !showGrayBackground && estadoDocAdq == 1, 'cursor-not-allowed': tipoCostoDetDocAdquisicion }">
                                         <div class="flex justify-center space-x-1 absolute top-0 left-0 ">
                                             <input type="text" v-model="detalle.costoProdAdquisicion"
-                                                :disabled="estadoDocAdq !== 1"
-                                                :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
+                                                :disabled="estadoDocAdq !== 1 || tipoCostoDetDocAdquisicion"
+                                                :class="estadoDocAdq !== 1 || tipoCostoDetDocAdquisicion ? 'cursor-not-allowed' : 'cursor-pointer '"
                                                 @input="handleInput(i, j); detalle.costoProdAdquisicion = detalle.costoProdAdquisicion.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
-                                                class="w-full bg-transparent border-none  text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
+                                                class="w-full bg-transparent border-none  text-center  text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                                                 placeholder="0.00" min="0" max="1000" />
                                         </div>
 
                                     </td>
-                                    <td class="relative text-center w-20 bg-slate-200 cursor-not-allowed">
-                                        <span class="absolute top-1 left-0 w-full flex flex-col items-center ">
-                                            {{ detalle.valorTotalProduct !== undefined ?
-                detalle.valorTotalProduct.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }) : '00.00' }}
-                                        </span>
+                                    <td class="relative text-center w-20"
+                                        :class="{ 'bg-red-300 transition-opacity-100 duration-1000': showGrayBackgroundTotal && estadoDocAdq == 1, ' transition-opacity-100 duration-1000': !showGrayBackgroundTotal && estadoDocAdq == 1, 'cursor-not-allowed': !tipoCostoDetDocAdquisicion }">
+                                        <div class="flex justify-center space-x-1 absolute top-0 left-0 ">
+
+                                            <input type="text" v-model="detalle.valorTotalProduct"
+                                                :disabled="estadoDocAdq !== 1 || !tipoCostoDetDocAdquisicion"
+                                                :class="estadoDocAdq !== 1 || !tipoCostoDetDocAdquisicion ? 'cursor-not-allowed' : 'cursor-pointer '"
+                                                @input="handleInput(i, j); detalle.valorTotalProduct = detalle.valorTotalProduct.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
+                                                class="w-full bg-transparent border-none  text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
+                                                placeholder="0.00" min="0" max="1000" />
+                                        </div>
                                     </td>
-                                    <!-- //!NUEVO -->
+
                                     <td class="relative p-0 bg-white"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
                                         <CalendarAcuerdoComponent v-if="showModal"
@@ -421,7 +453,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import { toRefs } from 'vue';
 import { useBienesServicios } from '@/Composables/UCP/BienesServicios/useBienesServicios.js';
 import Swal from 'sweetalert2';
-import Tooltip from '@/Components-ISRI/Tooltip.vue';
+import Tooltip from '@/Components-ISRI/TooltipAlwaysOpen.vue';
 import moment from 'moment';
 import { executeRequest } from '@/plugins/requestHelpers';
 import { useConfigPdf } from '@/Composables/UCP/BienesServicios/useConfigPdf';
@@ -486,6 +518,9 @@ export default {
             ArrayProductFiltered,
             setInformacionProduct,
             providerBusinessName,
+            tipoCostoDetDocAdquisicion,
+            showGrayBackgroundTotal,
+            showGrayBackground,
             onSelectDocAdquisicion,
             arrayWhenIsEditingDocAdq,
             arrayProductoAdquisicion,
@@ -591,10 +626,13 @@ export default {
             deleteProductAdq,
             errorsValidation,
             providerBusinessName,
+            showGrayBackgroundTotal,
+            showGrayBackground,
             deletLineaTrabajo,
             objectGetFromProp,
             arrayLineaTrabajo,
             arrayUnidadMedida,
+            tipoCostoDetDocAdquisicion,
             addinDocAdquisicion,
             productDataSearched,
             arrayCentroAtencion,

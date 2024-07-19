@@ -185,18 +185,19 @@ class DocumentoAdquisicionController extends Controller
 
             foreach ( $request->items as $detail ) {
                 $new_item = new DetDocumentoAdquisicion([
-                    'id_doc_adquisicion'                  => $new_acq_doc->id_doc_adquisicion,
-                    'id_estado_doc_adquisicion'           => 1,
-                    'id_proy_financiado'                  => $detail['financing_source_id'],
-                    'nombre_det_doc_adquisicion'          => $detail['name'],
-                    'monto_det_doc_adquisicion'           => isset($detail['amount']) ? $detail['amount'] : 0,
-                    'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
-                    'admon_det_doc_adquisicion'           => $detail['contract_manager'],
-                    'estado_det_doc_adquisicion'          => 1,
-                    'fecha_reg_det_doc_adquisicion'       => Carbon::now(),
-                    'usuario_det_doc_adquisicion'         => $request->user()->nick_usuario,
-                    'ip_det_doc_adquisicion'              => $request->ip(),
-                    'visible_ucp_det_doc_adquisicion'         => $request->comesFrom == 'ucp' ? 1 : 0 // Si se agrega desde tesoreria lo ponemos como 0 y si se agrega desde ucp 1
+                    'id_doc_adquisicion'                    => $new_acq_doc->id_doc_adquisicion,
+                    'id_estado_doc_adquisicion'             => 1,
+                    'id_proy_financiado'                    => $detail['financing_source_id'],
+                    'nombre_det_doc_adquisicion'            => $detail['name'],
+                    'monto_det_doc_adquisicion'             => isset($detail['amount']) ? $detail['amount'] : 0,
+                    'compromiso_ppto_det_doc_adquisicion'   => $detail['commitment_number'],
+                    'admon_det_doc_adquisicion'             => $detail['contract_manager'],
+                    'tipo_costo_det_doc_adquisicion'        => 0,
+                    'estado_det_doc_adquisicion'            => 1,
+                    'fecha_reg_det_doc_adquisicion'         => Carbon::now(),
+                    'usuario_det_doc_adquisicion'           => $request->user()->nick_usuario,
+                    'ip_det_doc_adquisicion'                => $request->ip(),
+                    'visible_ucp_det_doc_adquisicion'       => $request->comesFrom == 'ucp' ? 1 : 0 // Si se agrega desde tesoreria lo ponemos como 0 y si se agrega desde ucp 1
                 ]);
                 $new_item->save();
             }
