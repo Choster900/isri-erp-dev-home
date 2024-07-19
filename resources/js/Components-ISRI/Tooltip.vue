@@ -4,7 +4,7 @@
     <button class="block" aria-haspopup="true" aria-expanded="tooltipOpen" @click.prevent>
       <slot name="contenido"></slot>
     </button>
-    <div class="z-10 absolute -translate-y-1" :class="positionOuterClasses(position)">
+    <div class="z-50 absolute -translate-y-1" :class="positionOuterClasses(position)">
       <!--  <transition
         enter-active-class="transition ease-out duration-200 transform"
         enter-from-class="opacity-0 -translate-y-2"
@@ -15,7 +15,7 @@
       ></transition> -->
 
         <div v-show="tooltipOpen" class="rounded overflow-hidden " :class="[
-          bg === 'dark' ? 'bg-slate-800' : 'bg-white border border-slate-200 shadow-lg',
+          bg === 'dark' ? 'bg-slate-800' : 'bg-white border border-slate-200 shadow-lg text-black',
           sizeClasses(size),
           positionInnerClasses(position)
         ]">

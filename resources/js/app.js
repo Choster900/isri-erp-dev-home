@@ -4,6 +4,7 @@ import "../css/GlobalApp.css";
 import "./plugins/chart.js"
 import "./plugins/requestHelpers.js"
 import "../css/utility-patterns.css"
+import "../css/toggle-switch.css"
 import "../css/theme.css"
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";

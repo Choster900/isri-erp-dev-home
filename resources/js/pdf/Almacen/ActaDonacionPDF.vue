@@ -117,7 +117,7 @@
             <!-- Total -->
             <div class="w-[15%] flex justify-center items-center">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                    ${{ (prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido).toFixed(2) }}
+                    ${{ round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido) }}
                 </p>
             </div>
         </div>
@@ -214,6 +214,7 @@
 
 <script>
 import moment from 'moment';
+import { useToCalculate } from '@/Composables/General/useToCalculate.js';
 
 export default {
     components: {},
@@ -223,19 +224,20 @@ export default {
             default: {},
         }
     },
-    methods: {
-        floatToInt(value) {
+    setup(props) {
+        const { round2Decimals } = useToCalculate();
+
+        const floatToInt = (value) => {
             // Primero, convertimos el valor a un número flotante
             const floatValue = parseFloat(value);
             // Luego, lo redondeamos al entero más cercano
             const roundedValue = Math.round(floatValue);
             // Devolvemos el resultado como un número entero
             return roundedValue;
-        },
-    },
-    setup() {
+        }
+
         return {
-            moment
+            moment, floatToInt, round2Decimals
         }
     },
 };

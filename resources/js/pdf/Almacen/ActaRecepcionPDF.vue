@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        <!-- Date and time, financing source and commitment number -->
+        <!-- Date and time -->
         <div class="flex w-full border-x border-black pb-3">
             <div class="w-[50%] flex justify-start items-center">
                 <p class="ml-2 font-[MuseoSans] text-gray-800 text-[11px]">Fecha referencia documento de compra:</p>
@@ -78,8 +78,6 @@
             </div>
 
         </div>
-
-
 
         <!-- Third row -->
         <div class="flex bg-black  justify-center items-center font-[MuseoSans] pb-[12px]">
@@ -158,9 +156,7 @@
                     <!-- Total -->
                     <div class="w-[15%] flex justify-center items-center">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            ${{ prod.producto.fraccionado_producto == 1 ?
-                            downwardRounding(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido)
-                            : round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido).toFixed(2) }}
+                            ${{ round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido) }}
                         </p>
                     </div>
                 </div>
@@ -184,9 +180,17 @@
                     SON: {{ recToPrint.monto_letras }}</p>
             </div>
         </div>
-        <div> <!-- Aditional information -->
+
+        <div class="w-full" style="page-break-inside: avoid;"> 
+            <p class="font-[MuseoSans] text-[12px] mt-2">
+                SE HACE CONSTAR QUE LOS BIENES DETALLADOS EN ESTA ACTA, CUMPLEN CON LAS CONDICIONES Y ESPECIFICACIONES TECNICAS
+                PREVIAMENTE DEFINIDAS EN EL CONTRATO U ORDEN DE COMPRA.
+            </p>
+        </div>
+
+        <div style="page-break-inside: avoid;"> <!-- Aditional information -->
             <!-- Observacion -->
-            <div class="flex w-full mt-4">
+            <div class="flex w-full mt-2">
                 <p class="font-[MuseoSans] text-[12px] ">Observación guardaalmacen:</p>
                 <p class="font-[MuseoSans] text-[12px] font-bold ml-1">
                     {{ recToPrint.observacion_recepcion_pedido ??
@@ -349,11 +353,11 @@ export default {
         }
     },
     setup(props) {
-        const { round2Decimals, downwardRounding } = useToCalculate();
+        const { round2Decimals } = useToCalculate();
 
         const calculateTotal = (lts) => {
             const total = lts.reduce((acc, e) => acc + parseFloat(e.total), 0)
-            return round2Decimals(total).toFixed(2)
+            return round2Decimals(total)
         }
         const floatToInt = (value) => {
             // Primero, convertimos el valor a un número flotante
@@ -365,7 +369,7 @@ export default {
         }
 
         return {
-            moment, round2Decimals, floatToInt, calculateTotal, downwardRounding
+            moment, round2Decimals, floatToInt, calculateTotal
         }
     }
 };
