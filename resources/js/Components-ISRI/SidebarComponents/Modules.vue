@@ -3,7 +3,7 @@
         :class="color ? 'bg-gray-600' : (matchPath ? 'bg-[#010b2c]' : '')">
         <a @click="StateFromModal ? stateToMenu = !stateToMenu : this.$emit('emitToShowSidebarFromModules')"
             class="block text-slate-200 hover:text-white truncate transition duration-150">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between" id="content-menus">
                 <div class="flex items-center">
                     <svg v-if="stateToMenu" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="1" class="w-7 h-7  " :class="{

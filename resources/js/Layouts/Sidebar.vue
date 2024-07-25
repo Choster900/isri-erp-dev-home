@@ -27,7 +27,6 @@ const emit = defineEmits(['updateSidebarState']);
 // @Methods: Métodos para manejar el estado del sidebar
 const toggleSidebar = () => {
     sidebarState.value = !sidebarState.value; // Alternar el estado del sidebar
-    emit('updateSidebarState', sidebarState.value);
 
 };
 const closeSidebar = () => {
@@ -66,7 +65,7 @@ watch(() => isSidebarVisible.value, (newVal) => {
                 <img style="width:200px" src="../../img/logoSidebar.png" alt="GOBIERNO DE EL SALVADOR">
             </DropdownLink>
         </div>
-        <MenuSidebarVue :color="sidebarColor" :sidebarStateProp="sidebarState"
+        <MenuSidebarVue :color="sidebarColor" :stateFromSidebarProp="sidebarState"
             @emitToShowModalFromMenu="toggleSidebar" />
         <!-- Expand / collapse button -->
         <div class="pt-3 hidden lg:inline-flex 2xl:hidden justify-end mt-auto">

@@ -20,7 +20,7 @@ const props = defineProps({
     },
     isBackgroundVisible: {
         type: Boolean,
-        default: true, // Valor predeterminado si no se proporciona
+        default: false, // Valor predeterminado si no se proporciona
         required: true, // Propiedad obligatoria para la visibilidad del fondo
     },
 });
