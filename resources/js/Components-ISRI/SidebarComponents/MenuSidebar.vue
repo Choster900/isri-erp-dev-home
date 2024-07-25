@@ -8,8 +8,8 @@
                 <span v-else class="lg:sidebar-expanded:block 2xl:block">Modulos</span>
             </h3>
             <ul class="mt-3">
-                <ModulesVue :color="color" v-for="(module, index) in menuModules"  :modulo="module"
-                    :StateFromModal="isSidebarOpen" @triggerModalFromMenu="handleTriggerModalFromMenu" />
+                <ModulesVue :color="color" v-for="(module, index) in menuModules"  :module="module"
+                    :isSidebarOpen="isSidebarOpen" @triggerModalFromMenu="handleTriggerModalFromMenu" />
             </ul>
         </div>
     </div>
