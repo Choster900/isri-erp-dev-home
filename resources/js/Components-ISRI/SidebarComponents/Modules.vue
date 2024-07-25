@@ -1,7 +1,7 @@
 <template>
     <li class="px-3 py-2  mb-0.5 last:mb-0 cursor-pointer"
         :class="color ? 'bg-gray-600' : (matchPath ? 'bg-[#010b2c]' : '')">
-        <a @click="StateFromModal ? stateToMenu = !stateToMenu : this.$emit('emitToShowSidebarFromModules')"
+        <a @click="StateFromModal ? stateToMenu = !stateToMenu : this.$emit('triggerModalFromMenu')"
             class="block text-slate-200 hover:text-white truncate transition duration-150">
             <div class="flex items-center justify-between" id="content-menus">
                 <div class="flex items-center">
