@@ -27,7 +27,7 @@ const emit = defineEmits(['updateSidebarState']);
 // @Methods: Métodos para manejar el estado del sidebar
 const toggleSidebar = () => {
     sidebarState.value = !sidebarState.value; // Alternar el estado del sidebar
-
+    emit('updateSidebarState', sidebarState.value); // Emitir el evento para cerrar el sidebar
 };
 const closeSidebar = () => {
     sidebarState.value = false; // Cerramos el modal

@@ -19,7 +19,7 @@ const props = defineProps({
 });
 
 // Estado para el sidebar
-const isSidebarOpen = ref(false);
+const isSidebarOpen = ref(true);
 const isBackgroundVisible = ref(true);
 // Estado del modal
 const isModalOpen = ref(false);
@@ -46,7 +46,6 @@ const toggleModal = () => {
 // Manejar clics fuera del modal
 const handleClickOutside = (event) => {
     if (event.target.id === "header-content") {
-        console.log("entro en el if");
         // Cierra el modal y oculta el sidebar y el fondo si se hace clic fuera del modal
         isModalOpen.value = false; // Cierra el modal
         isBackgroundVisible.value = false; // Oculta el fondo
