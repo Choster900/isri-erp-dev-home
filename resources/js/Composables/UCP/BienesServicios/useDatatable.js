@@ -154,12 +154,11 @@ export const useDatatable = (type) => {
                 showCloseButton: true,
             });
             if (confirmedEliminarProd.isConfirmed) {
-               await executeRequest(
+                // const response = await updateDetDocAdquisicionRequest(idDetDoc, idState);
+                await executeRequest(
                     updateDetDocAdquisicionRequest(idDetDoc, idState),
-                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`,
-                    "El monto total de todos los productos no puede exceder el monto especificado en el detalle del documento de adquisición seleccionado."
+                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`
                 );
-
                 getProductoAdquisicion(lastUrl.value)
             }
         } catch (error) {
