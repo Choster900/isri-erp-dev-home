@@ -29,7 +29,8 @@ export const useDatatable = (type) => {
         { width: "7%", label: "Numero Adquisicion", name: "numero_doc_adquisicion", type: "text", },
         { width: "22%", label: "Nombre adquisicion", name: "nombre_det_doc_adquisicion", type: "text", },
 
-        { width: "1%", label: "Monto", name: "monto_det_doc_adquisicion", type: "text", },
+        { width: "1%", label: "Monto doc adquisicion", name: "monto_det_doc_adquisicion", type: "text", },
+        { width: "1%", label: "Monto prod adquisicion", name: "monto_det_doc_adquisicion", type: "text", },
         { width: "1%", label: "Fecha", name: "fecha_reg_prod_adquisicion", type: "date", },
         {
             width: "1%", label: "Estado", name: "id_estado_doc_adquisicion", type: "select",
