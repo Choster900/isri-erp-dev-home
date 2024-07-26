@@ -29,7 +29,8 @@ export const useDatatable = (type) => {
         { width: "7%", label: "Numero Adquisicion", name: "numero_doc_adquisicion", type: "text", },
         { width: "22%", label: "Nombre adquisicion", name: "nombre_det_doc_adquisicion", type: "text", },
 
-        { width: "1%", label: "Monto", name: "monto_det_doc_adquisicion", type: "text", },
+        { width: "1%", label: "Monto doc adquisicion", name: "monto_det_doc_adquisicion", type: "text", },
+        { width: "1%", label: "Monto prod adquisicion", name: "monto_det_doc_adquisicion", type: "text", },
         { width: "1%", label: "Fecha", name: "fecha_reg_prod_adquisicion", type: "date", },
         {
             width: "1%", label: "Estado", name: "id_estado_doc_adquisicion", type: "select",
@@ -154,12 +155,11 @@ export const useDatatable = (type) => {
                 showCloseButton: true,
             });
             if (confirmedEliminarProd.isConfirmed) {
-               await executeRequest(
+                // const response = await updateDetDocAdquisicionRequest(idDetDoc, idState);
+                await executeRequest(
                     updateDetDocAdquisicionRequest(idDetDoc, idState),
-                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`,
-                    "El monto total de todos los productos no puede exceder el monto especificado en el detalle del documento de adquisición seleccionado."
+                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`
                 );
-
                 getProductoAdquisicion(lastUrl.value)
             }
         } catch (error) {
