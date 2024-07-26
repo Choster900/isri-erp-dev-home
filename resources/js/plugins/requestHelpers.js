@@ -30,6 +30,17 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                 type: "success",
                 isLoading: false,
             },
+            /* error: {
+                render({ data }) {
+                    console.log("Error response data:", data.response.data.error); // Add this line
+                    // Assuming the backend response has an error property
+                    return data.error || 'Se encontraron errores de validación en los datos enviados. Por favor, verifica e intenta nuevamente.';
+                },
+                closeOnClick: true,
+                closeButton: true,
+                type: "error",
+                isLoading: false,
+            } */
             error: {
                 render(err) {
                     let errorMessage = "Se produjo un error en la solicitud. Por favor, inténtalo nuevamente más tarde.";
@@ -50,7 +61,7 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                                 errorCode = "NOT_FOUND";
                                 break;
                             case 422:
-                                errorMessage = errorMessageCustom;
+                                errorMessage = err.data.response.data.error;
                                 errorCode = "VALIDATION_ERROR";
                                 break;
                             case 500:
@@ -86,7 +97,7 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                 },
             },
         });
-        
+
         return response;
     } catch (error) {
         // Manejar errores no relacionados con la promesa del toast (opcional)
