@@ -175,7 +175,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                 // Verifica si los valores son números válidos antes de realizar el cálculo
                 if (!isNaN(costo) && !isNaN(cantidad)) {
                     // Realiza el cálculo del valor total y asigna al producto
-                    arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].valorTotalProduct = (costo * cantidad);
+                    arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].valorTotalProduct = (costo * cantidad).toFixed(6);
                 } else {
                     // Si alguno de los valores no es un número válido, muestra un mensaje o toma la acción adecuada
                     console.warn("Costo o cantidad no son números válidos. No se pudo calcular el valor total.");
@@ -217,11 +217,11 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             // Realiza el cálculo del valor total o del costo según el tipo de costo
             if (!tipoCostoDetDocAdquisicion.value) {
                 // Calculo del valor total
-                producto.valorTotalProduct = cantProdAdquisicion * costoProdAdquisicion;
+                producto.valorTotalProduct = (cantProdAdquisicion * costoProdAdquisicion).toFixed(6);
             } else {
                 console.log(valorTotalProduct / cantProdAdquisicion);
                 // Calculo del costo unitario
-                producto.costoProdAdquisicion = round2Decimals(valorTotalProduct / cantProdAdquisicion)
+                producto.costoProdAdquisicion = (valorTotalProduct / cantProdAdquisicion).toFixed(6);
             }
 
             // Actualiza el valor total de los productos
@@ -767,7 +767,34 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                 showGrayBackgroundTotal.value = false;
             }, 1000); // 1000 milisegundos = 1 segundo
         }
+        recalculateCostoProdAdquisicion()
     });
+
+     /**
+     * Recalcula el costo unitario y el valor total de los productos en arrayProductoAdquisicion.
+     */
+    const recalculateCostoProdAdquisicion = () => {
+        // Itera sobre cada elemento en arrayProductoAdquisicion
+        arrayProductoAdquisicion.value.forEach(index => {
+            // Itera sobre cada producto en el detalle del documento
+            index.detalleDoc.forEach(producto => {
+                console.log(producto);
+
+                // Desestructura las propiedades necesarias del producto
+                const { cantProdAdquisicion, valorTotalProduct, costoProdAdquisicion } = producto;
+
+                // Verifica el tipo de costo para realizar el cálculo adecuado
+                if (!tipoCostoDetDocAdquisicion.value) {
+                    // Calculo del valor total
+                    producto.valorTotalProduct = (cantProdAdquisicion * costoProdAdquisicion).toFixed(2);
+                    producto.costoProdAdquisicion = (valorTotalProduct / cantProdAdquisicion).toFixed(2);
+                } else {
+                    // Calculo del costo unitario
+                    producto.costoProdAdquisicion = (valorTotalProduct / cantProdAdquisicion).toFixed(6);
+                }
+            });
+        });
+    }
 
     return {
         showGrayBackgroundTotal,
