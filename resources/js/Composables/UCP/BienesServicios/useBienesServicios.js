@@ -175,7 +175,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                 // Verifica si los valores son números válidos antes de realizar el cálculo
                 if (!isNaN(costo) && !isNaN(cantidad)) {
                     // Realiza el cálculo del valor total y asigna al producto
-                    arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].valorTotalProduct = (costo * cantidad).toFixed(6);
+                    arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].valorTotalProduct = (costo * cantidad);
                 } else {
                     // Si alguno de los valores no es un número válido, muestra un mensaje o toma la acción adecuada
                     console.warn("Costo o cantidad no son números válidos. No se pudo calcular el valor total.");
@@ -217,7 +217,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             // Realiza el cálculo del valor total o del costo según el tipo de costo
             if (!tipoCostoDetDocAdquisicion.value) {
                 // Calculo del valor total
-                producto.valorTotalProduct = (cantProdAdquisicion * costoProdAdquisicion).toFixed(6);
+                producto.valorTotalProduct = cantProdAdquisicion * costoProdAdquisicion;
             } else {
                 console.log(valorTotalProduct / cantProdAdquisicion);
                 // Calculo del costo unitario
