@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { computed, defineProps, defineEmits } from 'vue';
+import { computed, defineEmits } from 'vue';
 import ModulesVue from './Modules.vue';
 import { usePage } from '@inertiajs/vue3';
 
