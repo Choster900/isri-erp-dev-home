@@ -387,13 +387,13 @@ class BienesServiciosController extends Controller
         if ($productoAdquisicionTotal > $detalleDoc->monto_det_doc_adquisicion) {
             // Devolver error 422 si el total de los productos es mayor que el monto del detalle
             return response()->json([
-                'error' => 'EL TOTAL DE LOS PRODUCTOS ($' . number_format($productoAdquisicionTotal, 2) . ') ES MAYOR QUE EL MONTO DEL DETALLE ($' . number_format($detalleDoc->monto_det_doc_adquisicion, 2) . ').'
+                'error' => 'EL TOTAL DE LOS PRODUCTOS: ($' . number_format($productoAdquisicionTotal, 2) . ') ES MAYOR QUE EL MONTO DEL DOCUMENTO DE ADQUISICIÓN ($' . number_format($detalleDoc->monto_det_doc_adquisicion, 2) . ').'
             ], 422);
         } elseif ($productoAdquisicionTotal < $detalleDoc->monto_det_doc_adquisicion) {
             // Devolver error 422 si el total de los productos es menor que el monto del detalle
             $amountMissing = $detalleDoc->monto_det_doc_adquisicion - $productoAdquisicionTotal;
             return response()->json([
-                'error' => 'EL TOTAL DE LOS PRODUCTOS ($' . number_format($productoAdquisicionTotal, 2) . ') ES MENOR QUE EL MONTO DEL DETALLE ($' . number_format($detalleDoc->monto_det_doc_adquisicion, 2) . '). FALTAN $' . number_format($amountMissing, 2) . '.'
+                'error' => 'EL TOTAL DE LOS PRODUCTOS: ($' . number_format($productoAdquisicionTotal, 2) . ') ES MENOR QUE EL MONTO DEL DOCUMENTO DE ADQUISICIÓN ($' . number_format($detalleDoc->monto_det_doc_adquisicion, 2) . '). FALTAN $' . number_format($amountMissing, 2) . '.'
             ], 422);
         } else {
             // Si la validación pasa, actualizar el estado del documento
