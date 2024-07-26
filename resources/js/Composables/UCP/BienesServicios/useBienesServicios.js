@@ -221,7 +221,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             } else {
                 console.log(valorTotalProduct / cantProdAdquisicion);
                 // Calculo del costo unitario
-                producto.costoProdAdquisicion = round2Decimals(valorTotalProduct / cantProdAdquisicion)
+                producto.costoProdAdquisicion = (valorTotalProduct / cantProdAdquisicion).toFixed(6);
             }
 
             // Actualiza el valor total de los productos
@@ -767,7 +767,34 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                 showGrayBackgroundTotal.value = false;
             }, 1000); // 1000 milisegundos = 1 segundo
         }
+        recalculateCostoProdAdquisicion()
     });
+
+     /**
+     * Recalcula el costo unitario y el valor total de los productos en arrayProductoAdquisicion.
+     */
+    const recalculateCostoProdAdquisicion = () => {
+        // Itera sobre cada elemento en arrayProductoAdquisicion
+        arrayProductoAdquisicion.value.forEach(index => {
+            // Itera sobre cada producto en el detalle del documento
+            index.detalleDoc.forEach(producto => {
+                console.log(producto);
+
+                // Desestructura las propiedades necesarias del producto
+                const { cantProdAdquisicion, valorTotalProduct, costoProdAdquisicion } = producto;
+
+                // Verifica el tipo de costo para realizar el cálculo adecuado
+                if (!tipoCostoDetDocAdquisicion.value) {
+                    // Calculo del valor total
+                    producto.valorTotalProduct = (cantProdAdquisicion * costoProdAdquisicion).toFixed(2);
+                    producto.costoProdAdquisicion = (valorTotalProduct / cantProdAdquisicion).toFixed(2);
+                } else {
+                    // Calculo del costo unitario
+                    producto.costoProdAdquisicion = (valorTotalProduct / cantProdAdquisicion).toFixed(6);
+                }
+            });
+        });
+    }
 
     return {
         showGrayBackgroundTotal,
