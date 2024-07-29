@@ -48,7 +48,7 @@ export const useRecepcion = (context) => {
         detStockId: '',
         isGas: '',
         financingSourceId: '',
-        is6Decimal:'',
+        is6Decimals:'',
         observation: '', //Reception observation
         detDocId: '', //Identifier of the document detail related to the reception
         status: '', //We use this to manage some functionalities in the view, it represent the reception status
@@ -142,7 +142,7 @@ export const useRecepcion = (context) => {
         const itemInfo = data.itemInfo;
         const recepData = data.recep;
 
-        recDocument.value.is6Decimal = itemInfo.tipo_costo_det_doc_adquisicion === 1 ? true : false
+        recDocument.value.is6Decimals = itemInfo.tipo_costo_det_doc_adquisicion === 1 ? true : false
         recDocument.value.financingSourceId = itemInfo.id_proy_financiado
         recDocument.value.detDocId = itemInfo.id_det_doc_adquisicion
         recDocument.value.isGas = itemInfo.documento_adquisicion.proceso_compra.nombre_proceso_compra === 'GAS LICUADO DE PETROLEO' ? true : false
@@ -204,7 +204,7 @@ export const useRecepcion = (context) => {
             fractionated: element.producto.fraccionado_producto,
             avails: "",
             qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
-            cost: element.producto_adquisicion.costo_prod_adquisicion,
+            cost: recDocument.value.is6Decimals ? parseFloat(element.producto_adquisicion.costo_prod_adquisicion).toFixed(6) : parseFloat(element.producto_adquisicion.costo_prod_adquisicion).toFixed(2),
             total: recDocument.value.isGas ? round2Decimals(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido) : '',
             deleted: false,
             initial: "",
