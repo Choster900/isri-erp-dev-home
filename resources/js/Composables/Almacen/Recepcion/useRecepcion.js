@@ -313,7 +313,6 @@ export const useRecepcion = (context) => {
             return;
         }
 
-        console.log(selectedProd);
         const array = createProdArray(selectedProd, paId);
 
         const lineOfWork = recDocument.value.prods.find(group => group.id_lt === selectedProd.id_lt);
