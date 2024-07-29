@@ -65,8 +65,8 @@ watch(() => isSidebarVisible.value, (newVal) => {
                 <img style="width:200px" src="../../img/logoSidebar.png" alt="GOBIERNO DE EL SALVADOR">
             </DropdownLink>
         </div>
-        <MenuSidebarVue :color="sidebarColor" :stateFromSidebarProp="sidebarState"
-            @emitToShowModalFromMenu="toggleSidebar" />
+        <MenuSidebarVue :color="sidebarColor" :isSidebarOpen="sidebarState"
+            @triggerModalFromMenu="toggleSidebar" />
         <!-- Expand / collapse button -->
         <div class="pt-3 hidden lg:inline-flex 2xl:hidden justify-end mt-auto">
             <div class="px-3 py-2">

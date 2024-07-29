@@ -66,6 +66,16 @@
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[2%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    $
+                                    {{
+                                        prod.productos_adquisiciones.reduce((total, index) => {
+                                            return total + parseFloat(index.costo_prod_adquisicion) * parseFloat(index.cant_prod_adquisicion);
+                                        }, 0).toFixed(2)
+                                    }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[2%]">
                                 <div class="font-medium text-slate-800 text-center uppercase">
                                     {{
         moment(prod.productos_adquisiciones[0].fecha_reg_prod_adquisicion)
