@@ -205,7 +205,8 @@ export const useRecepcion = (context) => {
             avails: "",
             qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
             cost: recDocument.value.is6Decimals ? parseFloat(element.producto_adquisicion.costo_prod_adquisicion).toFixed(6) : parseFloat(element.producto_adquisicion.costo_prod_adquisicion).toFixed(2),
-            total: recDocument.value.isGas ? round2Decimals(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido) : '',
+            total: recDocument.value.isGas ? round2Decimals(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido) : 
+            recDocument.is6Decimals ? parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(6) : parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2),
             deleted: false,
             initial: "",
             initialAmount: "",
@@ -267,7 +268,7 @@ export const useRecepcion = (context) => {
         fractionated: selectedProd.fraccionado_producto,
         avails: '', //Represents the maximum number of products that the user can write.
         qty: '', //Represents the the number of products the user wants to register
-        cost: selectedProd.costo_prod_adquisicion, //Represents the the cost of the product
+        cost: recDocument.value.is6Decimals ? parseFloat(selectedProd.costo_prod_adquisicion).toFixed(6) : parseFloat(selectedProd.costo_prod_adquisicion).toFixed(2), //Represents the the cost of the product
         total: '', //Represents the result of qty x cost for every row
         deleted: false, //This is the state of the row, it represents the logical deletion.
         initial: selectedProd.total_menos_acumulado, //Represents the initial availability of a product
@@ -625,7 +626,7 @@ export const useRecepcion = (context) => {
                     }
                 } else {
                     let prevRes = prod.qty * prod.cost
-                    prod.total = round2Decimals(prevRes)
+                    prod.total = recDocument.value.is6Decimals ? (prod.qty * prod.cost).toFixed(6) : round2Decimals(prevRes)
                 }
             })
         });
