@@ -14,13 +14,7 @@ composer install
 ```
 php artisan key:generate
 ```
-- Reemplazar linea de codigo
-
-Ir a la ruta
-*/vendor/laravel/framework/src/Illuminate/Auth*
-
-Modificar la linea 51 del archivo Authenticatable.php
-Sustituir por la siguiente linea:
-``
-return $this->password_usuario;
-``
+- Ejecutar comando
+```
+php artisan storage:link
+```

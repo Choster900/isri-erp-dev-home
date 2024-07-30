@@ -72,8 +72,8 @@ class User extends Authenticatable
         $rol = Rol::find($id_rol);
         $contador = 0;
         if ($rol) {
-            foreach ($rol->usuarios as $user) {
-                if ($user->pivot->id_usuario==$id_usuario && $user->pivot->estado_permiso_usuario==1 && $rol->estado_rol==1) {
+            foreach ( $rol->usuarios as $user ) {
+                if ($user->pivot->id_usuario == $id_usuario && $user->pivot->estado_permiso_usuario == 1 && $rol->estado_rol == 1) {
                     $contador++;
                 }
             }
@@ -83,6 +83,16 @@ class User extends Authenticatable
         } else {
             return true;
         }
-        
+
+    }
+
+    /**
+     * Get the password for the user.
+     *
+     * @return string
+     */
+    public function getAuthPassword()
+    {
+        return $this->password_usuario;
     }
 }
