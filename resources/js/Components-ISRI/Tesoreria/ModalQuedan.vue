@@ -55,7 +55,16 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     </h3>
                                 </div>
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/4 pt-1 px-8 ">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/4 pt-1 px-8 flex items-end">
+                                <div class="border-2 border-black w-full flex flex-col">
+                                    <h3 class="text-[10px] px-3 py-1 font-bold text-gray-600">
+                                        <span :class="{ 'text-red-600': isPersonaNatOrJur }">PERSONA NATURAL - PN</span>
+                                    </h3>
+                                    <h3 class="text-[10px] px-3 py-1 font-bold text-gray-600">
+                                        <span :class="{ 'text-red-600': !isPersonaNatOrJur }">PERSONA JURIDICA -
+                                            PJ</span>
+                                    </h3>
+                                </div>
                             </div>
                         </div>
 
@@ -73,7 +82,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     </div>
                                     <div class="mb-4 md:mr-2 md:mb-0 w-25">
                                         <div class="relative flex w-full flex-row">
-                                            <label for="" class="flex items-center text-[14px]">Porcentaje de IVA:</label>
+                                            <label for="" class="flex items-center text-[14px]">Porcentaje de
+                                                IVA:</label>
                                             <input type="text" style="width: 75px;" v-model="dataInputs.iva" disabled
                                                 class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
                                         </div>
@@ -95,7 +105,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <div class="relative flex  w-full flex-row">
                                             <label for="" class="flex items-center  text-[14px] text-sm">Quedan:
                                             </label>
-                                            <input type="text" style="width: 80px;" disabled v-model="dataInputs.id_quedan"
+                                            <input type="text" style="width: 80px;" disabled
+                                                v-model="dataInputs.id_quedan"
                                                 class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                         </div>
                                     </div>
@@ -120,8 +131,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
                                         <div class="relative flex  w-full flex-row">
                                             <label for="" class="flex items-center text-[14px] text-sm">Renta:</label>
-                                            <input type="text" style="width: 80px;" v-model="dataInputs.monto_isr_quedan"
-                                                disabled
+                                            <input type="text" style="width: 80px;"
+                                                v-model="dataInputs.monto_isr_quedan" disabled
                                                 class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center  transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                         </div>
                                     </div>
@@ -129,8 +140,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
                                         <div class="relative flex  w-full flex-row">
                                             <label for="" class="flex items-center text-[14px]">IVA: </label>
-                                            <input type="text" style="width: 80px;" v-model="dataInputs.monto_iva_quedan"
-                                                disabled
+                                            <input type="text" style="width: 80px;"
+                                                v-model="dataInputs.monto_iva_quedan" disabled
                                                 class="placeholder-slate-400 bg-gray-200 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                         </div>
                                     </div>
@@ -203,8 +214,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <td class="border-2 border-black"
                                             :class="errors['quedan.numero_doc_adquisicion'] ? 'bg-red-300' : dataInputs.numero_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
 
-                                            <input type="text" v-model="dataInputs.numero_doc_adquisicion" maxlength="20"
-                                                :title="errors['quedan.numero_doc_adquisicion']"
+                                            <input type="text" v-model="dataInputs.numero_doc_adquisicion"
+                                                maxlength="20" :title="errors['quedan.numero_doc_adquisicion']"
                                                 :disabled="documentoAdquisicion == '' ? false : true"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
@@ -218,7 +229,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
-                                                maxlength="20" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                maxlength="20"
+                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
@@ -233,9 +245,9 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     @select="DocumentoAdquisicionSelected($event, true)"
                                                     :placeholder="documentoAdquisicion == '' ? 'sin contratos' : 'seleccione contrato'"
                                                     :classes="{
-                                                        containerDisabled: 'cursor-not-allowed bg-gray-200 ', placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    }
-                                                        " noOptionsText="<p class='text-xs'>sin contratos<p>"
+            containerDisabled: 'cursor-not-allowed bg-gray-200 ', placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+        }
+            " noOptionsText="<p class='text-xs'>sin contratos<p>"
                                                     noResultsText="<p class='text-xs'>contrato no encontrados<p>"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : documentoAdquisicion == '' ? true : false"
                                                     :options="documentoAdquisicion" :searchable="true" />
@@ -249,8 +261,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                     <tr>
                                         <th class="border-2 border-black text-sm px-2 text-gray-600 w-40">FACTURA</th>
-                                        <th class="border-2 border-black text-sm px-2 text-gray-600" colspan="2">FECHA EMISION</th>
-                                        <th class="border-2 border-black text-sm px-3 text-gray-600">CENTRO ATENCION</th>
+                                        <th class="border-2 border-black text-sm px-2 text-gray-600" colspan="2">FECHA
+                                            EMISION</th>
+                                        <th class="border-2 border-black text-sm px-3 text-gray-600">CENTRO ATENCION
+                                        </th>
                                         <th class="border-2 border-black text-sm px-6 text-gray-600">LINEA TRABAJO</th>
                                         <th class="border-2 border-black text-sm px-4 text-gray-600">NUMERO ACTA</th>
                                         <th class="border-2 border-black text-sm px-7 text-gray-600">MONTO</th>
@@ -285,69 +299,66 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                                 v-model="rowsData[rowIndex]['fecha_factura_det_quedan']"
                                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                                 :class="[rowsData[rowIndex]['fecha_factura_det_quedan'] == '' ? 'bg-[#fdfd96]' : '',
-                                                                dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
+        dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
 
-                                                                ]
-                                                                    "
-                                                                class="w-[126px] text-xs text-center cursor-pointer rounded-[5px] border h-8 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+        ]
+            " class="w-[126px] text-xs text-center cursor-pointer rounded-[5px] border h-8 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                                                                 :config="config" />
                                                         </div>
 
                                                     </td>
                                                     <td v-else-if="cellIndex == 'id_centro_atencion'"
                                                         class="border-2 border-black" :class="{
-                                                            'condition-select': rowsData[rowIndex]['id_centro_atencion'] == '',//validando si esta vacio
-                                                            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_centro_atencion`]//validando si tiene errores
-                                                        }
-                                                            ">
+            'condition-select': rowsData[rowIndex]['id_centro_atencion'] == '',//validando si esta vacio
+            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_centro_atencion`]//validando si tiene errores
+        }
+            ">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                            <Multiselect v-model="rowsData[rowIndex]['id_centro_atencion']"
+                                                            <Multiselect
+                                                                v-model="rowsData[rowIndex]['id_centro_atencion']"
                                                                 :title="errors[`detalle_quedan.${rowIndex}.id_centro_atencion`]"
                                                                 placeholder="seleccione" :classes="{
-                                                                    placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
-                                                                }
-                                                                    " :options="dataForSelectInRow.centros"
-                                                                :searchable="true"
+            placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
+        }
+            " :options="dataForSelectInRow.centros" :searchable="true"
                                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
                                                     </td>
-                                                    <td v-else-if="cellIndex == 'id_lt'"
-                                                        class="border-2 border-black" :class="{
-                                                            'condition-select': rowsData[rowIndex]['id_lt'] == '',//validando si esta vacio
-                                                            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_lt`]//validando si tiene errores
-                                                        }
-                                                            ">
+                                                    <td v-else-if="cellIndex == 'id_lt'" class="border-2 border-black"
+                                                        :class="{
+            'condition-select': rowsData[rowIndex]['id_lt'] == '',//validando si esta vacio
+            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_lt`]//validando si tiene errores
+        }
+            ">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
                                                             <Multiselect v-model="rowsData[rowIndex]['id_lt']"
                                                                 :title="errors[`detalle_quedan.${rowIndex}.id_lt`]"
                                                                 placeholder="seleccione" :classes="{
-                                                                    placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
-                                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[8pt] leading-snug py-2 px-3',
-                                                                    optionSelected: 'text-white bg-[#001c48]',
-                                                                    optionPointed: 'text-gray-800 bg-gray-100',
-                                                                    optionSelectedPointed: 'text-white bg-[#001c48]',
+            placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
+            option: 'flex items-center justify-start box-border text-left cursor-pointer text-[8pt] leading-snug py-2 px-3',
+            optionSelected: 'text-white bg-[#001c48]',
+            optionPointed: 'text-gray-800 bg-gray-100',
+            optionSelectedPointed: 'text-white bg-[#001c48]',
 
-                                                                }
-                                                                    " :options="dataForSelectInRow.lineaTrabajo"
-                                                                :searchable="true"
+        }
+            " :options="dataForSelectInRow.lineaTrabajo" :searchable="true"
                                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
                                                     </td>
                                                     <td v-else-if="cellIndex == 'numero_acta_det_quedan'"
                                                         class="border-2 border-black max-w-[75px]" :class="[
-                                                            errors[`detalle_quedan.${rowIndex}.numero_acta_det_quedan`] ? 'bg-red-300' :
-                                                                cell == '' ? 'bg-[#fdfd96]' : '',
-                                                            errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
-                                                            errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
-                                                            dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
-                                                        ]"
-                                                        @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+            errors[`detalle_quedan.${rowIndex}.numero_acta_det_quedan`] ? 'bg-red-300' :
+                cell == '' ? 'bg-[#fdfd96]' : '',
+            errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
+            errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
+            dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
+        ]" @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         :title="errors[`detalle_quedan.${rowIndex}.numero_acta_det_quedan`]"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
                                                         {{ rowsData[rowIndex]['numero_acta_det_quedan'] }}
-                                                        </td>
+                                                    </td>
 
                                                     <td v-else-if="cellIndex == 'monto'" class="border-2 border-black">
                                                         <table>
@@ -436,8 +447,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                             REAJUSTES</span>
                                                     </div>
                                                 </th>
-                                                <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="5 "
-                                                    rowspan="2"
+                                                <th class="border-2 border-black text-sm px-3 text-gray-600"
+                                                    colspan="5 " rowspan="2"
                                                     :class="errors[`detalle_quedan.${rowIndex}.justificacion_det_quedan`] ? 'bg-red-300' : row['justificacion_det_quedan'] == '' || row['justificacion_det_quedan'] === null ? 'bg-[#fdfd96]' : ''">
 
                                                     <input type="text" v-model="row['justificacion_det_quedan']"
@@ -488,7 +499,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <td contenteditable="false" class="py-3 border-none"></td>
                                     </tr>
                                     <tr>
-                                        <td class="border-2 border-black " colspan="1" rowspan="2" contenteditable="false">
+                                        <td class="border-2 border-black " colspan="1" rowspan="2"
+                                            contenteditable="false">
                                             Descripción
                                         </td>
                                         <td class="border-2 border-black max-w-[250px]" colspan="5" rowspan="2"
@@ -519,7 +531,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 :class="{ 'condition-select': dataInputs.id_proy_financiado == '' }">
                                                 <Multiselect v-model="dataInputs.id_proy_financiado"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : documentoAdquisicion != '' ? true : false"
-                                                    :options="dataForSelectInRow.proyectoFinanciado" :searchable="true" />
+                                                    :options="dataForSelectInRow.proyectoFinanciado"
+                                                    :searchable="true" />
                                             </div>
                                         </td>
                                     </tr>
@@ -637,6 +650,8 @@ export default {
             },
             errors: [],
             incoherencia: false,
+
+            isPersonaNatOrJur: false
         };
     },
     methods: {
@@ -683,6 +698,9 @@ export default {
             if (supplier) {
                 // Buscar el proveedor en la lista de proveedores
                 const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
+                console.log(selectedSupplier.dui_proveedor);
+
+                this.isPersonaNatOrJur = selectedSupplier.dui_proveedor !== null && selectedSupplier.dui_proveedor !== '';
 
                 // Limpiar la variable (this.documentoAdquisicion, this.dataInputs.id_det_doc_adquisicion) que contiene los contratos antes de asignarle nuevos contratos
                 this.documentoAdquisicion = []
@@ -1199,6 +1217,12 @@ export default {
             });
         },
     },
+    computed: {
+        isPersonaNatural() {
+            return this.dataInputs.dui_proveedor !== null && this.dataInputs.dui_proveedor !== '';
+        }
+    },
+
     watch: {
         showModal() {
             if (this.showModal) {
