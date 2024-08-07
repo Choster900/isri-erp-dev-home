@@ -333,7 +333,15 @@ class QuedanController extends Controller
             )->get();
 
         $v_Proveedor = DB::table('proveedor')
-            ->select('id_proveedor as value', 'razon_social_proveedor as label', 'dui_proveedor', 'giro.codigo_giro', 'giro.nombre_giro', 'sujeto_retencion.iva_sujeto_retencion', 'sujeto_retencion.isrl_sujeto_retencion')
+            ->select(
+                'id_proveedor as value',
+                DB::raw("CONCAT(razon_social_proveedor, IF(dui_proveedor IS NULL OR dui_proveedor = '', ' - (PJ)', ' - (PN)')) as label"),
+                'dui_proveedor',
+                'giro.codigo_giro',
+                'giro.nombre_giro',
+                'sujeto_retencion.iva_sujeto_retencion',
+                'sujeto_retencion.isrl_sujeto_retencion'
+            )
             ->leftJoin('giro', 'giro.id_giro', '=', 'proveedor.id_giro')
             ->join('sujeto_retencion', 'sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion')
             ->where('estado_proveedor', 1)
