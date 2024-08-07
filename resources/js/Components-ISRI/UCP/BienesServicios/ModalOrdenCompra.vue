@@ -147,20 +147,20 @@
                             </tr>
                         </thead>
                         <tbody v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i" v-show="docAdq.estadoLt != 0">
-                            <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
+                            <tr class="*:border-black cursor-pointer"  >
                                 <td colspan="2" @click="docAdq.vShowLt = !docAdq.vShowLt"
-                                    @mouseover=" docAdq.hoverToDelete = true" @mouseout=" docAdq.hoverToDelete = false"
+
                                     @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deletLineaTrabajo(i)"
                                     class="uppercase border bg-black text-[8pt] text-white border-black border-t-white border-r-white text-center text-selection-disable">
 
                                     LÍNEA de trabajo:</td>
-                                <td colspan="6" @mouseover="docAdq.hoverToDelete = true"
-                                    @click="docAdq.vShowLt = !docAdq.vShowLt" @mouseout="docAdq.hoverToDelete = false"
+                                <td colspan="6"
+                                    @click="docAdq.vShowLt = !docAdq.vShowLt"
                                     @contextmenu.prevent="deletLineaTrabajo(i)"
                                     class="uppercase border bg-black text-[8pt] text-white border-black border-l-white text-center text-selection-disable">
                                     Documento de ADQUISICIÓN: </td>
                             </tr>
-                            <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
+                            <tr class="*:border-black cursor-pointer"  >
                                 <td colspan="2" class="border border-t-black ">
                                     <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
                                         :canClear="false" :canDeselect="true" :disabled="estadoDocAdq !== 1"
@@ -182,10 +182,12 @@
                             </tr>
                             <template v-if="docAdq.vShowLt">
                                 <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black  cursor-pointer"
-                                    :class="{ '*:bg-emerald-100 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq === 1, '*:bg-slate-300 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq !== 1, 'bg-slate-200': estadoDocAdq !== 1, 'hover:bg-slate-200': estadoDocAdq === 1 }"
+
                                     @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deleteProductAdq(docAdq.idLt, j)"
                                     v-for="(detalle, j) in docAdq.detalleDoc" :key="j"
                                     v-show="(detalle.estadoProdAdquisicion != 0)">
+
+                                    
                                     <td class=" relative  w-28"
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.idProducto`] }"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
