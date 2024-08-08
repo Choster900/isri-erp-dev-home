@@ -66,22 +66,7 @@
                                             </div>
                                             <div class="text-sm text-slate-500 font-medium">P.TOTAL</div>
                                         </div>
-                                        <Tooltip bg="dark" position="right" :key="weekIndex" class="" v-if="estadoDocAdq === 1">
-                                            <template v-slot:message>
-                                                <div class="text-[8pt] w-56">
-                                                    <div class="font-medium text-slate-200 mb-0.5 leading-tight">
-                                                        What's New!
-                                                    </div>
-                                                    <p class="text-[7pt] text-slate-400 leading-tight">
-                                                        Ahora puede optar por gestionar el total del documento
-                                                        utilizando el precio unitario del producto o el monto total del
-                                                        producto. Los campos marcados en <span
-                                                            class="text-red-500">ROJO</span> se bloquearán
-                                                        automáticamente.
-                                                    </p>
-                                                </div>
-                                            </template>
-                                        </Tooltip>
+
                                     </div>
                                 </td>
                             </tr>
@@ -214,13 +199,31 @@
                                                             </svg>
                                                         </a>
                                                     </li>
+                                                    <Tooltip bg="dark" position="right" :key="weekIndex" class="" v-if="estadoDocAdq === 1">
+                                                            <template v-slot:message>
+                                                                <div class="text-[8pt] w-56">
+                                                                    <div class="font-medium text-slate-200 mb-0.5 leading-tight">
+                                                                        What's New!
+                                                                    </div>
+                                                                    <p class="text-[7pt] text-slate-400 leading-tight">
+                                                                        Ahora puedes navegar entre los productos de adquisición utilizando la nueva paginación.
+                                                                    </p>
+                                                                </div>
+                                                            </template>
+                                                    </Tooltip>
                                                 </ul>
                                             </nav>
+
                                                 <div class="text-sm text-slate-500 text-center sm:text-left"> Showing
+
                                                     <span class="font-medium text-slate-600">{{ arrayProductoAdquisicion[i].currentPage }}</span> to <span class="font-medium text-slate-6000">{{ arrayProductoAdquisicion[i].currentPage * ITEMS_PER_PAGE }}</span> of <span class="font-medium text-slate-600">{{ arrayProductoAdquisicion[i].detalleDoc.length }}</span> results </div>
                                             </div>
+
+
                                         </div>
+
                                     </td>
+
                                 </tr>
                                 <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black  cursor-pointer"
 
