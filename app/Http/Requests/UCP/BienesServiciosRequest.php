@@ -33,17 +33,17 @@ class BienesServiciosRequest extends FormRequest
                 if ($productoAdq['estadoLt'] == 0) {
                     return;
                 }
-                $rules["productAdq.{$key}.idLt"] = ['required'];
-                collect($this->input("productAdq.{$key}.detalleDoc", []))
+                $rules["productAdq." . (string)$key . ".idLt"] = ['required'];
+                collect($this->input("productAdq." . (string)$key . ".detalleDoc", []))
                     ->each(function ($det, $indice) use (&$rules, $key) {
                         if ($det["estadoProdAdquisicion"] == 0) {
                             return;
                         }
-                        $rules["productAdq.{$key}.detalleDoc.{$indice}.idMarca"] = ['required'];
-                        $rules["productAdq.{$key}.detalleDoc.{$indice}.idProducto"] = ['required'];
-                        $rules["productAdq.{$key}.detalleDoc.{$indice}.idCentroAtencion"] = ['required'];
-                        $rules["productAdq.{$key}.detalleDoc.{$indice}.cantProdAdquisicion"] = ['required'];
-                        $rules["productAdq.{$key}.detalleDoc.{$indice}.costoProdAdquisicion"] = ['required'];
+                        $rules["productAdq." . (string)$key . ".detalleDoc." . (string)$indice . ".idMarca"] = ['required'];
+                        $rules["productAdq." . (string)$key . ".detalleDoc." . (string)$indice . ".idProducto"] = ['required'];
+                        $rules["productAdq." . (string)$key . ".detalleDoc." . (string)$indice . ".idCentroAtencion"] = ['required'];
+                        $rules["productAdq." . (string)$key . ".detalleDoc." . (string)$indice . ".cantProdAdquisicion"] = ['required'];
+                        $rules["productAdq." . (string)$key . ".detalleDoc." . (string)$indice . ".costoProdAdquisicion"] = ['required'];
                     });
             });
 
