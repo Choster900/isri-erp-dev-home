@@ -5,19 +5,13 @@ import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
 </script>
 <template>
-    <ProcessModal maxWidth="3xl" :show="showModal" @close="$emit('cerrar-modal')">
+    <ProcessModal maxWidth="3xl" :show="showModal" @close="$emit('cerrar-modal')" addClasses="py-[0.1px] bg-white">
         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25" @click="$emit('cerrar-modal')">
             <path fill="currentColor"
                 d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
         </svg>
 
         <div class="my-7 mx-4">
-            <!-- <div class="flex justify-center">
-                <GeneralButton :color="'bg-red-700 hover:bg-red-800'" text="Imprimir" icon="pdf" @click="printPdf()" />
-            </div> -->
-            <!--  <pre>
-                {{ beneficiarios }}
-            </pre> -->
             <table border="0" cellpadding="0" cellspacing="0" class="border-2 border-black sheet0 ">
                 <col class="col0">
                 <col class="col1">

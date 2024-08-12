@@ -22,7 +22,7 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                 icon: true,
             },
             success: {
-                render(res) {
+                render() {
                     return successMessage;
                 },
                 closeOnClick: true,
@@ -46,8 +46,10 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                     let errorMessage = "Se produjo un error en la solicitud. Por favor, inténtalo nuevamente más tarde.";
                     let errorCode = "REQUEST_ERROR";
 
-                    if (err.data.response && err.data.response.status) {
-                        switch (err.data.response.status) {
+                    if (err.data?.response?.status) {
+                        const { status, data } = err.data.response
+
+                        switch (status) {
                             case 400:
                                 errorMessage = "La solicitud es incorrecta. Por favor, verifica los datos enviados.";
                                 errorCode = "BAD_REQUEST";
@@ -61,7 +63,7 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                                 errorCode = "NOT_FOUND";
                                 break;
                             case 422:
-                                errorMessage = err.data.response.data.error;
+                                errorMessage = err.data.response.data.error || errorMessageCustom;
                                 errorCode = "VALIDATION_ERROR";
                                 break;
                             case 500:
@@ -81,7 +83,11 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                                 errorCode = "UNKNOWN_ERROR";
                                 break;
                         }
+                    }else if(err.data?.response?.status === 422){
+                        errorMessage = errorMessageCustom || data.error;
+                        errorCode = "VALIDATION_ERROR";
                     }
+
                     return `${errorMessage} (${errorCode})`;
                 },
                 icon: "❌",
@@ -101,7 +107,7 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
         return response;
     } catch (error) {
         // Manejar errores no relacionados con la promesa del toast (opcional)
-        console.error("Error en la peticion: ", error);
+        console.error("Error no relacionado con la promesa del toast:", error);
         throw error; // Re-lanzar el error si necesitas manejarlo en otro lugar
     }
 }
