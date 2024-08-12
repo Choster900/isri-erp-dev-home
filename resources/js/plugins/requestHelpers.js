@@ -30,6 +30,17 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                 type: "success",
                 isLoading: false,
             },
+            /* error: {
+                render({ data }) {
+                    console.log("Error response data:", data.response.data.error); // Add this line
+                    // Assuming the backend response has an error property
+                    return data.error || 'Se encontraron errores de validación en los datos enviados. Por favor, verifica e intenta nuevamente.';
+                },
+                closeOnClick: true,
+                closeButton: true,
+                type: "error",
+                isLoading: false,
+            } */
             error: {
                 render(err) {
                     let errorMessage = "Se produjo un error en la solicitud. Por favor, inténtalo nuevamente más tarde.";
