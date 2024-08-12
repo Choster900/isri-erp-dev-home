@@ -75,7 +75,8 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                     amountsPerMonthList: {}
 
                 });
-
+                // Actualiza la paginación después de agregar una nueva fila
+                initializePagination(i, true);
                 // Muestra la matriz actualizada en la consola
             } else {
                 // Muestra un mensaje de error si faltan datos para agregar filas
@@ -100,6 +101,8 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                 estadoLt: 1, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
                 hoverToDelete: false, // [Comment: It´ll add color]
                 detalleDoc: [],
+                paginationDetalleDoc: [], // TODO : PAGINATION
+                currentPage: 1, // TODO : PAGINATION
             });
             addingRows(arrayProductoAdquisicion.value.length - 1)
             // Muestra la matriz actualizada en la consola
@@ -108,6 +111,64 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             console.error("Error al agregar documento de adquisición:", error);
         }
     };
+
+
+    // Definimos una constante global para la cantidad de elementos por página
+    const ITEMS_PER_PAGE = 3;
+
+    /**
+    * Inicializa la paginación para un documento de adquisición.
+    * @param {number} docIndex - Índice del documento de adquisición.
+    * @param {boolean} goToLastPage - Indica si se debe ir a la última página.
+    */
+    const initializePagination = (docIndex, goToLastPage = false) => {
+        const doc = arrayProductoAdquisicion.value[docIndex];
+        const totalItems = doc.detalleDoc.length;
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+        let start, end;
+
+        if (goToLastPage) {
+            start = (totalPages - 1) * ITEMS_PER_PAGE;
+            end = totalItems;
+            doc.currentPage = totalPages;
+        } else {
+            start = 0;
+            end = ITEMS_PER_PAGE;
+            doc.currentPage = 1;
+        }
+
+        doc.paginationDetalleDoc = doc.detalleDoc.slice(start, end);
+    };
+
+    /**
+    * Avanza a la siguiente página de detalles de adquisición.
+    * @param {number} docIndex - Índice del documento de adquisición.
+    */
+    const nextPage = (docIndex) => {
+        const doc = arrayProductoAdquisicion.value[docIndex];
+        const start = doc.currentPage * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        if (start < doc.detalleDoc.length) {
+            doc.paginationDetalleDoc = doc.detalleDoc.slice(start, end);
+            doc.currentPage++;
+        }
+    };
+
+    /**
+    * Retrocede a la página anterior de detalles de adquisición.
+    * @param {number} docIndex - Índice del documento de adquisición.
+    */
+    const prevPage = (docIndex) => {
+        const doc = arrayProductoAdquisicion.value[docIndex];
+        if (doc.currentPage > 1) {
+            const start = (doc.currentPage - 2) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            doc.paginationDetalleDoc = doc.detalleDoc.slice(start, end);
+            doc.currentPage--;
+        }
+    };
+
 
     /**
      * Obtener Arrays de objetos para multiselect
@@ -219,7 +280,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                 // Calculo del valor total
                 producto.valorTotalProduct = cantProdAdquisicion * costoProdAdquisicion;
             } else {
-                console.log(valorTotalProduct / cantProdAdquisicion);
                 // Calculo del costo unitario
                 producto.costoProdAdquisicion = (valorTotalProduct / cantProdAdquisicion).toFixed(6);
             }
@@ -250,7 +310,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
         // Round the total sum to two decimal places and update the total products value
         const roundedTotal = round2Decimals(totalSum);
         totProductos.value = roundedTotal;
-        console.log(totProductos.value);
         // Call the function to get the text representation of the total sum
         getTextForNumber(roundedTotal);
     };
@@ -530,7 +589,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             recepcionDetDocAdquisicion.value = objectGetFromProp.value.recepcion_det_doc_adquisicion
             notificacionDetDocAdquisicion.value = objectGetFromProp.value.notificacion_det_doc_adquisicion
 
-            console.log(objectGetFromProp.value);
             tipoCostoDetDocAdquisicion.value = objectGetFromProp.value.tipo_costo_det_doc_adquisicion == 1 ? false : true
 
             let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
@@ -588,7 +646,9 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
                             vShowLt: show,
                             hoverToDelete: false,
                             estadoLt: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
-                            detalleDoc: []
+                            detalleDoc: [],
+                            paginationDetalleDocAdquisicion: [], // Inicializa la paginación
+                            currentPage: 1, // Inicializa la página actual
                         };
                     }
                 })
@@ -636,6 +696,11 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             onSelectDocAdquisicion(idDetDocAdquisicion.value)
             calculateTotalProductValue()
             disableLt()
+
+            // Inicializa la paginación para cada documento de adquisición
+            arrayProductoAdquisicion.value.forEach((_, index) => initializePagination(index));
+
+
         } else {
             objectGetFromProp.value = [];
             arrayProductoAdquisicion.value = []
@@ -761,7 +826,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
             setTimeout(() => {
                 showGrayBackground.value = false;
             }, 1000); // 1000 milisegundos = 1 segundo
-        }else{
+        } else {
             showGrayBackgroundTotal.value = true;
             setTimeout(() => {
                 showGrayBackgroundTotal.value = false;
@@ -770,15 +835,14 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
         recalculateCostoProdAdquisicion()
     });
 
-     /**
-     * Recalcula el costo unitario y el valor total de los productos en arrayProductoAdquisicion.
-     */
+    /**
+    * Recalcula el costo unitario y el valor total de los productos en arrayProductoAdquisicion.
+    */
     const recalculateCostoProdAdquisicion = () => {
         // Itera sobre cada elemento en arrayProductoAdquisicion
         arrayProductoAdquisicion.value.forEach(index => {
             // Itera sobre cada producto en el detalle del documento
             index.detalleDoc.forEach(producto => {
-                console.log(producto);
 
                 // Desestructura las propiedades necesarias del producto
                 const { cantProdAdquisicion, valorTotalProduct, costoProdAdquisicion } = producto;
@@ -797,6 +861,9 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
     }
 
     return {
+        nextPage, // Añadido
+        prevPage, // Añadido
+        ITEMS_PER_PAGE,
         showGrayBackgroundTotal,
         showGrayBackground,
         handleDataCalendarUpdate,

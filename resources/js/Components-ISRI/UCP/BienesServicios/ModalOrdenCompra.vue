@@ -66,22 +66,7 @@
                                             </div>
                                             <div class="text-sm text-slate-500 font-medium">P.TOTAL</div>
                                         </div>
-                                        <Tooltip bg="dark" position="right" :key="weekIndex" class="" v-if="estadoDocAdq === 1">
-                                            <template v-slot:message>
-                                                <div class="text-[8pt] w-56">
-                                                    <div class="font-medium text-slate-200 mb-0.5 leading-tight">
-                                                        What's New!
-                                                    </div>
-                                                    <p class="text-[7pt] text-slate-400 leading-tight">
-                                                        Ahora puede optar por gestionar el total del documento
-                                                        utilizando el precio unitario del producto o el monto total del
-                                                        producto. Los campos marcados en <span
-                                                            class="text-red-500">ROJO</span> se bloquearán
-                                                        automáticamente.
-                                                    </p>
-                                                </div>
-                                            </template>
-                                        </Tooltip>
+
                                     </div>
                                 </td>
                             </tr>
@@ -147,20 +132,20 @@
                             </tr>
                         </thead>
                         <tbody v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i" v-show="docAdq.estadoLt != 0">
-                            <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
+                            <tr class="*:border-black cursor-pointer"  >
                                 <td colspan="2" @click="docAdq.vShowLt = !docAdq.vShowLt"
-                                    @mouseover=" docAdq.hoverToDelete = true" @mouseout=" docAdq.hoverToDelete = false"
+
                                     @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deletLineaTrabajo(i)"
                                     class="uppercase border bg-black text-[8pt] text-white border-black border-t-white border-r-white text-center text-selection-disable">
 
                                     LÍNEA de trabajo:</td>
-                                <td colspan="6" @mouseover="docAdq.hoverToDelete = true"
-                                    @click="docAdq.vShowLt = !docAdq.vShowLt" @mouseout="docAdq.hoverToDelete = false"
+                                <td colspan="6"
+                                    @click="docAdq.vShowLt = !docAdq.vShowLt"
                                     @contextmenu.prevent="deletLineaTrabajo(i)"
                                     class="uppercase border bg-black text-[8pt] text-white border-black border-l-white text-center text-selection-disable">
                                     Documento de ADQUISICIÓN: </td>
                             </tr>
-                            <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
+                            <tr class="*:border-black cursor-pointer"  >
                                 <td colspan="2" class="border border-t-black ">
                                     <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
                                         :canClear="false" :canDeselect="true" :disabled="estadoDocAdq !== 1"
@@ -180,12 +165,73 @@
                                         :options="arrayDocAdquisicion" />
                                 </td>
                             </tr>
-                            <template v-if="docAdq.vShowLt">
+                            <template v-if="docAdq.vShowLt" v-for="(detalle, j) in docAdq.paginationDetalleDoc" :key="j">
+                                <tr v-if="j == 0" class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black  cursor-pointer">
+
+                                    <td colspan="8">
+                                        <div class=" ">
+                                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                            <nav class="mb-4 sm:mb-0 sm:order-1" role="navigation" aria-label="Navigation">
+                                                <ul class="flex justify-center">
+                                                    <li class="ml-3 first:ml-0">
+                                                        <a
+                                                            class="btn bg-white border-slate-200 hover:border-slate-300 text-indigo-500  "
+                                                            href="#0"
+                                                            :disabled="arrayProductoAdquisicion[i].currentPage === 1"
+                                                            :class="{'cursor-not-allowed text-slate-300': arrayProductoAdquisicion[i].currentPage === 1, 'text-indigo-500 hover:border-slate-300': arrayProductoAdquisicion[i].currentPage > 1}"
+                                                            @click="prevPage(i)">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 transform rotate-180">
+                                                                <path fill-rule="evenodd" d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Previous
+                                                        </a>
+                                                    </li>
+                                                    <li class="ml-3 first:ml-0">
+                                                        <a
+                                                            class="btn bg-white border-slate-200 hover:border-slate-300 text-indigo-500"
+                                                            href="#0"
+                                                            :disabled="arrayProductoAdquisicion[i].currentPage * ITEMS_PER_PAGE >= arrayProductoAdquisicion[i].detalleDoc.length"
+                                                            :class="{'cursor-not-allowed text-slate-300': arrayProductoAdquisicion[i].currentPage * ITEMS_PER_PAGE >= arrayProductoAdquisicion[i].detalleDoc.length, 'text-indigo-500 hover:border-slate-300': arrayProductoAdquisicion[i].currentPage * ITEMS_PER_PAGE < arrayProductoAdquisicion[i].detalleDoc.length}"
+                                                            @click="nextPage(i)">
+                                                            Next
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
+                                                                <path fill-rule="evenodd" d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        </a>
+                                                    </li>
+                                                    <Tooltip bg="dark" position="right" :key="weekIndex" class="" v-if="estadoDocAdq === 1">
+                                                            <template v-slot:message>
+                                                                <div class="text-[8pt] w-56">
+                                                                    <div class="font-medium text-slate-200 mb-0.5 leading-tight">
+                                                                        What's New!
+                                                                    </div>
+                                                                    <p class="text-[7pt] text-slate-400 leading-tight">
+                                                                        Ahora puedes navegar entre los productos de adquisición utilizando la nueva paginación.
+                                                                    </p>
+                                                                </div>
+                                                            </template>
+                                                    </Tooltip>
+                                                </ul>
+                                            </nav>
+
+                                                <div class="text-sm text-slate-500 text-center sm:text-left"> Showing
+
+                                                    <span class="font-medium text-slate-600">{{ arrayProductoAdquisicion[i].currentPage }}</span> to <span class="font-medium text-slate-6000">{{ arrayProductoAdquisicion[i].currentPage * ITEMS_PER_PAGE }}</span> of <span class="font-medium text-slate-600">{{ arrayProductoAdquisicion[i].detalleDoc.length }}</span> results </div>
+                                            </div>
+
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
                                 <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black  cursor-pointer"
-                                    :class="{ '*:bg-emerald-100 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq === 1, '*:bg-slate-300 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq !== 1, 'bg-slate-200': estadoDocAdq !== 1, 'hover:bg-slate-200': estadoDocAdq === 1 }"
+
                                     @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deleteProductAdq(docAdq.idLt, j)"
-                                    v-for="(detalle, j) in docAdq.detalleDoc" :key="j"
+
                                     v-show="(detalle.estadoProdAdquisicion != 0)">
+
+
                                     <td class=" relative  w-28"
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.idProducto`] }"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
@@ -466,6 +512,9 @@ export default {
 
         const { propProdAdquisicion, showModal } = toRefs(props)
         const {
+            ITEMS_PER_PAGE, // Añadido
+        nextPage, // Añadido
+        prevPage, // Añadido
             idLt,
             loader,
             disableLt,
@@ -582,6 +631,9 @@ export default {
         )
 
         return {
+            ITEMS_PER_PAGE, // Añadido
+        nextPage, // Añadido
+        prevPage, // Añadido
             idLt,
             loader,
             handleInput,

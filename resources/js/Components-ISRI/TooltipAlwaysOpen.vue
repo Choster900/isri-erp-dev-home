@@ -4,7 +4,7 @@
         @focusin="tooltipOpen = true" @focusout="tooltipOpen = false"> -->
     <div class="relative cursor-pointer ">
         <svg v-show="tooltipOpen"
-            class="absolute text-slate-800 border-slate-800 h-6 left-0 ml-1 -translate-x-4 -translate-y-3 transform rotate-90"
+            class="absolute text-slate-800 border-slate-800 h-6 left-0 ml-1 -translate-x-4 -translate-y-1 transform rotate-90"
             x="0px" y="0px" viewBox="0 0 255 255" xml:space="preserve">
             <polygon class="fill-current" points="0,0 127.5,127.5 255,0" />
         </svg>
