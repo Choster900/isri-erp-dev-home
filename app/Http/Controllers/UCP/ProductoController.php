@@ -29,8 +29,15 @@ class ProductoController extends Controller
         $query = Producto::select('*')
             ->with([
                 'unidad_medida',
-            ])
-            ->orderBy($columns[$column], $dir);
+            ]);
+
+        //Sorting
+        if ($column == 4) { //Order by nombre_unidad_medida
+            $query->orderByRaw('
+                (SELECT nombre_unidad_medida FROM unidad_medida WHERE unidad_medida.id_unidad_medida = producto.id_unidad_medida) ' . $dir);
+        } else {
+            $query->orderBy($columns[$column], $dir);
+        }
 
         if ($search_value) {
             $query->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
