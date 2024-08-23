@@ -42,7 +42,7 @@
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[27%]">
-                                <div class="font-medium text-slate-800 text-center">
+                                <div class="font-medium text-slate-800 text-center max-h-[125px] overflow-y-auto">
                                     {{ prod.nombre_completo_producto }}
                                 </div>
                             </td>
@@ -169,11 +169,11 @@ export default {
         const columns = [
             { width: "10%", label: "ID", name: "id_producto", type: "text" },
             { width: "21%", label: "Nombre completo", name: "nombre_completo_producto", type: "text" },
-            { width: "10%", label: "Codigo", name: "codigo_producto", type: "text" },
-            { width: "13%", label: "Medida", name: "unidad_medida", type: "text" },
+            { width: "12%", label: "Codigo", name: "codigo_producto", type: "text" },
+            { width: "13%", label: "Medida", name: "nombre_unidad_medida", type: "text" },
 
             { width: "19%", label: "Subalmacen", name: "nombre_sub_almacen", type: "text" },
-            { width: "10%", label: "Perc", name: "id_catalogo_perc", type: "text" },
+            { width: "8%", label: "Perc", name: "id_catalogo_perc", type: "text" },
 
             {
                 width: "9%", label: "Estado", name: "estado_producto", type: "select",

@@ -19,7 +19,7 @@ class ProductoAlmacenController extends Controller
 {
     public function getProductosAlmacen(Request $request)
     {
-        $columns = ['id_producto', 'nombre_completo_producto', 'codigo_producto', 'unidad_medida', 'nombre_sub_almacen', 'id_catalogo_perc', 'estado_producto'];
+        $columns = ['id_producto', 'nombre_completo_producto', 'codigo_producto', 'nombre_unidad_medida', 'nombre_sub_almacen', 'id_catalogo_perc', 'estado_producto'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -30,15 +30,27 @@ class ProductoAlmacenController extends Controller
             ->with([
                 'unidad_medida',
                 'sub_almacen'
-            ])
-            ->orderBy($columns[$column], $dir);
+            ]);
+
+        //Sorting
+        if ($column == 3) { //Order by nombre_unidad_medida
+            $query->orderByRaw('
+                (SELECT nombre_unidad_medida FROM unidad_medida WHERE unidad_medida.id_unidad_medida = producto.id_unidad_medida) ' . $dir);
+        } else {
+            if ($column == 4) { //Order by nombre_sub_almacen
+                $query->orderByRaw('
+                (SELECT nombre_sub_almacen FROM sub_almacen WHERE sub_almacen.id_sub_almacen = producto.id_sub_almacen) ' . $dir);
+            } else {
+                $query->orderBy($columns[$column], $dir);
+            }
+        }
 
         if ($search_value) {
             $query
                 ->where('codigo_producto', 'like', '%' . $search_value['codigo_producto'] . '%')
                 ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
                 ->whereHas('unidad_medida', function ($query) use ($search_value) {
-                    $query->where('nombre_unidad_medida', 'like', '%' . $search_value["unidad_medida"] . '%');
+                    $query->where('nombre_unidad_medida', 'like', '%' . $search_value["nombre_unidad_medida"] . '%');
                 });
 
             //Search by id
@@ -72,14 +84,14 @@ class ProductoAlmacenController extends Controller
     {
         $prod = Producto::with(['unidad_medida', 'catalogo_unspsc', 'proceso_compra'])->find($id);
         $catPerc = CatalogoPerc::selectRaw('id_catalogo_perc as value, concat(IFNULL(codigo_catalogo_perc,"")," - ",nombre_catalogo_perc) as label')
-        ->where('estado_catalogo_perc', 1)->get();
+            ->where('estado_catalogo_perc', 1)->get();
         $subWarehouses = SubAlmacen::select('id_sub_almacen as value', 'nombre_sub_almacen as label')
             ->where('estado_sub_almacen', 1)->get();
 
         return response()->json([
-            'prod'                      => $prod ?? [],
-            'catPerc'                   => $catPerc,
-            'subWarehouses'              => $subWarehouses
+            'prod'                          => $prod ?? [],
+            'catPerc'                       => $catPerc,
+            'subWarehouses'                 => $subWarehouses
         ]);
     }
 
