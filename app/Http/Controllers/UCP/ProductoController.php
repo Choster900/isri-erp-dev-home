@@ -137,7 +137,7 @@ class ProductoController extends Controller
                 'codigo_producto'           => $newProductCode,
                 'nombre_producto'           => $request->name,
                 'descripcion_producto'      => $request->description,
-                'nombre_completo_producto'  => $request->name . " " . $request->description,
+                'nombre_completo_producto'  => $request->name . ", " . $request->description,
                 'precio_producto'           => substr($request->price, 1), //we remove the dollar sign
                 'basico_producto'           => $request->gAndS == -1 ? null : $request->gAndS,
                 'perecedero_producto'       => $request->perishable == -1 ? null : $request->perishable,
@@ -179,7 +179,7 @@ class ProductoController extends Controller
                     'id_catalogo_perc'          => $request->catPercId,
                     'nombre_producto'           => $request->name,
                     'descripcion_producto'      => $request->description,
-                    'nombre_completo_producto'  => $request->name . " " . $request->description,
+                    'nombre_completo_producto'  => $request->name . ", " . $request->description,
                     'precio_producto'           => substr($request->price, 1),
                     'basico_producto'           => $request->gAndS == -1 ? null : $request->gAndS,
                     'perecedero_producto'       => $request->perishable == -1 ? null : $request->perishable,

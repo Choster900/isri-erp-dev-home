@@ -43,12 +43,7 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[27%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ prod.nombre_producto }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5 max-w-[20%]">
-                                <div class="font-medium text-slate-800 text-center max-h-[125px] overflow-y-auto">
-                                    {{ prod.descripcion_producto }}
+                                    {{ prod.nombre_completo_producto }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -61,9 +56,15 @@
                                     {{ prod.unidad_medida.nombre_unidad_medida }}
                                 </div>
                             </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[19%]">
+                                <div class="font-medium text-slate-800 text-center max-h-[125px] overflow-y-auto">
+                                    {{ prod.descripcion_producto }}
+                                </div>
+                            </td>
+                            
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    ${{ prod.precio_producto }}
+                                    {{ prod.id_catalogo_perc ?? '-' }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -166,12 +167,14 @@ export default {
         const prodId = ref(0)
 
         const columns = [
-            { width: "8%", label: "ID", name: "id_producto", type: "text" },
-            { width: "21%", label: "Nombre", name: "nombre_producto", type: "text" },
-            { width: "21%", label: "Descripcion", name: "descripcion_producto", type: "text" },
+            { width: "10%", label: "ID", name: "id_producto", type: "text" },
+            { width: "21%", label: "Nombre completo", name: "nombre_producto", type: "text" },
             { width: "10%", label: "Codigo", name: "codigo_producto", type: "text" },
             { width: "13%", label: "Medida", name: "unidad_medida", type: "text" },
-            { width: "10%", label: "Precio", name: "precio_producto", type: "text" },
+
+            { width: "19%", label: "Subalmacen", name: "sub_almacen", type: "text" },
+            { width: "10%", label: "Perc", name: "id_catalogo_perc", type: "text" },
+
             {
                 width: "9%", label: "Estado", name: "estado_producto", type: "select",
                 options: [

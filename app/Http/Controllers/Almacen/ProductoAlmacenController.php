@@ -17,6 +17,50 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductoAlmacenController extends Controller
 {
+    public function getProductosAlmacen(Request $request)
+    {
+        $columns = ['id_producto', 'nombre_completo_producto', 'codigo_producto', 'id_unidad_medida', 'sub_almacen', 'id_catalogo_perc', 'estado_producto'];
+
+        $length = $request->length;
+        $column = $request->column; //Index
+        $dir = $request->dir;
+        $search_value = $request->search;
+
+        $query = Producto::select('*')
+            ->with([
+                'unidad_medida',
+            ])
+            ->orderBy($columns[$column], $dir);
+
+        if ($search_value) {
+            $query->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
+                ->where('codigo_producto', 'like', '%' . $search_value['codigo_producto'] . '%')
+                ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
+                ->whereHas('unidad_medida', function ($query) use ($search_value) {
+                    $query->where('nombre_unidad_medida', 'like', '%' . $search_value["unidad_medida"] . '%');
+                });
+
+            //Search by id
+            if ($search_value['id_producto']) {
+                $query->where('id_producto', $search_value['id_producto']);
+            }
+            //Search by description
+            if ($search_value['descripcion_producto']) {
+                $terms = explode(' ', $search_value['descripcion_producto']);
+                foreach ($terms as $term) {
+                    $query->where('descripcion_producto', 'like', '%' . $term . '%');
+                }
+            }
+            //Search by price
+            if ($search_value['precio_producto']) {
+                $query->where('precio_producto', $search_value['precio_producto']);
+            }
+        }
+
+        $data = $query->paginate($length)->onEachSide(1);
+        return ['data' => $data, 'draw' => $request->input('draw')];
+    }
+
     public function getInfoModalProdAlmacen(Request $request, $id)
     {
         $prod = Producto::with(['unidad_medida', 'catalogo_unspsc', 'proceso_compra'])->find($id);
