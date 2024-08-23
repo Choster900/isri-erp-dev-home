@@ -61,4 +61,9 @@ class Producto extends Model
     {
         return $this->belongsTo('App\Models\CatalogoPerc','id_catalogo_perc','id_catalogo_perc');
     }
+
+    public function sub_almacen()
+    {
+        return $this->belongsTo('App\Models\SubAlmacen','id_sub_almacen','id_sub_almacen');
+    }
 }

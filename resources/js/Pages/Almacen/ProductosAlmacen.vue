@@ -58,7 +58,7 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[19%]">
                                 <div class="font-medium text-slate-800 text-center max-h-[125px] overflow-y-auto">
-                                    {{ prod.descripcion_producto }}
+                                    {{ prod.sub_almacen ? prod.sub_almacen.nombre_sub_almacen : '-' }}
                                 </div>
                             </td>
                             
@@ -168,11 +168,11 @@ export default {
 
         const columns = [
             { width: "10%", label: "ID", name: "id_producto", type: "text" },
-            { width: "21%", label: "Nombre completo", name: "nombre_producto", type: "text" },
+            { width: "21%", label: "Nombre completo", name: "nombre_completo_producto", type: "text" },
             { width: "10%", label: "Codigo", name: "codigo_producto", type: "text" },
             { width: "13%", label: "Medida", name: "unidad_medida", type: "text" },
 
-            { width: "19%", label: "Subalmacen", name: "sub_almacen", type: "text" },
+            { width: "19%", label: "Subalmacen", name: "nombre_sub_almacen", type: "text" },
             { width: "10%", label: "Perc", name: "id_catalogo_perc", type: "text" },
 
             {
@@ -184,17 +184,17 @@ export default {
             },
             { width: "8%", label: "Acciones", name: "Acciones" },
         ];
-        const requestUrl = "/productos"
+        const requestUrl = "/productos-almacen"
         const columntToSort = "id_producto"
         const dir = 'desc'
 
         const inputsToValidate = ref([
             { inputName: 'id_producto', limit: 6 },
-            { inputName: 'nombre_producto', limit: 50 },
-            { inputName: 'descripcion_producto', limit: 50 },
-            { inputName: 'id_ccta_presupuestal', number: true, limit: 5 },
+            { inputName: 'nombre_completo_producto', limit: 50 },
+            { inputName: 'nombre_sub_almacen', limit: 50 },
+            { inputName: 'id_catalogo_perc', number: true, limit: 5 },
             { inputName: 'unidad_medida', limit: 10 },
-            { inputName: 'precio_producto', amount: true, limit: 8 },
+            { inputName: 'codigo_producto', limit: 8 },
         ])
 
         const changeStatus = async (id, status) => {

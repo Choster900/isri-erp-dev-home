@@ -19,7 +19,7 @@ class ProductoAlmacenController extends Controller
 {
     public function getProductosAlmacen(Request $request)
     {
-        $columns = ['id_producto', 'nombre_completo_producto', 'codigo_producto', 'id_unidad_medida', 'sub_almacen', 'id_catalogo_perc', 'estado_producto'];
+        $columns = ['id_producto', 'nombre_completo_producto', 'codigo_producto', 'unidad_medida', 'nombre_sub_almacen', 'id_catalogo_perc', 'estado_producto'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -29,11 +29,12 @@ class ProductoAlmacenController extends Controller
         $query = Producto::select('*')
             ->with([
                 'unidad_medida',
+                'sub_almacen'
             ])
             ->orderBy($columns[$column], $dir);
 
         if ($search_value) {
-            $query->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
+            $query
                 ->where('codigo_producto', 'like', '%' . $search_value['codigo_producto'] . '%')
                 ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
                 ->whereHas('unidad_medida', function ($query) use ($search_value) {
@@ -45,15 +46,21 @@ class ProductoAlmacenController extends Controller
                 $query->where('id_producto', $search_value['id_producto']);
             }
             //Search by description
-            if ($search_value['descripcion_producto']) {
-                $terms = explode(' ', $search_value['descripcion_producto']);
+            if ($search_value['nombre_completo_producto']) {
+                $terms = explode(' ', $search_value['nombre_completo_producto']);
                 foreach ($terms as $term) {
-                    $query->where('descripcion_producto', 'like', '%' . $term . '%');
+                    $query->where('nombre_completo_producto', 'like', '%' . $term . '%');
                 }
             }
-            //Search by price
-            if ($search_value['precio_producto']) {
-                $query->where('precio_producto', $search_value['precio_producto']);
+            //Search by subalmacen
+            if ($search_value['nombre_sub_almacen']) {
+                $query->whereHas('sub_almacen', function ($query) use ($search_value) {
+                    $query->where('nombre_sub_almacen', 'like', '%' . $search_value["nombre_sub_almacen"] . '%');
+                });
+            }
+            //Search by perc
+            if ($search_value['id_catalogo_perc']) {
+                $query->where('id_catalogo_perc', $search_value['id_catalogo_perc']);
             }
         }
 
