@@ -56,4 +56,14 @@ class Producto extends Model
     {
         return $this->belongsTo('App\Models\ProcesoCompra','id_proceso_compra','id_proceso_compra');
     }
+
+    public function catalogo_perc()
+    {
+        return $this->belongsTo('App\Models\CatalogoPerc','id_catalogo_perc','id_catalogo_perc');
+    }
+
+    public function sub_almacen()
+    {
+        return $this->belongsTo('App\Models\SubAlmacen','id_sub_almacen','id_sub_almacen');
+    }
 }

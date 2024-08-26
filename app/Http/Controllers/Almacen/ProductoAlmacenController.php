@@ -17,18 +17,81 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductoAlmacenController extends Controller
 {
+    public function getProductosAlmacen(Request $request)
+    {
+        $columns = ['id_producto', 'nombre_completo_producto', 'codigo_producto', 'nombre_unidad_medida', 'nombre_sub_almacen', 'id_catalogo_perc', 'estado_producto'];
+
+        $length = $request->length;
+        $column = $request->column; //Index
+        $dir = $request->dir;
+        $search_value = $request->search;
+
+        $query = Producto::select('*')
+            ->with([
+                'unidad_medida',
+                'sub_almacen'
+            ]);
+
+        //Sorting
+        if ($column == 3) { //Order by nombre_unidad_medida
+            $query->orderByRaw('
+                (SELECT nombre_unidad_medida FROM unidad_medida WHERE unidad_medida.id_unidad_medida = producto.id_unidad_medida) ' . $dir);
+        } else {
+            if ($column == 4) { //Order by nombre_sub_almacen
+                $query->orderByRaw('
+                (SELECT nombre_sub_almacen FROM sub_almacen WHERE sub_almacen.id_sub_almacen = producto.id_sub_almacen) ' . $dir);
+            } else {
+                $query->orderBy($columns[$column], $dir);
+            }
+        }
+
+        if ($search_value) {
+            $query
+                ->where('codigo_producto', 'like', '%' . $search_value['codigo_producto'] . '%')
+                ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
+                ->whereHas('unidad_medida', function ($query) use ($search_value) {
+                    $query->where('nombre_unidad_medida', 'like', '%' . $search_value["nombre_unidad_medida"] . '%');
+                });
+
+            //Search by id
+            if ($search_value['id_producto']) {
+                $query->where('id_producto', $search_value['id_producto']);
+            }
+            //Search by description
+            if ($search_value['nombre_completo_producto']) {
+                $terms = explode(' ', $search_value['nombre_completo_producto']);
+                foreach ($terms as $term) {
+                    $query->where('nombre_completo_producto', 'like', '%' . $term . '%');
+                }
+            }
+            //Search by subalmacen
+            if ($search_value['nombre_sub_almacen']) {
+                $query->whereHas('sub_almacen', function ($query) use ($search_value) {
+                    $query->where('nombre_sub_almacen', 'like', '%' . $search_value["nombre_sub_almacen"] . '%');
+                });
+            }
+            //Search by perc
+            if ($search_value['id_catalogo_perc']) {
+                $query->where('id_catalogo_perc', $search_value['id_catalogo_perc']);
+            }
+        }
+
+        $data = $query->paginate($length)->onEachSide(1);
+        return ['data' => $data, 'draw' => $request->input('draw')];
+    }
+
     public function getInfoModalProdAlmacen(Request $request, $id)
     {
         $prod = Producto::with(['unidad_medida', 'catalogo_unspsc', 'proceso_compra'])->find($id);
         $catPerc = CatalogoPerc::selectRaw('id_catalogo_perc as value, concat(IFNULL(codigo_catalogo_perc,"")," - ",nombre_catalogo_perc) as label')
-        ->where('estado_catalogo_perc', 1)->get();
+            ->where('estado_catalogo_perc', 1)->get();
         $subWarehouses = SubAlmacen::select('id_sub_almacen as value', 'nombre_sub_almacen as label')
             ->where('estado_sub_almacen', 1)->get();
 
         return response()->json([
-            'prod'                      => $prod ?? [],
-            'catPerc'                   => $catPerc,
-            'subWarehouses'              => $subWarehouses
+            'prod'                          => $prod ?? [],
+            'catPerc'                       => $catPerc,
+            'subWarehouses'                 => $subWarehouses
         ]);
     }
 

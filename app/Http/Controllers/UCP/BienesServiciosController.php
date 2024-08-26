@@ -383,13 +383,13 @@ class BienesServiciosController extends Controller
             ], 404);
         }
 
-        // Comparar los totales
-        if ($productoAdquisicionTotal > $detalleDoc->monto_det_doc_adquisicion) {
+        // Comparar los totales usando bccomp para evitar problemas de precisión
+        if (bccomp($productoAdquisicionTotal, $detalleDoc->monto_det_doc_adquisicion, 2) > 0) {
             // Devolver error 422 si el total de los productos es mayor que el monto del detalle
             return response()->json([
                 'error' => 'EL TOTAL DE LOS PRODUCTOS: ($' . number_format($productoAdquisicionTotal, 2) . ') ES MAYOR QUE EL MONTO DEL DOCUMENTO DE ADQUISICIÓN ($' . number_format($detalleDoc->monto_det_doc_adquisicion, 2) . ').'
             ], 422);
-        } elseif ($productoAdquisicionTotal < $detalleDoc->monto_det_doc_adquisicion) {
+        } elseif (bccomp($productoAdquisicionTotal, $detalleDoc->monto_det_doc_adquisicion, 2) < 0) {
             // Devolver error 422 si el total de los productos es menor que el monto del detalle
             $amountMissing = $detalleDoc->monto_det_doc_adquisicion - $productoAdquisicionTotal;
             return response()->json([

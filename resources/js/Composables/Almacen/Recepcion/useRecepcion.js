@@ -142,7 +142,7 @@ export const useRecepcion = (context) => {
         const itemInfo = data.itemInfo;
         const recepData = data.recep;
 
-        recDocument.value.is6Decimals = itemInfo.tipo_costo_det_doc_adquisicion === 1 ? true : false
+        recDocument.value.is6Decimals = itemInfo.tipo_costo_det_doc_adquisicion === 1 ? false : true
         recDocument.value.financingSourceId = itemInfo.id_proy_financiado
         recDocument.value.detDocId = itemInfo.id_det_doc_adquisicion
         recDocument.value.isGas = itemInfo.documento_adquisicion.proceso_compra.nombre_proceso_compra === 'GAS LICUADO DE PETROLEO' ? true : false

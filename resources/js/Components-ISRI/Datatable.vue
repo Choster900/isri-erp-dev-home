@@ -8,8 +8,8 @@
                     class="px-2 first:pl-5 last:pr-5 py-2" :style="'width:' + column.width + ';' + 'cursor:pointer;'">
                     <div class="font-medium text-center flex justify-center items-center">
                         <p>{{ column.label }}</p>
-                        <svg v-if="sortIcons && column.name != 'Acciones'" class="h-[18px] w-[18px] text-white" viewBox="0 0 24 24"
-                            fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg v-if="sortIcons && column.name != 'Acciones'" class="h-[18px] w-[18px] text-white"
+                            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                             <g id="SVGRepo_iconCarrier">
@@ -54,7 +54,7 @@
                                 :style="staticSelect ? 'width: 100px;' : 'width: 100%;'">
                                 <option value=""></option>
                                 <option v-for="(option, i) in column.options " :key="i" :value="option.value">{{
-                option.label }}
+                                    option.label }}
                                 </option>
                             </select>
                         </div>
@@ -116,33 +116,42 @@ export default {
     methods: {
         sendData(event) {
             const id = event.target.id;
-            // Encuentra el objeto correspondiente en inputsToValidate por inputName
             const inputToValidate = this.inputsToValidate.find(element => element.inputName === id);
+            let isValid = true; // Variable para rastrear si las validaciones son exitosas
+
             if (inputToValidate) {
                 if (inputToValidate.number) {
                     // Reemplazar caracteres no numéricos con una cadena vacía
-                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
+                    const newValue = event.target.value.replace(/[^0-9]/g, '');
+                    if (newValue !== event.target.value) {
+                        event.target.value = newValue;
+                        isValid = false; // Si hubo caracteres no numéricos, la validación falla
+                    }
                 }
                 if (inputToValidate.limit) {
                     // Limitar la longitud del valor
-                    event.target.value = event.target.value.substring(0, inputToValidate.limit);
+                    if (event.target.value.length > inputToValidate.limit) {
+                        event.target.value = event.target.value.substring(0, inputToValidate.limit);
+                        isValid = false; // Si la longitud excede el límite, la validación falla
+                    }
                 }
                 if (inputToValidate.amount) {
                     let x = event.target.value.replace(/^\./, '').replace(/[^0-9.]/g, '')
                     event.target.value = x
                     const regex = /^(\d+)?([.]?\d{0,2})?$/
                     if (!regex.test(event.target.value)) {
-                        event.target.value = event.target.value.match(regex) || x.substring(0, x.length - 1)
+                        event.target.value = event.target.value.match(regex) || x.substring(0, x.length - 1);
+                        isValid = false; // Si el valor no es un número válido, la validación falla
                     }
                 }
             }
-            const value = event.target.value;
-            if (id in this.columnsComputed) {
-                this.columnsComputed[id] = value;
-            }
-            this.$emit('datos-enviados', this.columnsComputed);
-        }
 
+            // Solo se actualiza y se emiten los datos si todas las validaciones son exitosas
+            if (isValid && id in this.columnsComputed) {
+                this.columnsComputed[id] = event.target.value;
+                this.$emit('datos-enviados', this.columnsComputed);
+            }
+        }
     },
 
 
