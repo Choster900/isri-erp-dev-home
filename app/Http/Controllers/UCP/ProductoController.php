@@ -29,8 +29,15 @@ class ProductoController extends Controller
         $query = Producto::select('*')
             ->with([
                 'unidad_medida',
-            ])
-            ->orderBy($columns[$column], $dir);
+            ]);
+
+        //Sorting
+        if ($column == 4) { //Order by nombre_unidad_medida
+            $query->orderByRaw('
+                (SELECT nombre_unidad_medida FROM unidad_medida WHERE unidad_medida.id_unidad_medida = producto.id_unidad_medida) ' . $dir);
+        } else {
+            $query->orderBy($columns[$column], $dir);
+        }
 
         if ($search_value) {
             $query->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
@@ -137,7 +144,7 @@ class ProductoController extends Controller
                 'codigo_producto'           => $newProductCode,
                 'nombre_producto'           => $request->name,
                 'descripcion_producto'      => $request->description,
-                'nombre_completo_producto'  => $request->name . " " . $request->description,
+                'nombre_completo_producto'  => $request->name . ", " . $request->description,
                 'precio_producto'           => substr($request->price, 1), //we remove the dollar sign
                 'basico_producto'           => $request->gAndS == -1 ? null : $request->gAndS,
                 'perecedero_producto'       => $request->perishable == -1 ? null : $request->perishable,
@@ -179,7 +186,7 @@ class ProductoController extends Controller
                     'id_catalogo_perc'          => $request->catPercId,
                     'nombre_producto'           => $request->name,
                     'descripcion_producto'      => $request->description,
-                    'nombre_completo_producto'  => $request->name . " " . $request->description,
+                    'nombre_completo_producto'  => $request->name . ", " . $request->description,
                     'precio_producto'           => substr($request->price, 1),
                     'basico_producto'           => $request->gAndS == -1 ? null : $request->gAndS,
                     'perecedero_producto'       => $request->perishable == -1 ? null : $request->perishable,

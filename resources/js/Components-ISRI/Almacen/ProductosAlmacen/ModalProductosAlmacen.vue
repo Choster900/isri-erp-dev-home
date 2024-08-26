@@ -9,7 +9,8 @@
                 </h1>
             </div>
         </div>
-        <ProcessModal v-else maxWidth='3xl' :show="showModalProd" :center="true" @close="$emit('cerrar-modal')" class="bg-red-400">
+        <ProcessModal v-else maxWidth='3xl' :show="showModalProd" :center="true" @close="$emit('cerrar-modal')"
+            class="bg-red-400">
             <div class="flex items-center justify-between py-3 px-4 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
                     <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Producto</span>
@@ -27,7 +28,7 @@
                 </svg>
             </div>
 
-            <div class="mx-4 p-3 my-[25px] rounded-lg shadow-lg " style="border : 5px solid #d1d5db;">
+            <div class="mx-4 p-4 my-[25px] rounded-lg shadow-lg" style="border: 3px solid rgba(30, 58, 138, 0.8);">
                 <div class="flex flex-wrap mb-2">
                     <div class="w-full sm:w-1/3">
                         <p class="font-[MuseoSans] text-[13px] text-gray-500">
@@ -93,17 +94,21 @@
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
                         <Multiselect v-model="prod.catPercId" :options="catPerc" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione perc" :disabled="prod.status === 0" />
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione perc"
+                            :disabled="prod.status === 0" 
+                            :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.catPercId" :key="index" class="mt-2" :message="item" />
                 </div>
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.catPercId > 0, }">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.subWarehouseId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Sub Almacen
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
                         <Multiselect v-model="prod.subWarehouseId" :options="subWarehouses" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione Sub Almacen" :disabled="prod.status === 0"/>
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione Sub Almacen"
+                            :disabled="prod.status === 0" 
+                            :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.subWarehouseId" :key="index" class="mt-2"
                         :message="item" />
@@ -168,7 +173,7 @@ export default {
         const { prodId } = toRefs(props)
 
         const {
-            isLoadingRequest, prod, errors, catPerc, 
+            isLoadingRequest, prod, errors, catPerc,
             subWarehouses, showTooltipCAT, showTooltipUAT,
             getInfoForModalProd, updateProduct
         } = useProductoAlmacen(context);
@@ -180,7 +185,7 @@ export default {
         )
 
         return {
-            isLoadingRequest, prod, errors, catPerc, 
+            isLoadingRequest, prod, errors, catPerc,
             subWarehouses, moment, showTooltipCAT, showTooltipUAT,
             updateProduct
         }
