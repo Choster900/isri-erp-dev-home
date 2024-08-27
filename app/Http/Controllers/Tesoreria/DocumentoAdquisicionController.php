@@ -154,6 +154,7 @@ class DocumentoAdquisicionController extends Controller
     {
         DB::beginTransaction();
         try {
+            // Create a new acquisition document with the provided details
             $new_acq_doc = new DocumentoAdquisicion([
                 'id_tipo_gestion_compra'              => $request->management_type_id,
                 'id_tipo_doc_adquisicion'             => $request->type_id,
@@ -164,44 +165,47 @@ class DocumentoAdquisicionController extends Controller
                 'numero_gestion_doc_adquisicion'      => $request->management_number,
                 'numero_adjudicacion_doc_adquisicion' => $request->award_number,
                 'fecha_adjudicacion_doc_adquisicion'  => $request->award_date,
-                'estado_doc_adquisicion'              => 1,
+                'estado_doc_adquisicion'              => 1, // Set document status to active
                 'fecha_reg_doc_adquisicion'           => Carbon::now(),
                 'usuario_doc_adquisicion'             => $request->user()->nick_usuario,
                 'ip_doc_adquisicion'                  => $request->ip(),
             ]);
-            $new_acq_doc->save();
+            $new_acq_doc->save(); // Save the new acquisition document
 
-            foreach ( $request->employees as $emp ) {
+            // Assign document managers (employees) to the newly created acquisition document
+            foreach ($request->employees as $emp) {
                 $newAdm = new AdministradorAdquisicion([
                     'id_doc_adquisicion'          => $new_acq_doc->id_doc_adquisicion,
                     'id_empleado'                 => $emp,
-                    'estado_admon_adquisicion'    => 1,
+                    'estado_admon_adquisicion'    => 1, // Set document manager status to active
                     'fecha_reg_admon_adquisicion' => Carbon::now(),
                     'usuario_admon_adquisicion'   => $request->user()->nick_usuario,
                     'ip_admon_adquisicion'        => $request->ip(),
                 ]);
-                $newAdm->save();
+                $newAdm->save(); // Save the new document manager record
             }
 
-            foreach ( $request->items as $detail ) {
+            // Add items to the acquisition document
+            foreach ($request->items as $detail) {
                 $new_item = new DetDocumentoAdquisicion([
                     'id_doc_adquisicion'                        => $new_acq_doc->id_doc_adquisicion,
-                    'id_estado_doc_adquisicion'                 => 1,
+                    'id_estado_doc_adquisicion'                 => 1, // Set item status to active
                     'id_proy_financiado'                        => $detail['financing_source_id'],
                     'nombre_det_doc_adquisicion'                => $detail['name'],
                     'monto_det_doc_adquisicion'                 => isset($detail['amount']) ? $detail['amount'] : 0,
                     'compromiso_ppto_det_doc_adquisicion'       => $detail['commitment_number'],
                     'admon_det_doc_adquisicion'                 => $detail['contract_manager'],
-                    'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, //Award date for every contract item
-                    'tipo_costo_det_doc_adquisicion'            => 0,
-                    'estado_det_doc_adquisicion'                => 1,
+                    'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, // Award date for every contract item
+                    'tipo_costo_det_doc_adquisicion'            => 0, // Default cost type
+                    'estado_det_doc_adquisicion'                => 1, // Set item status to active
                     'fecha_reg_det_doc_adquisicion'             => Carbon::now(),
                     'usuario_det_doc_adquisicion'               => $request->user()->nick_usuario,
                     'ip_det_doc_adquisicion'                    => $request->ip(),
                     'visible_ucp_det_doc_adquisicion'           => $request->comesFrom == 'ucp' ? 1 : 0 // Si se agrega desde tesoreria lo ponemos como 0 y si se agrega desde ucp 1
                 ]);
-                $new_item->save();
+                $new_item->save(); // Save the new item record
             }
+
 
             DB::commit(); // Confirma las operaciones en la base de datos
             return response()->json([
@@ -238,39 +242,44 @@ class DocumentoAdquisicionController extends Controller
                     'ip_doc_adquisicion'                  => $request->ip(),
                 ]);
 
-                //CRUD doc managers
+                // Manage document managers (CRUD operations)
                 $newEmpIds = $request->employees;
                 $currentEmpIds = AdministradorAdquisicion::where('id_doc_adquisicion', $acq_doc->id_doc_adquisicion)
                     ->where('estado_admon_adquisicion', 1)
                     ->pluck('id_empleado')
                     ->toArray();
                 $deletedEmpIds = array_diff($currentEmpIds, $newEmpIds);
-                //Deleting doc managers
+
+                // Deactivate document managers who are no longer assigned
                 AdministradorAdquisicion::where('id_doc_adquisicion', $acq_doc->id_doc_adquisicion)
                     ->whereIn('id_empleado', $deletedEmpIds)
                     ->update([
-                        'estado_admon_adquisicion'    => 0,
+                        'estado_admon_adquisicion'    => 0, // Set status to inactive
                         'fecha_mod_admon_adquisicion' => Carbon::now(),
                         'usuario_admon_adquisicion'   => $request->user()->nick_usuario,
                         'ip_admon_adquisicion'        => $request->ip(),
                     ]);
-                //Activate an inactive doc manager or create a new one
-                foreach ( $newEmpIds as $empId ) {
+
+                // Activate an inactive document manager or create a new one
+                foreach ($newEmpIds as $empId) {
                     if (!in_array($empId, $currentEmpIds)) {
+                        // Check if the document manager already exists
                         $existAdm = AdministradorAdquisicion::where('id_doc_adquisicion', $acq_doc->id_doc_adquisicion)
                             ->where('id_empleado', $empId)->first();
                         if ($existAdm) {
+                            // Reactivate the document manager if found inactive
                             $existAdm->update([
-                                'estado_admon_adquisicion'    => 1,
+                                'estado_admon_adquisicion'    => 1, // Set status to active
                                 'fecha_mod_admon_adquisicion' => Carbon::now(),
                                 'usuario_admon_adquisicion'   => $request->user()->nick_usuario,
                                 'ip_admon_adquisicion'        => $request->ip(),
                             ]);
                         } else {
+                            // Create a new document manager entry
                             $newAdm = new AdministradorAdquisicion([
                                 'id_empleado'                 => $empId,
                                 'id_doc_adquisicion'          => $acq_doc->id_doc_adquisicion,
-                                'estado_admon_adquisicion'    => 1,
+                                'estado_admon_adquisicion'    => 1, // Set status to active
                                 'fecha_reg_admon_adquisicion' => Carbon::now(),
                                 'usuario_admon_adquisicion'   => $request->user()->nick_usuario,
                                 'ip_admon_adquisicion'        => $request->ip(),
@@ -280,9 +289,11 @@ class DocumentoAdquisicionController extends Controller
                     }
                 }
 
-                foreach ( $request->items as $detail ) {
+                // Loop through each item in the request
+                foreach ($request->items as $detail) {
+
+                    // Case 1: Update an existing item if it has an ID and is not marked as deleted
                     if ($detail['id'] != "" && $detail['deleted'] == false) {
-                        //Update item
                         $item = DetDocumentoAdquisicion::find($detail['id']);
                         $item->update([
                             'id_proy_financiado'                        => $detail['financing_source_id'],
@@ -290,55 +301,61 @@ class DocumentoAdquisicionController extends Controller
                             'monto_det_doc_adquisicion'                 => is_numeric($detail['amount']) ? $detail['amount'] : 0,
                             'compromiso_ppto_det_doc_adquisicion'       => $detail['commitment_number'],
                             'admon_det_doc_adquisicion'                 => $detail['contract_manager'],
-                            'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, //Award date for every contract item
+                            'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, // Award date for every contract item
                             'fecha_mod_det_doc_adquisicion'             => Carbon::now(),
                             'usuario_det_doc_adquisicion'               => $request->user()->nick_usuario,
                             'ip_det_doc_adquisicion'                    => $request->ip()
                         ]);
                     }
 
+                    // Case 2: Mark an existing item as 'deleted' in DB if it has an ID and is marked as deleted from the view
                     if ($detail['id'] != "" && $detail['deleted'] == true) {
                         $item = DetDocumentoAdquisicion::find($detail['id']);
                         $item->update([
-                            'estado_det_doc_adquisicion'    => 0,
+                            'estado_det_doc_adquisicion'    => 0, // Set item status to deleted
                             'fecha_mod_det_doc_adquisicion' => Carbon::now(),
                             'usuario_det_doc_adquisicion'   => $request->user()->nick_usuario,
                             'ip_det_doc_adquisicion'        => $request->ip()
                         ]);
                     }
 
+                    // Case 3: Create a new item if it does not have an ID and is not marked as deleted
                     if ($detail['id'] == "" && $detail['deleted'] == false) {
+                        // Check if an item with the same commitment number already exists
                         $exist_item = DetDocumentoAdquisicion::where('id_doc_adquisicion', $request->id)
                             ->where('compromiso_ppto_det_doc_adquisicion', $detail['commitment_number'])
                             ->first();
+
                         if ($exist_item) {
+                            // Update the existing item with the new details
                             $exist_item->update([
                                 'id_proy_financiado'                        => $detail['financing_source_id'],
                                 'nombre_det_doc_adquisicion'                => $detail['name'],
                                 'monto_det_doc_adquisicion'                 => is_numeric($detail['amount']) ? $detail['amount'] : 0,
                                 'compromiso_ppto_det_doc_adquisicion'       => $detail['commitment_number'],
                                 'admon_det_doc_adquisicion'                 => $detail['contract_manager'],
-                                'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, //Award date for every contract item
-                                'estado_det_doc_adquisicion'                => 1,
+                                'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, // Award date for every contract item
+                                'estado_det_doc_adquisicion'                => 1, // Set item status to active
                                 'fecha_mod_det_doc_adquisicion'             => Carbon::now(),
                                 'usuario_det_doc_adquisicion'               => $request->user()->nick_usuario,
                                 'ip_det_doc_adquisicion'                    => $request->ip()
                             ]);
                         } else {
+                            // Create a new item as it doesn't exist yet
                             $new_item = new DetDocumentoAdquisicion([
                                 'id_doc_adquisicion'                        => $request->id,
-                                'id_estado_doc_adquisicion'                 => 1,
+                                'id_estado_doc_adquisicion'                 => 1, // Set initial status to active
                                 'id_proy_financiado'                        => $detail['financing_source_id'],
                                 'nombre_det_doc_adquisicion'                => $detail['name'],
                                 'monto_det_doc_adquisicion'                 => is_numeric($detail['amount']) ? $detail['amount'] : 0,
                                 'compromiso_ppto_det_doc_adquisicion'       => $detail['commitment_number'],
-                                'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, //Award date for every contract item
+                                'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, // Award date for every contract item
                                 'admon_det_doc_adquisicion'                 => $detail['contract_manager'],
-                                'estado_det_doc_adquisicion'                => 1,
+                                'estado_det_doc_adquisicion'                => 1, // Set item status to active
                                 'fecha_reg_det_doc_adquisicion'             => Carbon::now(),
                                 'usuario_det_doc_adquisicion'               => $request->user()->nick_usuario,
                                 'ip_det_doc_adquisicion'                    => $request->ip(),
-                                'visible_ucp_det_doc_adquisicion'           => $request->comesFrom == 'ucp' ? 1 : 0 // Si se agrega desde tesoreria lo ponemos como 0 y si se agrega desde ucp 1
+                                'visible_ucp_det_doc_adquisicion'           => $request->comesFrom == 'ucp' ? 1 : 0 // Set visibility based on the source
                             ]);
                             $new_item->save();
                         }

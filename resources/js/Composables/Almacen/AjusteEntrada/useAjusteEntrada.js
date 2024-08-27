@@ -594,9 +594,9 @@ export const useAjusteEntrada = (context) => {
             }
         }
         // Set the total amount in the adjustment object
-        adjustment.value.total = round2Decimals(sum).toFixed(2);
+        adjustment.value.total = round2Decimals(sum);
         // Return the computed total amount
-        return round2Decimals(sum).toFixed(2);
+        return round2Decimals(sum);
     });
 
     /**
