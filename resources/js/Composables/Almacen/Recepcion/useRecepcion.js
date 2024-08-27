@@ -133,7 +133,7 @@ export const useRecepcion = (context) => {
         infoToShow.value.supplier = itemInfo.documento_adquisicion.proveedor.razon_social_proveedor
         infoToShow.value.nit = itemInfo.documento_adquisicion.proveedor.nit_proveedor
         infoToShow.value.dui = itemInfo.documento_adquisicion.proveedor.dui_proveedor
-        infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
+        infoToShow.value.dateTime = recepData ? (recepData.id_estado_recepcion_pedido === 2 ? moment(recepData.fecha_mod_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss')) : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
         infoToShow.value.acqDocDate = moment(itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
     };
