@@ -316,10 +316,10 @@ class RecepcionController extends Controller
                 $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
                 return response()->json([
-                    'recep'                         => $recep,
-                    'products'                      => $procedure,
-                    'itemInfo'                      => $item,
-                    'brands'                         => $brands
+                    'recep'                             => $recep,
+                    'products'                          => $procedure,
+                    'itemInfo'                          => $item,
+                    'brands'                            => $brands
                 ]);
             } else {
                 return response()->json([
