@@ -350,6 +350,7 @@ class DocumentoAdquisicionController extends Controller
                                 'monto_det_doc_adquisicion'                 => is_numeric($detail['amount']) ? $detail['amount'] : 0,
                                 'compromiso_ppto_det_doc_adquisicion'       => $detail['commitment_number'],
                                 'fecha_adjudicacion_det_doc_adquisicion'    => $request->award_date, // Award date for every contract item
+                                'tipo_costo_det_doc_adquisicion'            => 0, // Default cost type
                                 'admon_det_doc_adquisicion'                 => $detail['contract_manager'],
                                 'estado_det_doc_adquisicion'                => 1, // Set item status to active
                                 'fecha_reg_det_doc_adquisicion'             => Carbon::now(),

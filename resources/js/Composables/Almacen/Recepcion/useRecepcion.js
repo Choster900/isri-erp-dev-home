@@ -229,8 +229,6 @@ export const useRecepcion = (context) => {
                     detDocId: detDocId
                 }
                 );
-                console.log(response.data);
-                
                 months.value = response.data.monthsAvail
             } catch (err) {
                 if (err.response.data.logical_error) {
@@ -262,7 +260,7 @@ export const useRecepcion = (context) => {
     const createProdArray = (selectedProd, paId) => ({
         detRecId: '', //id_det_recepcion_pedido
         prodId: paId, //id_prod_adquisicion
-        desc: `${selectedProd.codigo_up_lt} — ${selectedProd.codigo_centro_atencion} — ${selectedProd.codigo_producto} — ${selectedProd.nombre_completo_producto} — ${selectedProd.nombre_unidad_medida} — ${selectedProd.descripcion_prod_adquisicion}`, //Acquisition product description
+        desc: `${selectedProd.codigo_up_lt} — ${selectedProd.codigo_centro_atencion} — ${selectedProd.codigo_producto} — ${selectedProd.nombre_completo_producto} — ${selectedProd.descripcion_prod_adquisicion} — ${selectedProd.nombre_unidad_medida}`, //Acquisition product description
         brandId: selectedProd.id_marca,
         brandLabel: '',
         expiryDate: '',

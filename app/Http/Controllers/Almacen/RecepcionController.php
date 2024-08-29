@@ -799,7 +799,8 @@ class RecepcionController extends Controller
             'detalle_recepcion.marca',
             'detalle_recepcion.producto_adquisicion',
             'administrador_contrato.persona',
-            'guarda_almacen.persona'
+            'guarda_almacen.persona',
+            'mes_recepcion'
         ])->find($id);
 
         if ($recToPrint->id_estado_recepcion_pedido == 2) {
