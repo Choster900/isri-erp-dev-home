@@ -96,7 +96,6 @@ export const useEnviarKardex = (context) => {
                     const response = await axios.get(
                         `/print-reception/${id}`
                     );
-                    console.log(response)
                     let fecha = moment().format('DD-MM-YYYY');
                     let name = 'ACTA ' + response.data.recToPrint.acta_recepcion_pedido + ' - ' + fecha;
                     const opt = {

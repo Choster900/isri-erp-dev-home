@@ -573,6 +573,7 @@ export default {
             saveProductAdquisicionRequest,
             updateProductAdquisicionRequest,
             handleInput,
+            findIndexBySameObject,
         } = useBienesServicios(propProdAdquisicion, showModal, "orden de compra")
 
         /**
@@ -646,24 +647,6 @@ export default {
             totProductos
         )
 
-        function areObjectsEqual(obj1, obj2) {
-            return JSON.stringify(obj1) === JSON.stringify(obj2);
-        }
-
-        const findIndexBySameObject = (obj, lineaTrabajo) => {
-            // Suponiendo que arrayProductoAdquisicion es un array de algún tipo de datos
-
-
-            // Obtenemos el detalle de la línea de trabajo
-            const detalleArray = arrayProductoAdquisicion.value[lineaTrabajo].detalleDoc;
-
-            // Encontramos el índice en el detalleArray que corresponde al objeto buscado
-            const indexInArray2 = detalleArray.findIndex(producto => areObjectsEqual(producto, obj));
-
-            console.log(`El objeto ${JSON.stringify(obj)} se encuentra en la posición ${indexInArray2} de detalleArray`);
-
-            return indexInArray2;
-        }
 
         return {
             findIndexBySameObject,

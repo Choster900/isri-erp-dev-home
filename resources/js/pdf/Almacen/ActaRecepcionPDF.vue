@@ -30,7 +30,7 @@
             <div class="w-[40%] flex justify-start items-center">
                 <p class="ml-2 font-[MuseoSans] text-gray-800 text-[11px]">Fecha y hora de recepción:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
-                    {{ moment(recToPrint.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') }}
+                    {{ moment(recToPrint.fecha_mod_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') }}
                 </p>
             </div>
             <div class="w-[35%] flex justify-start items-center">
@@ -68,15 +68,21 @@
 
         <!-- Date and time -->
         <div class="flex w-full border-x border-black pb-3">
-            <div class="w-[50%] flex justify-start items-center">
+            <div class="w-[75%] flex justify-start items-center">
                 <p class="ml-2 font-[MuseoSans] text-gray-800 text-[11px]">Fecha referencia documento de compra:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
-                    {{ moment(
-                        recToPrint.det_doc_adquisicion.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
+                    {{ recToPrint.det_doc_adquisicion.fecha_adjudicacion_det_doc_adquisicion
+                        ? moment(recToPrint.det_doc_adquisicion.fecha_adjudicacion_det_doc_adquisicion).format('DD/MM/YYYY')
+                        : '-'
                     }}
                 </p>
             </div>
-
+            <div v-if="recToPrint.mes_recepcion" class="w-[25%] flex justify-start items-center">
+                <p class="font-[MuseoSans] text-gray-800 text-[11px]">Mes:</p>
+                <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
+                    {{ recToPrint.mes_recepcion.nombre_mes_recepcion }}
+                </p>
+            </div>
         </div>
 
         <!-- Third row -->
@@ -110,13 +116,14 @@
         <!-- Table body -->
         <template v-for="(lts, indexLt) in recToPrint.detalles_agrupados" :key="indexLt">
             <div class="flex  border-x border-b border-black justify-center items-center font-[MuseoSans] pb-[12px]">
-                <p class="font-[MuseoSans] font-bold text-[11px]">{{ lts.codigo_up_lt }} - ${{ lts.total.toFixed(2) }}</p>
+                <p class="font-[MuseoSans] font-bold text-[11px]">{{ lts.codigo_up_lt }} - ${{ lts.total.toFixed(2) }}
+                </p>
             </div>
             <template v-for="(prod, index) in lts.productos" :key="index">
                 <div class="flex w-full border-x border-b border-black" style="page-break-inside: avoid;">
                     <!-- Producto -->
                     <div class="w-[35%] flex justify-center items-center border-r border-black">
-                        <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] px-0.5">
+                        <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] px-0.5 uppercase">
                             {{ prod.producto.codigo_producto + " — " +
                                 prod.producto.nombre_completo_producto + " — " +
                                 prod.producto_adquisicion.descripcion_prod_adquisicion + " — " +
@@ -148,15 +155,22 @@
                     <!-- Costo -->
                     <div class="w-[16%] flex justify-center items-center border-r border-black">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            ${{ recToPrint.det_doc_adquisicion.documento_adquisicion.id_proceso_compra == 5 ?
-                                prod.costo_det_recepcion_pedido :
-                                parseFloat(prod.costo_det_recepcion_pedido).toFixed(2) }}
+                            ${{
+                                recToPrint.det_doc_adquisicion.documento_adquisicion.id_proceso_compra == 5
+                                    ? prod.costo_det_recepcion_pedido
+                                    : (recToPrint.det_doc_adquisicion.tipo_costo_det_doc_adquisicion === 0 //Purchase doc by amount
+                                        ? prod.costo_det_recepcion_pedido
+                                        : parseFloat(prod.costo_det_recepcion_pedido).toFixed(2))
+                            }}
                         </p>
                     </div>
                     <!-- Total -->
                     <div class="w-[15%] flex justify-center items-center">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            ${{ round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido) }}
+                            ${{ recToPrint.det_doc_adquisicion.tipo_costo_det_doc_adquisicion === 0 //Purchase doc by amount
+                                ? (prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido).toFixed(6)
+                                : round2Decimals(prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido)
+                            }}
                         </p>
                     </div>
                 </div>
@@ -181,9 +195,10 @@
             </div>
         </div>
 
-        <div class="w-full" style="page-break-inside: avoid;"> 
+        <div class="w-full" style="page-break-inside: avoid;">
             <p class="font-[MuseoSans] text-[12px] mt-2">
-                SE HACE CONSTAR QUE LOS BIENES DETALLADOS EN ESTA ACTA, CUMPLEN CON LAS CONDICIONES Y ESPECIFICACIONES TECNICAS
+                SE HACE CONSTAR QUE LOS BIENES DETALLADOS EN ESTA ACTA, CUMPLEN CON LAS CONDICIONES Y ESPECIFICACIONES
+                TECNICAS
                 PREVIAMENTE DEFINIDAS EN EL CONTRATO U ORDEN DE COMPRA.
             </p>
         </div>
@@ -199,8 +214,11 @@
             <!-- Incumplimiento -->
             <div class="flex w-full mt-2">
                 <p class="font-[MuseoSans] text-[12px] ">Incumplimiento:</p>
-                <p class="font-[MuseoSans] text-[12px] font-bold ml-1">{{ recToPrint.incumple_acuerdo_recepcion_pedido
-                    == 1 ? recToPrint.incumplimiento_recepcion_pedido : "Sin incumplimiento." }}</p>
+                <p class="font-[MuseoSans] text-[12px] font-bold ml-1">
+                    {{ recToPrint.incumple_acuerdo_recepcion_pedido == 1 ? "Si incumple" : "No incumple" }}
+                    {{ recToPrint.incumplimiento_recepcion_pedido ? ' - ' + recToPrint.incumplimiento_recepcion_pedido :
+                    '.' }}
+                </p>
             </div>
         </div>
         <div class="" style="page-break-inside: avoid;"> <!-- Signatures -->
@@ -282,7 +300,7 @@
             <div class="w-[50%] flex justify-end">
                 <p class="text-[14px] mr-1 font-[Roboto]">{{
                     recToPrint.det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion
-                }} No. <span class="font-bold font-[Roboto]">{{
+                    }} No. <span class="font-bold font-[Roboto]">{{
                         recToPrint.det_doc_adquisicion.documento_adquisicion.numero_doc_adquisicion }}</span> </p>
             </div>
         </div>

@@ -48,7 +48,7 @@ export const useRecepcion = (context) => {
         detStockId: '',
         isGas: '',
         financingSourceId: '',
-        is6Decimals:'',
+        is6Decimals: '',
         observation: '', //Reception observation
         detDocId: '', //Identifier of the document detail related to the reception
         status: '', //We use this to manage some functionalities in the view, it represent the reception status
@@ -72,6 +72,8 @@ export const useRecepcion = (context) => {
                 const response = await axios.get(
                     `/get-initial-doc-info`
                 );
+                console.log(response);
+                
                 documents.value = response.data.docs
                 items.value = response.data.test
             } catch (err) {
@@ -133,9 +135,9 @@ export const useRecepcion = (context) => {
         infoToShow.value.supplier = itemInfo.documento_adquisicion.proveedor.razon_social_proveedor
         infoToShow.value.nit = itemInfo.documento_adquisicion.proveedor.nit_proveedor
         infoToShow.value.dui = itemInfo.documento_adquisicion.proveedor.dui_proveedor
-        infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
+        infoToShow.value.dateTime = recepData ? (recepData.id_estado_recepcion_pedido === 2 ? moment(recepData.fecha_mod_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss')) : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
-        infoToShow.value.acqDocDate = moment(itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
+        infoToShow.value.acqDocDate = itemInfo.fecha_adjudicacion_det_doc_adquisicion ? moment(itemInfo.fecha_adjudicacion_det_doc_adquisicion).format('DD/MM/YYYY') : '-'
     };
 
     const setRecDocumentData = (data, id) => {
@@ -205,8 +207,8 @@ export const useRecepcion = (context) => {
             avails: "",
             qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
             cost: recDocument.value.is6Decimals ? parseFloat(element.producto_adquisicion.costo_prod_adquisicion).toFixed(6) : parseFloat(element.producto_adquisicion.costo_prod_adquisicion).toFixed(2),
-            total: recDocument.value.isGas ? round2Decimals(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido) : 
-            recDocument.is6Decimals ? parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(6) : parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2),
+            total: recDocument.value.isGas ? round2Decimals(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido) :
+                recDocument.is6Decimals ? parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(6) : parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2),
             deleted: false,
             initial: "",
             initialAmount: "",
@@ -260,7 +262,7 @@ export const useRecepcion = (context) => {
     const createProdArray = (selectedProd, paId) => ({
         detRecId: '', //id_det_recepcion_pedido
         prodId: paId, //id_prod_adquisicion
-        desc: `${selectedProd.codigo_up_lt} — ${selectedProd.codigo_centro_atencion} — ${selectedProd.codigo_producto} — ${selectedProd.nombre_completo_producto} — ${selectedProd.nombre_unidad_medida} — ${selectedProd.descripcion_prod_adquisicion}`, //Acquisition product description
+        desc: `${selectedProd.codigo_up_lt} — ${selectedProd.codigo_centro_atencion} — ${selectedProd.codigo_producto} — ${selectedProd.nombre_completo_producto} — ${selectedProd.descripcion_prod_adquisicion} — ${selectedProd.nombre_unidad_medida}`, //Acquisition product description
         brandId: selectedProd.id_marca,
         brandLabel: '',
         expiryDate: '',

@@ -156,7 +156,7 @@ class RecepcionController extends Controller
             )
             //->whereRaw('(pendiente.diferencia_monto > 0 AND pendiente.id_proceso_compra = 5) OR (pendiente.id_proceso_compra != 5 AND pendiente.diferencia > 0)')
             ->whereRaw('pendiente.diferencia_monto > 0')
-            ->groupBy('pendiente.id_doc_adquisicion');
+            ->groupBy('pendiente.id_det_doc_adquisicion');
 
         //We evaluate if the user is not admin to apply filter
         if ($rol->nombre_rol != 'Administrador ALM') {
@@ -189,7 +189,7 @@ class RecepcionController extends Controller
                     drp.id_prod_adquisicion,
                     rp.id_mes_recepcion,
                     SUM(drp.cant_det_recepcion_pedido) AS contador,
-                    ROUND(SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido),2) AS contador_monto
+                    ROUND(SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido), 2) AS contador_monto
                 FROM
                     recepcion_pedido rp
                 INNER JOIN detalle_recepcion_pedido drp 
@@ -203,15 +203,8 @@ class RecepcionController extends Controller
             ),
             MesesConFaltantes AS (
                 SELECT DISTINCT
-                    mr.id_mes_recepcion
-                FROM producto_adquisicion pa
-                JOIN mes_recepcion mr ON mr.id_mes_recepcion BETWEEN 1 AND 12
-                LEFT JOIN Interno i 
-                    ON pa.id_prod_adquisicion = i.id_prod_adquisicion 
-                    AND mr.id_mes_recepcion = i.id_mes_recepcion
-                WHERE
-                    pa.id_det_doc_adquisicion = ?
-                    AND CASE mr.id_mes_recepcion
+                    mr.id_mes_recepcion,
+                    ROUND(CASE mr.id_mes_recepcion
                         WHEN 1 THEN pa.cant_ene_prod_adquisicion * pa.costo_prod_adquisicion
                         WHEN 2 THEN pa.cant_feb_prod_adquisicion * pa.costo_prod_adquisicion
                         WHEN 3 THEN pa.cant_mar_prod_adquisicion * pa.costo_prod_adquisicion
@@ -224,9 +217,37 @@ class RecepcionController extends Controller
                         WHEN 10 THEN pa.cant_oct_prod_adquisicion * pa.costo_prod_adquisicion
                         WHEN 11 THEN pa.cant_nov_prod_adquisicion * pa.costo_prod_adquisicion
                         WHEN 12 THEN pa.cant_dic_prod_adquisicion * pa.costo_prod_adquisicion
-                    END > IFNULL(i.contador_monto, 0)
+                    END, 2) AS valor_comparacion,
+                    IFNULL(i.contador_monto, 0) AS contador_monto
+                FROM producto_adquisicion pa
+                JOIN mes_recepcion mr ON mr.id_mes_recepcion BETWEEN 1 AND 12
+                LEFT JOIN Interno i 
+                    ON pa.id_prod_adquisicion = i.id_prod_adquisicion 
+                    AND mr.id_mes_recepcion = i.id_mes_recepcion
+                WHERE
+                    pa.id_det_doc_adquisicion = ?
+                    AND ROUND(CASE mr.id_mes_recepcion
+                        WHEN 1 THEN pa.cant_ene_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 2 THEN pa.cant_feb_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 3 THEN pa.cant_mar_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 4 THEN pa.cant_abr_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 5 THEN pa.cant_may_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 6 THEN pa.cant_jun_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 7 THEN pa.cant_jul_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 8 THEN pa.cant_ago_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 9 THEN pa.cant_sept_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 10 THEN pa.cant_oct_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 11 THEN pa.cant_nov_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 12 THEN pa.cant_dic_prod_adquisicion * pa.costo_prod_adquisicion
+                    END, 2) > IFNULL(i.contador_monto, 0)
             )
-            SELECT id_mes_recepcion FROM MesesConFaltantes;
+            SELECT 
+                id_mes_recepcion, 
+                valor_comparacion, 
+                contador_monto 
+            FROM 
+                MesesConFaltantes;
+
         ',
             [$idDetDoc, $idDetDoc]
         );
@@ -247,7 +268,8 @@ class RecepcionController extends Controller
             ->get();
 
         return response()->json([
-            'monthsAvail'      => $mesesSeleccionables
+            'monthsAvail'      => $mesesSeleccionables,
+            'meses'            => $mesesConFaltantes
         ]);
     }
 
@@ -316,10 +338,10 @@ class RecepcionController extends Controller
                 $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
                 return response()->json([
-                    'recep'                         => $recep,
-                    'products'                      => $procedure,
-                    'itemInfo'                      => $item,
-                    'brands'                         => $brands
+                    'recep'                             => $recep,
+                    'products'                          => $procedure,
+                    'itemInfo'                          => $item,
+                    'brands'                            => $brands
                 ]);
             } else {
                 return response()->json([
@@ -634,24 +656,24 @@ class RecepcionController extends Controller
 
     public function sendGoodsReception(Request $request)
     {
-        //Define the custom messages
+        // Define custom error messages for validation
         $customMessages = [
-            'conctManagerId.required' => 'Debe seleccionar el administrador de documento.',
-            'suppRep.required' => 'Debe escribir el nombre del representante del proveedor.',
-            //'nonCompliant.required' => 'Debe seleccionar si existe incumplimiento.',
-            'nonCompliant.not_in' => 'Debe seleccionar si existe incumplimiento.',
-            'observation.required' => 'Debe digitar observación.'
+            'conctManagerId.required'       => 'Debe seleccionar el administrador de documento.',
+            'suppRep.required'              => 'Debe escribir el nombre del representante del proveedor.',
+            //'nonCompliant.required'       => 'Debe seleccionar si existe incumplimiento.',
+            'nonCompliant.not_in'           => 'Debe seleccionar si existe incumplimiento.',
+            'observation.required'          => 'Debe digitar observación.'
         ];
 
-        // Validate the request data with custom error messages and custom rule
+        // Validate the request data with custom error messages and rules
         $validatedData = Validator::make($request->all(), [
-            'conctManagerId' => 'required',
-            'suppRep' => 'required',
-            'nonCompliant' => 'not_in:-1',
-            'observation' => 'required',
+            'conctManagerId'                => 'required',
+            'suppRep'                       => 'required',
+            'nonCompliant'                  => 'not_in:-1', // Ensure a valid non-compliance selection
+            'observation'                   => 'required',
         ], $customMessages)->validate();
 
-        //Find the current products reception
+        // Find the current products reception with related data
         $reception = RecepcionPedido::with([
             'det_doc_adquisicion.fuente_financiamiento',
             'det_doc_adquisicion.documento_adquisicion.proceso_compra',
@@ -660,37 +682,40 @@ class RecepcionController extends Controller
             },
             'detalle_recepcion.producto_adquisicion'
         ])->find($request->id);
-        //Find the user who stores the products reception
+
+        // Find the user who is processing the products reception
         $user = User::with('persona.empleado')->find($request->user()->id_usuario);
 
-        if ($reception->id_estado_recepcion_pedido == 1) { //We must evaluate if the reception has the status 'CREADO'
-            DB::beginTransaction(); //Start the transaction
+        if ($reception->id_estado_recepcion_pedido == 1) { // Check if the reception status is 'CREADO'
+            DB::beginTransaction(); // Start a database transaction
             try {
-                //We update the reception
+                // Update the reception with new data
                 $reception->update([
-                    'id_estado_recepcion_pedido'            => 2,
+                    'id_estado_recepcion_pedido'            => 2, // Change status to 'PROCESADO'
                     'incumple_acuerdo_recepcion_pedido'     => $request->nonCompliant,
                     'incumplimiento_recepcion_pedido'       => $request->observation,
                     'id_empleado'                           => $request->conctManagerId,
                     'representante_prov_recepcion_pedido'   => $request->suppRep,
                     'emp_id_empleado'                       => $user->persona->empleado->id_empleado,
-                    'fecha_reg_recepcion_pedido'            => Carbon::now(),
+                    'fecha_mod_recepcion_pedido'            => Carbon::now(),
                     'fecha_recepcion_pedido'                => Carbon::now(),
                     'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                     'ip_recepcion_pedido'                   => $request->ip(),
                 ]);
-                //Create a new Kardex object
+
+                // Create a new Kardex record for inventory tracking
                 $kardex = new Kardex([
                     'id_recepcion_pedido'                   => $reception->id_recepcion_pedido,
                     'id_proy_financiado'                    => $reception->id_proy_financiado,
-                    'id_tipo_mov_kardex'                    => 1,
+                    'id_tipo_mov_kardex'                    => 1, // Indicate the type of Kardex movement (INGRESO)
                     'fecha_kardex'                          => Carbon::now(),
                     'fecha_reg_kardex'                      => Carbon::now(),
                     'usuario_kardex'                        => $request->user()->nick_usuario,
                     'ip_kardex'                             => $request->ip(),
                 ]);
                 $kardex->save();
-                //Foreach 'detalle_reception' we create a 'detalle_kardex' instance
+
+                // Create a Kardex detail entry for each item in the reception
                 foreach ($reception->detalle_recepcion as $det) {
                     $detKardex = new DetalleKardex([
                         'id_kardex'                         => $kardex->id_kardex,
@@ -707,7 +732,7 @@ class RecepcionController extends Controller
                     ]);
                     $detKardex->save();
 
-                    //We update the stock
+                    // Update the stock for each item using a stored procedure
                     $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
                         $reception->id_proy_financiado,
                         $det->id_producto,
@@ -723,35 +748,37 @@ class RecepcionController extends Controller
                     ]);
                 }
 
+                // Check if there are any pending items based on the purchase process
                 if ($reception->det_doc_adquisicion->documento_adquisicion->proceso_compra->nombre_proceso_compra == 'GAS LICUADO DE PETROLEO') {
                     $pendientes = $this->getPendingItems(true, $reception);
                 } else {
                     $pendientes = $this->getPendingItems(false, $reception);
                 }
 
+                // If no pending items, update the acquisition document status
                 if ($pendientes->isEmpty()) {
                     $item = DetDocumentoAdquisicion::find($reception->id_det_doc_adquisicion);
                     $item->update([
-                        'id_estado_doc_adquisicion'         => 3,
+                        'id_estado_doc_adquisicion'         => 3, // Set the status to 'CERRADO'
                         'fecha_mod_det_doc_adquisicion'     => Carbon::now(),
                         'usuario_det_doc_adquisicion'       => $request->user()->nick_usuario,
                         'ip_det_doc_adquisicion'            => $request->ip()
                     ]);
                 }
 
-                DB::commit(); // Confirma las operaciones en la base de datos
+                DB::commit(); // Commit the database transaction
                 return response()->json([
-                    'message'          => "Recepción enviada al Kardex con éxito.",
+                    'message' => "Recepción enviada al Kardex con éxito.",
                 ]);
             } catch (\Exception $e) {
-                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                DB::rollBack(); // Rollback the transaction in case of an error
                 return response()->json([
                     'logical_error' => 'Ha ocurrido un error con sus datos.',
                     'error' => $e->getMessage(),
                 ], 422);
             }
         } else {
-            return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta recepción.',], 422);
+            return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta recepción.'], 422);
         }
     }
 
@@ -772,7 +799,8 @@ class RecepcionController extends Controller
             'detalle_recepcion.marca',
             'detalle_recepcion.producto_adquisicion',
             'administrador_contrato.persona',
-            'guarda_almacen.persona'
+            'guarda_almacen.persona',
+            'mes_recepcion'
         ])->find($id);
 
         if ($recToPrint->id_estado_recepcion_pedido == 2) {
@@ -861,34 +889,41 @@ class RecepcionController extends Controller
 
     function getPendingItems($byMonto, $reception)
     {
+        // Start building the base query to retrieve acquisition product data
         $query = DB::table('producto_adquisicion AS dc')
             ->select('dc.id_prod_adquisicion', 'dc.id_producto', 'dc.cant_prod_adquisicion', 'dc.costo_prod_adquisicion')
+            // Join with the reception details subquery to calculate the received quantity or amount
             ->leftJoinSub(
                 DB::table('detalle_recepcion_pedido AS drp')
+                    // Select the product ID and the sum of received quantity or amount (depending on $byMonto)
                     ->selectRaw('drp.id_prod_adquisicion, SUM(drp.cant_det_recepcion_pedido' . ($byMonto ? ' * drp.costo_det_recepcion_pedido' : '') . ') AS recibido')
+                    // Join with the reception table to filter by completed receptions (status 2)
                     ->join('recepcion_pedido AS rp', 'drp.id_recepcion_pedido', '=', 'rp.id_recepcion_pedido')
-                    ->where('rp.id_estado_recepcion_pedido', 2)
-                    ->where('drp.estado_det_recepcion_pedido', 1)
-                    ->groupBy('drp.id_prod_adquisicion'),
+                    ->where('rp.id_estado_recepcion_pedido', 2) // Only consider completed receptions
+                    ->where('drp.estado_det_recepcion_pedido', 1) // Consider only active reception details
+                    ->groupBy('drp.id_prod_adquisicion'), // Group by product acquisition ID
                 'dr',
                 'dc.id_prod_adquisicion',
                 '=',
                 'dr.id_prod_adquisicion'
             )
-            ->where('dc.id_det_doc_adquisicion', $reception->id_det_doc_adquisicion)
-            ->where('dc.estado_prod_adquisicion', 1)
+            ->where('dc.id_det_doc_adquisicion', $reception->id_det_doc_adquisicion) // Filter by document acquisition detail ID
+            ->where('dc.estado_prod_adquisicion', 1) // Consider only active acquisition products
             ->groupBy('dc.id_prod_adquisicion', 'dc.id_producto', 'dc.cant_prod_adquisicion', 'dc.costo_prod_adquisicion');
 
+        // If $byMonto is true, calculate pending amount instead of quantity
         if ($byMonto) {
-            $query->addSelect(DB::raw('COALESCE(SUM(dr.recibido), 0) AS monto_recibido'))
-                ->addSelect(DB::raw('ROUND(((dc.cant_prod_adquisicion * dc.costo_prod_adquisicion) - COALESCE(SUM(dr.recibido), 0)), 2) AS monto_pendiente'))
-                ->havingRaw('monto_pendiente > 0');
+            $query->addSelect(DB::raw('COALESCE(SUM(dr.recibido), 0) AS monto_recibido')) // Sum of received amount
+                ->addSelect(DB::raw('ROUND(((dc.cant_prod_adquisicion * dc.costo_prod_adquisicion) - COALESCE(SUM(dr.recibido), 0)), 2) AS monto_pendiente')) // Calculate pending amount
+                ->havingRaw('monto_pendiente > 0'); // Filter where there is still a pending amount
         } else {
-            $query->addSelect(DB::raw('COALESCE(SUM(dr.recibido), 0) AS cantidad_recibida'))
-                ->addSelect(DB::raw('(dc.cant_prod_adquisicion - COALESCE(SUM(dr.recibido), 0)) AS cantidad_pendiente'))
-                ->havingRaw('cantidad_pendiente > 0');
+            // Otherwise, calculate pending quantity
+            $query->addSelect(DB::raw('COALESCE(SUM(dr.recibido), 0) AS cantidad_recibida')) // Sum of received quantity
+                ->addSelect(DB::raw('(dc.cant_prod_adquisicion - COALESCE(SUM(dr.recibido), 0)) AS cantidad_pendiente')) // Calculate pending quantity
+                ->havingRaw('cantidad_pendiente > 0'); // Filter where there is still a pending quantity
         }
 
+        // Execute the query and return the results
         return $query->get();
     }
 }
