@@ -48,7 +48,7 @@ export const useRecepcion = (context) => {
         detStockId: '',
         isGas: '',
         financingSourceId: '',
-        is6Decimals:'',
+        is6Decimals: '',
         observation: '', //Reception observation
         detDocId: '', //Identifier of the document detail related to the reception
         status: '', //We use this to manage some functionalities in the view, it represent the reception status
@@ -205,8 +205,8 @@ export const useRecepcion = (context) => {
             avails: "",
             qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
             cost: recDocument.value.is6Decimals ? parseFloat(element.producto_adquisicion.costo_prod_adquisicion).toFixed(6) : parseFloat(element.producto_adquisicion.costo_prod_adquisicion).toFixed(2),
-            total: recDocument.value.isGas ? round2Decimals(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido) : 
-            recDocument.is6Decimals ? parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(6) : parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2),
+            total: recDocument.value.isGas ? round2Decimals(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido) :
+                recDocument.is6Decimals ? parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(6) : parseFloat(element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2),
             deleted: false,
             initial: "",
             initialAmount: "",
@@ -229,6 +229,8 @@ export const useRecepcion = (context) => {
                     detDocId: detDocId
                 }
                 );
+                console.log(response.data);
+                
                 months.value = response.data.monthsAvail
             } catch (err) {
                 if (err.response.data.logical_error) {

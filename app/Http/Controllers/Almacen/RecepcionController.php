@@ -189,7 +189,7 @@ class RecepcionController extends Controller
                     drp.id_prod_adquisicion,
                     rp.id_mes_recepcion,
                     SUM(drp.cant_det_recepcion_pedido) AS contador,
-                    ROUND(SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido),2) AS contador_monto
+                    ROUND(SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido), 2) AS contador_monto
                 FROM
                     recepcion_pedido rp
                 INNER JOIN detalle_recepcion_pedido drp 
@@ -203,15 +203,8 @@ class RecepcionController extends Controller
             ),
             MesesConFaltantes AS (
                 SELECT DISTINCT
-                    mr.id_mes_recepcion
-                FROM producto_adquisicion pa
-                JOIN mes_recepcion mr ON mr.id_mes_recepcion BETWEEN 1 AND 12
-                LEFT JOIN Interno i 
-                    ON pa.id_prod_adquisicion = i.id_prod_adquisicion 
-                    AND mr.id_mes_recepcion = i.id_mes_recepcion
-                WHERE
-                    pa.id_det_doc_adquisicion = ?
-                    AND CASE mr.id_mes_recepcion
+                    mr.id_mes_recepcion,
+                    ROUND(CASE mr.id_mes_recepcion
                         WHEN 1 THEN pa.cant_ene_prod_adquisicion * pa.costo_prod_adquisicion
                         WHEN 2 THEN pa.cant_feb_prod_adquisicion * pa.costo_prod_adquisicion
                         WHEN 3 THEN pa.cant_mar_prod_adquisicion * pa.costo_prod_adquisicion
@@ -224,9 +217,37 @@ class RecepcionController extends Controller
                         WHEN 10 THEN pa.cant_oct_prod_adquisicion * pa.costo_prod_adquisicion
                         WHEN 11 THEN pa.cant_nov_prod_adquisicion * pa.costo_prod_adquisicion
                         WHEN 12 THEN pa.cant_dic_prod_adquisicion * pa.costo_prod_adquisicion
-                    END > IFNULL(i.contador_monto, 0)
+                    END, 2) AS valor_comparacion,
+                    IFNULL(i.contador_monto, 0) AS contador_monto
+                FROM producto_adquisicion pa
+                JOIN mes_recepcion mr ON mr.id_mes_recepcion BETWEEN 1 AND 12
+                LEFT JOIN Interno i 
+                    ON pa.id_prod_adquisicion = i.id_prod_adquisicion 
+                    AND mr.id_mes_recepcion = i.id_mes_recepcion
+                WHERE
+                    pa.id_det_doc_adquisicion = ?
+                    AND ROUND(CASE mr.id_mes_recepcion
+                        WHEN 1 THEN pa.cant_ene_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 2 THEN pa.cant_feb_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 3 THEN pa.cant_mar_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 4 THEN pa.cant_abr_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 5 THEN pa.cant_may_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 6 THEN pa.cant_jun_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 7 THEN pa.cant_jul_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 8 THEN pa.cant_ago_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 9 THEN pa.cant_sept_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 10 THEN pa.cant_oct_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 11 THEN pa.cant_nov_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 12 THEN pa.cant_dic_prod_adquisicion * pa.costo_prod_adquisicion
+                    END, 2) > IFNULL(i.contador_monto, 0)
             )
-            SELECT id_mes_recepcion FROM MesesConFaltantes;
+            SELECT 
+                id_mes_recepcion, 
+                valor_comparacion, 
+                contador_monto 
+            FROM 
+                MesesConFaltantes;
+
         ',
             [$idDetDoc, $idDetDoc]
         );
@@ -247,7 +268,8 @@ class RecepcionController extends Controller
             ->get();
 
         return response()->json([
-            'monthsAvail'      => $mesesSeleccionables
+            'monthsAvail'      => $mesesSeleccionables,
+            'meses'            => $mesesConFaltantes
         ]);
     }
 
