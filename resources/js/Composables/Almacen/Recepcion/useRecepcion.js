@@ -72,6 +72,8 @@ export const useRecepcion = (context) => {
                 const response = await axios.get(
                     `/get-initial-doc-info`
                 );
+                console.log(response);
+                
                 documents.value = response.data.docs
                 items.value = response.data.test
             } catch (err) {
