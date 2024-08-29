@@ -55,7 +55,7 @@ class BienesServiciosController extends Controller
         $v_query = DetDocumentoAdquisicion::with([
             "estado_documento_adquisicion",
             "productos_adquisiciones" => function ($query) {
-                return $query->where("estado_prod_adquisicion", 1);
+                return $query->orderBy('fecha_reg_prod_adquisicion', 'desc')->where("estado_prod_adquisicion", 1);
             },
             "productos_adquisiciones.producto.unidad_medida",
             "productos_adquisiciones.linea_trabajo",
@@ -92,6 +92,11 @@ class BienesServiciosController extends Controller
             $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
                 $query->where('numero_doc_adquisicion', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
             });
+
+            $v_query->whereHas('fecha_reg_prod_adquisicion', function ($query) use ($data) {
+                $query->where('fecha_reg_prod_adquisicion', 'like', '%' . $data["fecha_reg_prod_adquisicion"] . '%');
+            });
+
             $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
                 $query->where('numero_doc_adquisicion', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
             });
@@ -218,7 +223,7 @@ class BienesServiciosController extends Controller
                                     'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
                                     'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
                                     'estado_prod_adquisicion'      => 1,
-                                    'fecha_reg_prod_adquisicion'   => $fechaActual,
+                                    'fecha_mod_prod_adquisicion'   => $fechaActual,
                                     'usuario_prod_adquisicion'     => $usuario,
                                     'ip_prod_adquisicion'          => $ip,
                                     'cant_ene_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["January"] ?? 0,

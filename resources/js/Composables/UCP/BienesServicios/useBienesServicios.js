@@ -860,7 +860,36 @@ export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
         });
     }
 
+    /**
+     * Compara dos objetos y determina si son iguales.
+     * @param {Object} obj1 - El primer objeto a comparar.
+     * @param {Object} obj2 - El segundo objeto a comparar.
+     * @returns {boolean} - Retorna true si los objetos son iguales, false en caso contrario.
+     */
+    function areObjectsEqual(obj1, obj2) {
+        return JSON.stringify(obj1) === JSON.stringify(obj2);
+    }
+
+    /**
+     * Encuentra el índice de un objeto en un array de detalleDoc que coincide con el objeto proporcionado.
+     * @param {Object} obj - El objeto que se busca en el array.
+     * @param {number} lineaTrabajo - El índice de la línea de trabajo en arrayProductoAdquisicion.
+     * @returns {number} - Retorna el índice del objeto en detalleDoc, o -1 si no se encuentra.
+     */
+    const findIndexBySameObject = (obj, lineaTrabajo) => {
+        // Suponiendo que arrayProductoAdquisicion es un array de algún tipo de datos
+
+        // Obtenemos el detalle de la línea de trabajo
+        const detalleArray = arrayProductoAdquisicion.value[lineaTrabajo].detalleDoc;
+
+        // Encontramos el índice en el detalleArray que corresponde al objeto buscado
+        const indexInArray2 = detalleArray.findIndex(producto => areObjectsEqual(producto, obj));
+
+        return indexInArray2;
+    }
+
     return {
+        findIndexBySameObject,
         nextPage, // Añadido
         prevPage, // Añadido
         ITEMS_PER_PAGE,
