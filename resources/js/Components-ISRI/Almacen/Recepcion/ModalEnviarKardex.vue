@@ -34,7 +34,7 @@
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-2/3" :class="{ 'selected-opt': infoToSend.conctManagerId > 0 }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Administrador de
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Administrador de
                         contrato
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
@@ -45,7 +45,7 @@
                     <InputError v-for="(item, index) in errors.conctManagerId" :key="index" class="mt-2" :message="item" />
                 </div>
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3 justify-center text-center">
-                    <label class="block mb-3 text-[13px] font-medium text-gray-600 dark:text-white">Incumple recepcion
+                    <label class="block mb-3 text-[13px] font-medium text-gray-600 ">Incumple recepcion
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <label for="checbox1" class="text-sm font-semibold text-gray-600 ml-4 mr-1">SI</label>
@@ -62,7 +62,7 @@
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-full" style="border: none; background-color: transparent;">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Observacion sobre
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Observacion sobre
                         incumplimiento
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
@@ -88,9 +88,9 @@
 
             <div class="md:flex flex md:items-center py-4 sticky flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
-                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center">CANCELAR</button>
                 <button type="button"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 text-center inline-flex items-center "
                     @click="sendReception(infoToSend)">
                     Enviar Kardex
                     <svg class="w-[24px] h-[24px] ml-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

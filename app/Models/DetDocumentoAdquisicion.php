@@ -21,6 +21,7 @@ class DetDocumentoAdquisicion extends Model
         'nombre_det_doc_adquisicion',
         'monto_det_doc_adquisicion',
         'compromiso_ppto_det_doc_adquisicion',
+        'fecha_adjudicacion_det_doc_adquisicion', //Reference date
         'admon_det_doc_adquisicion',
         'observacion_det_doc_adquisicion',
         'recepcion_det_doc_adquisicion',
