@@ -63,9 +63,17 @@ class DocumentoAdquisicionController extends Controller
     public function changeStateAcqdoc(Request $request)
     {
         $acq_doc = DocumentoAdquisicion::find($request->id);
-        $has_assigned = $acq_doc->detalles()->whereHas('quedan')->exists();
-        if ($has_assigned) {
-            return response()->json(['logical_error' => 'Error, el documento seleccionado no puede ser desactivado porque ya tiene quedan asignados.'], 422);
+        $has_assigned = $acq_doc->detalles()->whereHas('quedan', function ($query) {
+            $query->where('estado_quedan', 1);
+        })->exists();
+        $has_active_prod = $acq_doc->detalles()
+            ->where('estado_det_doc_adquisicion', 1)
+            ->whereHas('productos_adquisiciones', function ($query) {
+                $query->where('estado_prod_adquisicion', 1);
+            })->exists();
+
+        if ($has_assigned || $has_active_prod) {
+            return response()->json(['logical_error' => 'Error, el documento seleccionado no puede ser desactivado, ya posee documento de compra o quedan asignado.'], 422);
         } else {
             if ($acq_doc->estado_doc_adquisicion == 1) {
                 if ($request->status == 1) {
