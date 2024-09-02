@@ -38,7 +38,7 @@
 
                         <!-- First row -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tipo Documento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -49,7 +49,7 @@
                                 </div>
                                 <InputError class="mt-2" :message="errors.type_id" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="doc-number" v-model="acq_doc.number" type="text"
                                     placeholder="Numero documento"
                                     @update:modelValue="handleValidation('number', { limit: 20, upper: true })">
@@ -59,15 +59,7 @@
                                     :message="item" />
                                 <InputError class="mt-2" :message="errors.number" />
                             </div>
-                            <div class="mb-4 md:mr-0 md:mb-0 basis-1/4">
-                                <TextInput id="mngm-number" v-model="acq_doc.management_number" type="text"
-                                    placeholder="Numero gestion"
-                                    @update:modelValue="handleValidation('management_number', { limit: 20 })">
-                                    <LabelToInput icon="objects" forLabel="mngm-number" />
-                                </TextInput>
-                                <InputError class="mt-2" :message="errors.management_number" />
-                            </div>
-                            <div class="mb-4 md:mx-2 md:mb-0 basis-1/4">
+                            <div class="mb-4 md:mr-0 md:mb-0 basis-1/3">
                                 <TextInput id="mngm-number" v-model="acq_doc.award_number" type="text"
                                     placeholder="Numero adjudicacion" :required="false"
                                     @update:modelValue="handleValidation('award_number', { limit: 20 })">
@@ -78,7 +70,7 @@
                         </div>
                         <!-- Second row -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Proveedor <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -89,7 +81,7 @@
                                 </div>
                                 <InputError class="mt-2" :message="errors.supplier_id" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tipo Gestión <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -100,18 +92,13 @@
                                 </div>
                                 <InputError class="mt-2" :message="errors.management_type_id" />
                             </div>
-                            <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
-                                <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
-                                    Fecha adjudicacion<span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative flex">
-                                    <LabelToInput icon="date" />
-                                    <flat-pickr
-                                        class="font-semibold peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
-                                        :config="config" v-model="acq_doc.award_date"
-                                        :placeholder="'Seleccione fecha adjudicacion'" />
-                                </div>
-                                <InputError class="mt-2" :message="errors.award_date" />
+                            <div class="mb-4 md:mr-0 md:mb-0 basis-1/3">
+                                <TextInput id="mngm-number" v-model="acq_doc.management_number" type="text"
+                                    placeholder="Numero gestion"
+                                    @update:modelValue="handleValidation('management_number', { limit: 20 })">
+                                    <LabelToInput icon="objects" forLabel="mngm-number" />
+                                </TextInput>
+                                <InputError class="mt-2" :message="errors.management_number" />
                             </div>
                         </div>
                         <!-- Third row -->
@@ -128,6 +115,19 @@
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError class="mt-2" :message="errors.procesoCompraId" />
+                            </div>
+                            <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
+                                    Fecha adjudicacion<span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative flex">
+                                    <LabelToInput icon="date" />
+                                    <flat-pickr
+                                        class="font-semibold peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                                        :config="config" v-model="acq_doc.award_date"
+                                        :placeholder="'Seleccione fecha adjudicacion'" />
+                                </div>
+                                <InputError class="mt-2" :message="errors.award_date" />
                             </div>
 
                         </div>
