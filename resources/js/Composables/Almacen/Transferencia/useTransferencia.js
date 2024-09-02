@@ -334,6 +334,8 @@ export const useTransferencia = (context) => {
                 handleSuccessResponse(response)
             })
             .catch((error) => {
+                console.log(error);
+                
                 handleErrorResponse(error)
             })
             .finally(() => {
