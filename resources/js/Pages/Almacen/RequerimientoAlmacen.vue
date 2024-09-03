@@ -85,8 +85,13 @@ export default {
             }
         };
 
+        const capitalizeFirstLetter = (text) => {
+            if (!text) return '';
+            return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+        }
 
         return {
+            capitalizeFirstLetter,
             changeState,
             links,
             sortBy,
@@ -171,12 +176,15 @@ export default {
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[2%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div :class="{
-                                            'text-green-600 bg-green-200': requ.id_estado_req === 1,
-                                            'bg-blue-300 text-blue-600': requ.id_estado_req === 2,
-                                            'text-red-600 bg-red-300': requ.id_estado_req === 3
-                                        }" class="inline-flex font-medium rounded-full text-center px-1.5 py-.5">
-                                        {{ requ.estado_requerimiento.nombre_estado_req }}
+                                    <div class="m-1.5">
+                                        <div :class="{
+                                                'bg-emerald-100 text-emerald-600': requ.id_estado_req === 1,
+                                                'text-white bg-blue-500': requ.id_estado_req === 2,
+                                                ' bg-blue-100 text-blue-600': requ.id_estado_req === 3,
+                                                'bg-rose-100 text-rose-600': requ.id_estado_req === 4
+                                            }" class=" text-xs inline-flex font-medium  rounded-full text-center px-2.5 py-1 capitalize ">
+                                            {{ capitalizeFirstLetter(requ.estado_requerimiento.nombre_estado_req) }}
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -200,7 +208,7 @@ export default {
                                             <div class="font-semibold">Ver</div>
                                         </div>
 
-                                       <!--  <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                        <!--  <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="requ.id_estado_req == 1"
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 2)">
                                             <div class="w-8 text-indigo-700">
@@ -219,8 +227,7 @@ export default {
 
 
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                        v-if="requ.id_estado_req == 1"
-
+                                            v-if="requ.id_estado_req == 1"
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 3)">
                                             <div class="w-8 text-indigo-700">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
