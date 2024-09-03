@@ -22,7 +22,7 @@ class TransferenciaRequest extends FormRequest
     public function rules(): array
     {
         //$rules["reasonId"] = ['required'];
-        $rules["centerId"] = ['required'];
+        $rules["destCenterId"] = ['required'];
         $rules["financingSourceId"] = ['required'];
         foreach ($this->input('prods', []) as $key => $prod) {
             $rules["prods.{$key}.detId"] = [
@@ -52,7 +52,7 @@ class TransferenciaRequest extends FormRequest
     public function messages()
     {
         $messages = [];   
-        $messages["centerId.required"] = "Debe seleccionar proveedor.";
+        $messages["destCenterId.required"] = "Debe seleccionar centro destino.";
         $messages["financingSourceId.required"] = "Debe seleccionar fuente de financiamiento.";
         //$messages["reasonId.required"] = "Debe seleccionar motivo.";
         return $messages;
