@@ -200,7 +200,7 @@ export default {
                                             <div class="font-semibold">Ver</div>
                                         </div>
 
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                       <!--  <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="requ.id_estado_req == 1"
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 2)">
                                             <div class="w-8 text-indigo-700">
@@ -215,11 +215,12 @@ export default {
                                                 </span>
                                             </div>
                                             <div class="font-semibold">Aprobar</div>
-                                        </div>
+                                        </div> -->
 
 
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="requ.id_estado_req == 2 && canSaveReq == true"
+                                        v-if="requ.id_estado_req == 1"
+
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 3)">
                                             <div class="w-8 text-indigo-700">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
