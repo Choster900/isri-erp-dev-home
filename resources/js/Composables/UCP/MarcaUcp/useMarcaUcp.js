@@ -47,8 +47,8 @@ export const useMarcaUcp = (context) => {
         }
     };
 
-    const setModalValues = (product) => {
-        objDB.value = product
+    const setModalValues = (brand) => {
+        objDB.value = brand
     }
 
     const storeObject = async (obj) => {

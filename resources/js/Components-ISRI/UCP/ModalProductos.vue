@@ -54,7 +54,7 @@
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.unspscId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Catalogo Unspsc
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuenta ONU
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
@@ -68,7 +68,7 @@
                     <InputError v-for="(item, index) in errors.unspscId" :key="index" class="mt-2" :message="item" />
                 </div>
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.catPercId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Código perc
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuenta PERC
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
@@ -78,7 +78,7 @@
                     <InputError v-for="(item, index) in errors.catPercId" :key="index" class="mt-2" :message="item" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.catNicspId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuenta Nicsp
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuenta NICSP
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">

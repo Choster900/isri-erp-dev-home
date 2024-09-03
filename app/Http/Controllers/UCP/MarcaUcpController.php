@@ -65,16 +65,19 @@ class MarcaUcpController extends Controller
 
     public function saveBrandUcp(Request $request)
     {
-        //Define the custom messages
+        // Define the custom messages
         $customMessages = [
             'id_tipo_marca.required'                    => 'Debe seleccionar tipo marca.',
             'nombre_marca.required'                     => 'Debe escribir el nombre de la marca.',
+            'nombre_marca.unique'                       => 'El nombre de la marca ya está en uso.', // Mensaje personalizado para la unicidad
         ];
+
         // Validate the request data with custom error messages and custom rule
         $validatedData = Validator::make($request->all(), [
             'id_tipo_marca'                             => 'required',
-            'nombre_marca'                              => 'required',
+            'nombre_marca'                              => 'required|unique:marca,nombre_marca', // Agrega la regla de unicidad
         ], $customMessages)->validate();
+
 
         DB::beginTransaction();
         try {
@@ -103,15 +106,17 @@ class MarcaUcpController extends Controller
 
     public function updateBrandUcp(Request $request)
     {
-        //Define the custom messages
+        // Define the custom messages
         $customMessages = [
             'id_tipo_marca.required'                    => 'Debe seleccionar tipo marca.',
             'nombre_marca.required'                     => 'Debe escribir el nombre de la marca.',
+            'nombre_marca.unique'                       => 'El nombre de la marca ya está en uso.',
         ];
+
         // Validate the request data with custom error messages and custom rule
         $validatedData = Validator::make($request->all(), [
             'id_tipo_marca'                             => 'required',
-            'nombre_marca'                              => 'required',
+            'nombre_marca'                              => 'required|unique:marca,nombre_marca,' . $request->input('id_marca') . ',id_marca',
         ], $customMessages)->validate();
 
         $brand = Marca::find($request->id_marca);
