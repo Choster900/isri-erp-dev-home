@@ -68,7 +68,7 @@ class RequerimientoAlmacenController extends Controller
         // Crear una colección para almacenar los centros de atención únicos
         $centrosUnicos = collect();
         // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-        foreach ( $plazasAsignadas as $plazaAsignada ) {
+        foreach ($plazasAsignadas as $plazaAsignada) {
             $centroAtencion = $plazaAsignada->centro_atencion;
             $centrosUnicos->push($centroAtencion);
         }
@@ -139,7 +139,7 @@ class RequerimientoAlmacenController extends Controller
         // Crear una colección para almacenar los centros de atención únicos
         $centrosUnicos = collect();
         // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-        foreach ( $plazasAsignadas as $plazaAsignada ) {
+        foreach ($plazasAsignadas as $plazaAsignada) {
             $centroAtencion = $plazaAsignada->centro_atencion;
             $centrosUnicos->push($centroAtencion);
         }
@@ -148,9 +148,9 @@ class RequerimientoAlmacenController extends Controller
 
         $centroProduccionUnicos = collect();
 
-        foreach ( $centrosUnicos as $centros ) {
+        foreach ($centrosUnicos as $centros) {
 
-            foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
+            foreach ($centros->asignacion_centro_produccion as $key => $value) {
                 $asignacion = $value->centro_produccion;
                 $centroProduccionUnicos->push($asignacion);
             }
@@ -267,15 +267,15 @@ class RequerimientoAlmacenController extends Controller
             ];
             $requerimientoId = Requerimiento::insertGetId($requerimiento);
 
-            foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
+            foreach ($request->dataDetalleRequerimiento as $key => $value) {
 
-                foreach ( $value["productos"] as $key => $value2 ) {
+                foreach ($value["productos"] as $key => $value2) {
 
                     collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request) {
                         if ($prodReq["stateCentroProduccion"] == 0)
                             return;
 
-                            collect($request["dataDetalleRequerimiento"][$key]["productos"]) // Ensure correct access
+                        collect($request["dataDetalleRequerimiento"][$key]["productos"]) // Ensure correct access
                             ->each(function ($det, $indice) use (&$rules, $key, $prodReq) {
                                 if ($det["stateProducto"] == 0)
                                     return;
@@ -283,7 +283,7 @@ class RequerimientoAlmacenController extends Controller
                                 $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = ['required'];
                                 $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".idDetExistenciaAlmacen"] = ['required'];
 
-                                if (!empty ($det["idDetExistenciaAlmacen"])) {
+                                if (!empty($det["idDetExistenciaAlmacen"])) {
 
                                     $cantidadTotal = 0;
 
@@ -410,10 +410,14 @@ class RequerimientoAlmacenController extends Controller
             Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
 
 
-            foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
+            foreach ($request->dataDetalleRequerimiento as $key => $value) {
 
+                /*
+                $totalCantidad = array_reduce($value["productos"], function ($carry, $item) {
+                    return $carry + $item["cantDetRequerimiento"];
+                }, 0); */
 
-                foreach ( $value["productos"] as $key => $value2 ) {
+                foreach ($value["productos"] as $key => $value2) {
 
                     if (!isset($value2["idDetRequerimiento"]) || !empty($value2["idDetRequerimiento"])) {
 
@@ -421,64 +425,89 @@ class RequerimientoAlmacenController extends Controller
 
                             $rules = [];
 
+                            $cantidadDetalleExistencia = 0;
+                            $cantidadTotal = 0;
 
-
-                            collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request, &$value2) {
+                            collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request, &$value2, &$totalCantidad, &$cantidadTotal, &$cantidadDetalleExistencia) {
                                 if ($prodReq["stateCentroProduccion"] == 0)
                                     return;
 
                                 collect($request->input("dataDetalleRequerimiento")[$key]["productos"])
-                                    ->each(function ($det, $indice) use (&$rules, $key, $prodReq, $value2) {
+                                    ->each(function ($det, $indice) use (&$rules, $key, $prodReq, &$value2, &$totalCantidad0, $request, &$cantidadTotal, &$cantidadDetalleExistencia) {
                                         if ($det["stateProducto"] == 0)
-                                        return;
+                                            return;
                                         $rules["dataDetalleRequerimiento." . $key . ".productos." . $indice . ".cantDetRequerimiento"] = ['required'];
                                         $rules["dataDetalleRequerimiento." . $key . ".productos." . $indice . ".idDetExistenciaAlmacen"] = ['required'];
 
-                                        if (!empty ($det["idDetExistenciaAlmacen"])) {
-
-                                            $cantidadTotal = 0;
+                                        if (!empty($det["idDetExistenciaAlmacen"])) {
 
                                             $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::select("cant_det_existencia_almacen")
                                                 ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
                                                 ->first();
 
-                                            $cantidadDetalleExistencia = $detalleExistenciaAlmacen->cant_det_existencia_almacen;
+                                            $cantidadDetalleExistencia = (float) $detalleExistenciaAlmacen->cant_det_existencia_almacen;
 
 
-                                            $totalDetalleRequerimiento = DetalleRequerimiento::whereHas('requerimiento', function ($query) {
+                                            $totalDetalleRequerimiento = DetalleRequerimiento::whereHas('requerimiento', function ($query) use ($request) {
                                                 $query->whereIn('id_estado_req', [1, 2])
                                                     ->where('id_tipo_req', 1);
+                                                    /* ->where('id_requerimiento', '!=', $request->idRequerimiento);  */// Asegúrate de pasar el parámetro correcto
                                             })->whereNotIn("id_det_requerimiento", [$value2["idDetRequerimiento"]])
                                                 ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
                                                 ->sum('cant_det_requerimiento');
 
-                                            $cantidadTotal = $cantidadDetalleExistencia - $totalDetalleRequerimiento; // Sumamos
+                                            // Validar que $totalCantidad no sea mayor que $cantidadDetalleExistencia
+
+
+
+                                            $cantidadTotal = $cantidadDetalleExistencia - $totalDetalleRequerimiento;
+
+
+
 
 
                                             $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = [
                                                 'required',
                                                 'numeric',
+                                                'gte:0', // Ensure the value is greater than or equal to 0
+
                                             ];
+
+                                            if ($totalDetalleRequerimiento > $cantidadDetalleExistencia) {
+                                                $errors = ['totalCantidad' => 'La cantidad total no puede ser mayor que la cantidad disponible.'];
+                                                return response()->json(['message' => 'The given data was invalid.', 'errors' => $errors], 422);
+                                            }
                                         }
                                     });
                             });
 
+
+
                             $messages = [
-                                'dataDetalleRequerimiento.*.productos.*.idDetExistenciaAlmacen.required' => 'El Producto es requerido para realizar esta acción.',
-                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.required'   => 'La cantidad del producto es requerida para realizar esta acción.',
-                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.numeric'    => 'El campo Cantidad de Requerimiento debe ser numérico.',
-                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.lte'        => 'La cantidad del producto seleccionado excede la cantidad disponible en el almacén (Cantidad disponible: :value)',
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.required' => 'La cantidad del producto es requerida.',
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.numeric' => 'La cantidad del producto debe ser un número.',
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.gte' => 'La cantidad del producto no puede ser menor a 0.',
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.lte' => 'La cantidad del producto no puede exceder la cantidad disponible xd.',
                             ];
+
+
+                            // .
                             $validator = Validator::make($request->all(), $rules, $messages);
 
                             if ($validator->fails()) {
                                 $errors = $validator->errors()->toArray();
                                 $message = 'The given data was invalid.';
-                                return response()->json(['message' => $message, 'errors' => $errors], 422);
+                                return response()->json([
+                                    'message' => $message,
+                                    'errors' => $errors,
+                                    'cant' => $cantidadTotal,
+                                    'totalCantidad' => $totalCantidad,
+                                    'cantidadDetalleExistencia' => $cantidadDetalleExistencia
+                                ], 422);
                             }
+                            //return $cantidadTotal;
 
-
-                            DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update(
+                            /*    DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update(
                                 [
                                     'id_producto'                 => $value2["idProducto"],
                                     'id_marca'                    => $value2["idMarca"],
@@ -491,16 +520,16 @@ class RequerimientoAlmacenController extends Controller
                                     'usuario_det_requerimiento'   => $request->user()->nick_usuario,
                                     'ip_det_requerimiento'        => $request->ip(),
                                 ]
-                            );
+                            ); */
                         } else {
                             // eliminar
-                            DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update([
+                            /* DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update([
                                 "estado_det_requerimiento" => 0
-                            ]);
+                            ]); */
                         }
                     } else {
 
-                        if ($value2["stateProducto"] == 1) {
+                        /*   if ($value2["stateProducto"] == 1) {
 
                             $rules = [];
                             collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request) {
@@ -515,7 +544,7 @@ class RequerimientoAlmacenController extends Controller
                                         $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = ['required'];
                                         $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".idDetExistenciaAlmacen"] = ['required'];
 
-                                        if (!empty ($det["idDetExistenciaAlmacen"])) {
+                                        if (!empty($det["idDetExistenciaAlmacen"])) {
 
                                             $cantidadTotal = 0;
 
@@ -528,7 +557,8 @@ class RequerimientoAlmacenController extends Controller
 
                                             $totalDetalleRequerimiento = DetalleRequerimiento::whereHas('requerimiento', function ($query) {
                                                 $query->whereIn('id_estado_req', [1, 2])
-                                                    ->where('id_tipo_req', 1);
+                                                    ->where('id_tipo_req', 1)
+                                                    ->where('id_requerimiento', '!=', 36); // Asegúrate de pasar el parámetro correcto
                                             })
                                                 ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
                                                 ->sum('cant_det_requerimiento');
@@ -539,6 +569,7 @@ class RequerimientoAlmacenController extends Controller
                                             $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = [
                                                 'required',
                                                 'numeric',
+                                                "lte:$cantidadTotal",
                                             ];
                                         }
                                     });
@@ -582,7 +613,7 @@ class RequerimientoAlmacenController extends Controller
                                     'ip_det_requerimiento'        => $request->ip(),
                                 ]
                             );
-                        }
+                        } */
                     }
                 }
             }
@@ -615,13 +646,13 @@ class RequerimientoAlmacenController extends Controller
             ];
 
             // Si el estado es "Despachado" (idEstado == 3)
-                if ( $request->idEstado == 3) {
+            if ($request->idEstado == 3) {
                 // Obtener los detalles del requerimiento
                 $detReq = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
                 $existencias = [];
 
                 // Iterar sobre los detalles del requerimiento
-                foreach ( $detReq as $key => $value ) {
+                foreach ($detReq as $key => $value) {
 
 
                     $cantidadTotal = 0;
@@ -708,7 +739,7 @@ class RequerimientoAlmacenController extends Controller
                     // Registrar detalles en el kardex
                     $detalleRequerimiento = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
 
-                    foreach ( $detalleRequerimiento as $key => $value ) {
+                    foreach ($detalleRequerimiento as $key => $value) {
                         DetalleKardex::insert([
                             'id_kardex'            => $cardexId,
                             'id_producto'          => $value['id_producto'],
@@ -750,14 +781,14 @@ class RequerimientoAlmacenController extends Controller
         // Crear una colección para almacenar los centros de atención únicos
         $centrosUnicos = collect();
         // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-        foreach ( $plazasAsignadas as $plazaAsignada ) {
+        foreach ($plazasAsignadas as $plazaAsignada) {
             $centroAtencion = $plazaAsignada->centro_atencion;
             $centrosUnicos->push($centroAtencion);
         }
         $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
         $centroProduccionUnicos = collect();
-        foreach ( $centrosUnicos as $centros ) {
-            foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
+        foreach ($centrosUnicos as $centros) {
+            foreach ($centros->asignacion_centro_produccion as $key => $value) {
                 $asignacion = $value->centro_produccion;
                 $centroProduccionUnicos->push($asignacion);
             }
@@ -789,8 +820,8 @@ class RequerimientoAlmacenController extends Controller
     {
         $centrosInDb = CentroAtencion::where("id_centro_atencion", $request->idCentroAtencion)->with(["asignacion_centro_produccion.centro_produccion"])->get();
         $centroProduccionUnicos = collect();
-        foreach ( $centrosInDb as $centros ) {
-            foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
+        foreach ($centrosInDb as $centros) {
+            foreach ($centros->asignacion_centro_produccion as $key => $value) {
                 $asignacion = $value->centro_produccion;
                 $centroProduccionUnicos->push($asignacion);
             }
@@ -803,13 +834,12 @@ class RequerimientoAlmacenController extends Controller
         // Crear una colección para almacenar los centros de atención únicos
         $centrosUnicos = collect();
         // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-        foreach ( $plazasAsignadas as $plazaAsignada ) {
+        foreach ($plazasAsignadas as $plazaAsignada) {
             $centroAtencion = $plazaAsignada->centro_atencion;
             $centrosUnicos->push($centroAtencion);
         }
         // Filtrar la colección para obtener solo centros de atención únicos
         $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
         return $centrosUnicos;
-
     }
 }
