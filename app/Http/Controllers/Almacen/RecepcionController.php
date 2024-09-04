@@ -757,9 +757,19 @@ class RecepcionController extends Controller
 
                 // If no pending items, update the acquisition document status
                 if ($pendientes->isEmpty()) {
+                    //Find the DetDocumentoAdquisicion we want to close
                     $item = DetDocumentoAdquisicion::find($reception->id_det_doc_adquisicion);
+
+                    // Update the status of all associated recepcion_pedido where id_estado_recepcion_pedido = 1 (CREADO)
+                    RecepcionPedido::where('id_det_doc_adquisicion', $item->id_det_doc_adquisicion)
+                        ->where('id_estado_recepcion_pedido', 1)
+                        ->update([
+                            'id_estado_recepcion_pedido' => 3, // Set the status to 'ELIMINADO'
+                        ]);
+
+                    // Set the status to 'CERRADO'
                     $item->update([
-                        'id_estado_doc_adquisicion'         => 3, // Set the status to 'CERRADO'
+                        'id_estado_doc_adquisicion'         => 3, // 'CERRADO'
                         'fecha_mod_det_doc_adquisicion'     => Carbon::now(),
                         'usuario_det_doc_adquisicion'       => $request->user()->nick_usuario,
                         'ip_det_doc_adquisicion'            => $request->ip()
