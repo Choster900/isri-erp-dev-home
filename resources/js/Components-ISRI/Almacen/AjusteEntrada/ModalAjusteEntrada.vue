@@ -170,7 +170,7 @@
                                 <p class="text-center font-[MuseoSans] text-[11px]">CANTIDAD</p>
                             </div>
                             <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
-                                <p class="text-center font-[MuseoSans] text-[11px]">COSTO UNIT.</p>
+                                <p class="text-center font-[MuseoSans] text-[11px]">C. UNITARIO</p>
                             </div>
                             <div class="w-full flex items-center justify-center border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[11px]">TOTAL</p>

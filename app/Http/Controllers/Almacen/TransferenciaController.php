@@ -72,6 +72,8 @@ class TransferenciaController extends Controller
     {
         $idAdjustment = $request->id; //Reception id from the view, if it's 0 that means we are creating a new reception
         if ($idAdjustment > 0) { //This means we are updating an existing reception
+
+            // Query the requirement and its related entities
             $req = Requerimiento::with([
                 'centro_atencion',
                 'proyecto_financiado',
@@ -80,45 +82,74 @@ class TransferenciaController extends Controller
                 'motivo_ajuste',
                 'detalles_requerimiento.producto.unidad_medida',
                 'detalles_requerimiento.marca',
-                'detalles_requerimiento.detalle_existencia_almacen.existencia_almacen'
+                'detalles_requerimiento.detalle_existencia_almacen.existencia_almacen.producto.unidad_medida',
+                'detalles_requerimiento.detalle_existencia_almacen.existencia_almacen.proyecto_financiado',
+                'detalles_requerimiento.detalle_existencia_almacen.linea_trabajo',
+                'detalles_requerimiento.detalle_existencia_almacen.centro_atencion',
+                'detalles_requerimiento.detalle_existencia_almacen.marca'
             ])->find($idAdjustment);
 
-            $matchStock = DetalleExistenciaAlmacen::with([
+            // Filter the stock details related to the requirement's details
+            $matchStock = $req->detalles_requerimiento->map(function ($detalleReq) {
+                return $detalleReq->detalle_existencia_almacen;
+            });
+
+            // Additional query to get stock details that meet the criteria and have quantity greater than zero
+            $additionalStock = DetalleExistenciaAlmacen::with([
                 'centro_atencion',
                 'existencia_almacen.producto.unidad_medida',
                 'existencia_almacen.proyecto_financiado',
                 'linea_trabajo',
                 'marca'
-            ]);
+            ])
+                ->where('cant_det_existencia_almacen', '>', 0); // Filter for quantity greater than zero
 
-            if ($req->id_proy_financiado != '' && $req->id_proy_financiado != null) {
-                $matchStock->whereHas('existencia_almacen', function ($query) use ($req) {
+            // Apply the financing source filter if applicable
+            if ($req->id_proy_financiado) {
+                $additionalStock->whereHas('existencia_almacen', function ($query) use ($req) {
                     $query->where('id_proy_financiado', $req->id_proy_financiado);
                 });
             }
 
-            if ($req->id_centro_atencion != '' && $req->id_centro_atencion != null) {
-                $matchStock->where('id_centro_atencion', $req->id_centro_atencion);
+            // Apply the center filter if applicable
+            if ($req->id_centro_atencion) {
+                $additionalStock->where('id_centro_atencion', $req->id_centro_atencion);
             }
 
-            if ($req->id_lt != '' && $req->id_lt != null) {
-                $matchStock->where('id_lt', $req->id_lt);
+            // Apply the work line filter if applicable
+            if ($req->id_lt) {
+                $additionalStock->where('id_lt', $req->id_lt);
             }
 
-            $match = $matchStock->get();
+            // Retrieve the additional stock details that match the criteria
+            $additionalStock = $additionalStock->get();
 
-            $products = $match->map(function ($detailStock) {
+            // Combine the results of both queries
+            $combinedStock = $matchStock->merge($additionalStock)->unique('id_det_existencia_almacen');
+
+            // Map the combined stock details to the desired format
+            $products = $combinedStock->map(function ($detailStock) {
+                // Start with the basic label
+                $label = $detailStock->existencia_almacen->producto->codigo_producto
+                    . ' — ' . $detailStock->existencia_almacen->producto->nombre_completo_producto
+                    . ' — ' . $detailStock->existencia_almacen->producto->unidad_medida->nombre_unidad_medida
+                    . ' — STOCK: ' . $detailStock->cant_det_existencia_almacen;
+
+                // Conditionally concatenate the brand if it exists
+                if ($detailStock->marca) {
+                    $label .= ' — Marca: ' . $detailStock->marca->nombre_marca;
+                }
+
+                // Conditionally concatenate the expiration date if it exists
+                if ($detailStock->fecha_vcto_det_existencia_almacen) {
+                    $label .= ' — Vencimiento: ' . Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y');
+                }
+
+                // Return the mapped product with the conditionally built label
                 return [
-                    'value' => $detailStock->id_det_existencia_almacen,
-                    'label' => $detailStock->existencia_almacen->producto->codigo_producto
-                        . ' — ' . $detailStock->existencia_almacen->proyecto_financiado->codigo_proy_financiado
-                        . ' — ' . $detailStock->existencia_almacen->producto->nombre_completo_producto
-                        . ' — ' . $detailStock->existencia_almacen->producto->unidad_medida->nombre_unidad_medida
-                        . ' — UP/LT: ' . ($detailStock->linea_trabajo->codigo_up_lt ?? 'Sin UP/LT')
-                        . ' — Centro: ' . $detailStock->centro_atencion->codigo_centro_atencion
-                        . ' — Marca: ' . ($detailStock->marca->nombre_marca ?? 'Sin marca')
-                        . ' — Vencimiento: ' . ($detailStock->fecha_vcto_det_existencia_almacen ? Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y') : 'Sin fecha.'),
-                    'allInfo' => $detailStock
+                    'value'             => $detailStock->id_det_existencia_almacen,
+                    'label'             => $label,
+                    'allInfo'           => $detailStock
                 ];
             });
 

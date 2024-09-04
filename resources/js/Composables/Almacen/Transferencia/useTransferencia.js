@@ -6,6 +6,7 @@ import { toast } from "vue3-toastify";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
 import { useToCalculate } from '@/Composables/General/useToCalculate.js';
 import _ from "lodash";
+import moment from "moment";
 
 export const useTransferencia = (context) => {
     const swal = inject("$swal");
@@ -96,7 +97,8 @@ export const useTransferencia = (context) => {
                 if (element.estado_det_requerimiento === 1) {
 
                     const selectedProd = products.value.find((e) => e.value === element.id_det_existencia_almacen)
-
+                    console.log(selectedProd);
+                    
                     // Construct array
                     const array = {
                         id: element.id_det_requerimiento, //id_det_recepcion_pedido
@@ -105,7 +107,7 @@ export const useTransferencia = (context) => {
                         cost: element.detalle_existencia_almacen.existencia_almacen.costo_existencia_almacen, //Represents the the cost of the product
                         prevAvails: element.detalle_existencia_almacen.cant_det_existencia_almacen,
                         fractionated: element.producto.fraccionado_producto,
-                        prodLabel: selectedProd.label,
+                        prodLabel: setProductLabel(selectedProd.allInfo),
                         avails: "",
                         total: "", //Represents the result of qty x cost for every row
                         deleted: false, //This is the state of the row, it represents the logical deletion.
@@ -123,6 +125,19 @@ export const useTransferencia = (context) => {
                 }
             });
         }
+    }
+
+    const setProductLabel = (detExistencia) => {
+        let label = detExistencia.existencia_almacen.producto.codigo_producto + ' — ' +
+                    detExistencia.existencia_almacen.producto.nombre_completo_producto + ' — ' +
+                    detExistencia.existencia_almacen.producto.unidad_medida.nombre_unidad_medida
+        if(detExistencia.marca) {
+            label += ' — Marca: ' + detExistencia.marca.nombre_marca 
+        }
+        if(detExistencia.fecha_vcto_det_existencia_almacen) {
+            label += ' — Vencimiento: ' + moment(detExistencia.fecha_vcto_det_existencia_almacen).format('d/m/Y') 
+        }
+        return label
     }
 
     const addNewRow = () => {
@@ -210,7 +225,7 @@ export const useTransferencia = (context) => {
             adjustment.value.prods[index].cost = selectedProd.allInfo.existencia_almacen.costo_existencia_almacen
             adjustment.value.prods[index].avails = selectedProd.allInfo.cant_det_existencia_almacen
             adjustment.value.prods[index].prevAvails = selectedProd.allInfo.cant_det_existencia_almacen
-            adjustment.value.prods[index].prodLabel = selectedProd.label
+            adjustment.value.prods[index].prodLabel = setProductLabel(selectedProd.allInfo)
             adjustment.value.prods[index].fractionated = selectedProd.allInfo.existencia_almacen.producto.fraccionado_producto
         } else {
             adjustment.value.prods[index].cost = ''
