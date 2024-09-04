@@ -145,7 +145,6 @@ class AjusteSalidaController extends Controller
             $products = $combinedStock->map(function ($detailStock) {
                 // Start with the basic label
                 $label = $detailStock->existencia_almacen->producto->codigo_producto
-                    . ' — ' . $detailStock->existencia_almacen->proyecto_financiado->codigo_proy_financiado
                     . ' — ' . $detailStock->existencia_almacen->producto->nombre_completo_producto
                     . ' — ' . $detailStock->existencia_almacen->producto->unidad_medida->nombre_unidad_medida
                     . ' — STOCK: ' . $detailStock->cant_det_existencia_almacen;
@@ -218,27 +217,53 @@ class AjusteSalidaController extends Controller
             $query->where('id_lt', $request->idLt);
         });
 
+        // Map the combined stock details to the desired format
         $products = $matchStock->get()->map(function ($detailStock) {
-            $existencia = $detailStock->existencia_almacen;
-            $producto = $existencia->producto;
-            $proyectoFinanciado = $existencia->proyecto_financiado;
-            $lineaTrabajo = $detailStock->linea_trabajo;
-            $centroAtencion = $detailStock->centro_atencion;
-            $marca = $detailStock->marca;
+            // Start with the basic label
+            $label = $detailStock->existencia_almacen->producto->codigo_producto
+                . ' — ' . $detailStock->existencia_almacen->producto->nombre_completo_producto
+                . ' — ' . $detailStock->existencia_almacen->producto->unidad_medida->nombre_unidad_medida
+                . ' — STOCK: ' . $detailStock->cant_det_existencia_almacen;
 
+            // Conditionally concatenate the brand if it exists
+            if ($detailStock->marca) {
+                $label .= ' — Marca: ' . $detailStock->marca->nombre_marca;
+            }
+
+            // Conditionally concatenate the expiration date if it exists
+            if ($detailStock->fecha_vcto_det_existencia_almacen) {
+                $label .= ' — Vencimiento: ' . Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y');
+            }
+
+            // Return the mapped product with the conditionally built label
             return [
-                'value' => $detailStock->id_det_existencia_almacen,
-                'label' => $producto->codigo_producto . " — " .
-                    $proyectoFinanciado->codigo_proy_financiado . " — " .
-                    $producto->nombre_completo_producto . " — " .
-                    $producto->unidad_medida->nombre_unidad_medida . " — UP/LT: " .
-                    ($lineaTrabajo->codigo_up_lt ?? 'Sin UP/LT') .
-                    " — Centro: $centroAtencion->codigo_centro_atencion — Marca: " .
-                    ($marca->nombre_marca ?? 'Sin marca') . ' — Vencimiento: ' .
-                    ($detailStock->fecha_vcto_det_existencia_almacen ? Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y') : 'Sin fecha.'),
-                'allInfo' => $detailStock
+                'value'             => $detailStock->id_det_existencia_almacen,
+                'label'             => $label,
+                'allInfo'           => $detailStock
             ];
         });
+
+        // $products = $matchStock->get()->map(function ($detailStock) {
+        //     $existencia = $detailStock->existencia_almacen;
+        //     $producto = $existencia->producto;
+        //     $proyectoFinanciado = $existencia->proyecto_financiado;
+        //     $lineaTrabajo = $detailStock->linea_trabajo;
+        //     $centroAtencion = $detailStock->centro_atencion;
+        //     $marca = $detailStock->marca;
+
+        //     return [
+        //         'value' => $detailStock->id_det_existencia_almacen,
+        //         'label' => $producto->codigo_producto . " — " .
+        //             $proyectoFinanciado->codigo_proy_financiado . " — " .
+        //             $producto->nombre_completo_producto . " — " .
+        //             $producto->unidad_medida->nombre_unidad_medida . " — UP/LT: " .
+        //             ($lineaTrabajo->codigo_up_lt ?? 'Sin UP/LT') .
+        //             " — Centro: $centroAtencion->codigo_centro_atencion — Marca: " .
+        //             ($marca->nombre_marca ?? 'Sin marca') . ' — Vencimiento: ' .
+        //             ($detailStock->fecha_vcto_det_existencia_almacen ? Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y') : 'Sin fecha.'),
+        //         'allInfo' => $detailStock
+        //     ];
+        // });
 
         return response()->json([
             'products' => $products,

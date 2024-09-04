@@ -102,7 +102,7 @@ export const useAjusteSalida = (context) => {
                         qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_requerimiento) : element.cant_det_requerimiento, //Represents the the number of products the user wants to register
                         cost: element.detalle_existencia_almacen.existencia_almacen.costo_existencia_almacen, //Represents the the cost of the product
                         prevAvails: element.detalle_existencia_almacen.cant_det_existencia_almacen,
-                        prodLabel: selectedProd.label,
+                        prodLabel: setProductLabel(selectedProd.allInfo),
                         fractionated: element.producto.fraccionado_producto,
                         avails: "",
                         total: "", //Represents the result of qty x cost for every row
@@ -121,6 +121,19 @@ export const useAjusteSalida = (context) => {
                 }
             });
         }
+    }
+
+    const setProductLabel = (detExistencia) => {
+        let label = detExistencia.existencia_almacen.producto.codigo_producto + ' — ' +
+                    detExistencia.existencia_almacen.producto.nombre_completo_producto + ' — ' +
+                    detExistencia.existencia_almacen.producto.unidad_medida.nombre_unidad_medida
+        if(detExistencia.marca) {
+            label += ' — Marca: ' + detExistencia.marca.nombre_marca 
+        }
+        if(detExistencia.fecha_vcto_det_existencia_almacen) {
+            label += ' — Vencimiento: ' + moment(detExistencia.fecha_vcto_det_existencia_almacen).format('d/m/Y') 
+        }
+        return label
     }
 
     const addNewRow = () => {
@@ -208,7 +221,7 @@ export const useAjusteSalida = (context) => {
             adjustment.value.prods[index].cost = selectedProd.allInfo.existencia_almacen.costo_existencia_almacen
             adjustment.value.prods[index].avails = selectedProd.allInfo.cant_det_existencia_almacen
             adjustment.value.prods[index].prevAvails = selectedProd.allInfo.cant_det_existencia_almacen
-            adjustment.value.prods[index].prodLabel = selectedProd.label
+            adjustment.value.prods[index].prodLabel = setProductLabel(selectedProd.allInfo)
             adjustment.value.prods[index].fractionated = selectedProd.allInfo.existencia_almacen.producto.fraccionado_producto
         } else {
             adjustment.value.prods[index].cost = ''

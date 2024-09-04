@@ -131,7 +131,6 @@ class TransferenciaController extends Controller
             $products = $combinedStock->map(function ($detailStock) {
                 // Start with the basic label
                 $label = $detailStock->existencia_almacen->producto->codigo_producto
-                    . ' — ' . $detailStock->existencia_almacen->proyecto_financiado->codigo_proy_financiado
                     . ' — ' . $detailStock->existencia_almacen->producto->nombre_completo_producto
                     . ' — ' . $detailStock->existencia_almacen->producto->unidad_medida->nombre_unidad_medida
                     . ' — STOCK: ' . $detailStock->cant_det_existencia_almacen;

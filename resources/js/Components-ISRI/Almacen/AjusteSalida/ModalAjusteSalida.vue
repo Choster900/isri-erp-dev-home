@@ -254,7 +254,7 @@
                                     :class="((errors['prods.' + index + '.qty'] || prod.avails < 0) && adjustment.status == 1) ? 'bg-red-300' : ''">
                                     <!-- Aquí se colocará el número dinámicamente -->
                                     <span v-if="adjustment.status == 1"
-                                        class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">STOCK:
+                                        class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">REST:
                                         {{ prod.avails }}</span>
                                     <!-- El input -->
                                     <input v-model="prod.qty" :disabled="adjustment.status != 1"
