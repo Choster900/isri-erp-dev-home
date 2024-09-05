@@ -35,8 +35,8 @@
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative  flex h-[30px] w-full">
                         <Multiselect v-model="reportInfo.numeroCuenta" :options="[
-        { value: 541, label: '541-BIENES DE USO Y CONSUMO' },
-        { value: 611, label: '611-BIENES MUEBLES' },
+        { value: 91, label: '541-BIENES DE USO Y CONSUMO' },
+        { value: 109, label: '611-BIENES MUEBLES' },
     ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
                     <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />

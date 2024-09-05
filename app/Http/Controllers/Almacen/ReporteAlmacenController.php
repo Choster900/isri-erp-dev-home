@@ -40,7 +40,7 @@ class ReporteAlmacenController extends Controller
 
     function getBudgetaryAccountsByAccountNumber(): object
     {
-        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal", 611)->orWhere("id_padre_ccta_presupuestal", 541)->get();
+        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal", 91)->orWhere("id_padre_ccta_presupuestal", 109)->get();
         // Formatear resultados para respuesta JSON
         return $cuentas->map(function ($item) {
             return [
