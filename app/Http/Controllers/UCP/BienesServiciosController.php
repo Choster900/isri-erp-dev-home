@@ -11,6 +11,7 @@ use App\Models\LineaTrabajo;
 use App\Models\Marca;
 use App\Models\ProductoAdquisicion;
 use App\Models\Proveedor;
+use App\Models\RecepcionPedido;
 use App\Models\UnidadMedida;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -405,6 +406,17 @@ class BienesServiciosController extends Controller
             DetDocumentoAdquisicion::where('id_det_doc_adquisicion', $request->id)->update([
                 'id_estado_doc_adquisicion' => $request->idState,
             ]);
+
+            if ($request->idState == 3) {
+                //Find the DetDocumentoAdquisicion we want to close
+                $item = DetDocumentoAdquisicion::find($request->id);
+                // Update the status of all associated recepcion_pedido where id_estado_recepcion_pedido = 1 (CREADO)
+                RecepcionPedido::where('id_det_doc_adquisicion', $item->id_det_doc_adquisicion)
+                    ->where('id_estado_recepcion_pedido', 1)
+                    ->update([
+                        'id_estado_recepcion_pedido' => 3, // Set the status to 'ELIMINADO'
+                    ]);
+            }
 
             // Devolver una respuesta exitosa
             return response()->json([
