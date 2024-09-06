@@ -248,4 +248,4 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('find-employee-by-name-for-warehouse', [ProcesoCompraController::class, 'findEmployeeByName'])->name('procesoCompra.findEmployeeByName');
     Route::post('update-employee-in-proceso-compra', [ProcesoCompraController::class, 'updateProcesoCompraEmployee'])->name('procesoCompra.updateProcesoCompraEmployee');
     Route::get('getEmployeeByDependencia', [ProcesoCompraController::class, 'getEmployeeByDependencia'])->name('procesoCompra.getEmployeeByDependencia');
-});
+});//COMENTARIO
