@@ -185,7 +185,7 @@
 
                                 <div
                                     class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
-                                    <div class="overflow-y-auto h-full">
+                                    <div class="overflow-y-auto h-full flex items-center justify-center">
                                         <p class="font-[MuseoSans] text-[12px] p-1">{{ prod.desc }}</p>
                                     </div>
                                 </div>

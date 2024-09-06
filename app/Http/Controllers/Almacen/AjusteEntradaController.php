@@ -90,6 +90,16 @@ class AjusteEntradaController extends Controller
                 'detalles_requerimiento.marca'
             ])->find($idAdjustment);
 
+            $brands = Marca::select('id_marca as value', 'nombre_marca as label')
+                ->where('estado_marca', 1)
+                ->orWhereIn('id_marca', function ($query) use ($idAdjustment) {
+                    $query->select('id_marca')
+                        ->from('detalle_requerimiento')
+                        ->where('estado_det_requerimiento', 1)
+                        ->where('id_requerimiento', $idAdjustment);
+                })
+                ->get();
+
             if (!$req) {
                 return response()->json([
                     'logical_error' => 'Error, no fue posible obtener el ajuste seleccionado.',
@@ -97,13 +107,15 @@ class AjusteEntradaController extends Controller
             }
         } else { //Creating a new one
             $req = [];
+            $brands = Marca::select('id_marca as value', 'nombre_marca as label')
+                ->where('estado_marca', 1)
+                ->get();
         }
 
         $centers = CentroAtencion::selectRaw('id_centro_atencion as value, concat(codigo_centro_atencion," - ",nombre_centro_atencion) as label')->get();
         $reasons = MotivoAjuste::select('id_motivo_ajuste as value', 'nombre_motivo_ajuste as label')->get();
         $financingSources = ProyectoFinanciado::selectRaw('id_proy_financiado as value, concat(codigo_proy_financiado," - ",nombre_proy_financiado) as label')->get();
         $lts = LineaTrabajo::selectRaw('id_lt as value, concat(codigo_up_lt," - ",nombre_lt) as label')->get();
-        $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
         return response()->json([
             'req'                           => $req,
