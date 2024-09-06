@@ -20,6 +20,7 @@
         "phpoffice/phpspreadsheet": "^1.28",
         "psr/simple-cache": "^3.0",
         "tightenco/ziggy": "^1.0",
+        "tymon/jwt-auth": "^2.1",
         "yajra/laravel-datatables": "9.0"
     },
     "require-dev": {
