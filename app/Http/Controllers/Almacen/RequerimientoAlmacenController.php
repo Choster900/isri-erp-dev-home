@@ -275,13 +275,14 @@ class RequerimientoAlmacenController extends Controller
                         if ($prodReq["stateCentroProduccion"] == 0)
                             return;
 
-                            collect($request["dataDetalleRequerimiento"][$key]["productos"]) // Ensure correct access
+                        collect($request["dataDetalleRequerimiento.{$key}.productos"])
                             ->each(function ($det, $indice) use (&$rules, $key, $prodReq) {
                                 if ($det["stateProducto"] == 0)
                                     return;
 
-                                $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = ['required'];
-                                $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".idDetExistenciaAlmacen"] = ['required'];
+                                $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = ['required'];
+                                $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idDetExistenciaAlmacen"] = ['required'];
+
 
                                 if (!empty ($det["idDetExistenciaAlmacen"])) {
 
@@ -303,7 +304,7 @@ class RequerimientoAlmacenController extends Controller
                                     $cantidadTotal = $cantidadDetalleExistencia - $totalDetalleRequerimiento;
 
 
-                                    $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = [
+                                    $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
                                         'required',
                                         'numeric',
                                         "lte:$cantidadTotal",
@@ -427,12 +428,13 @@ class RequerimientoAlmacenController extends Controller
                                 if ($prodReq["stateCentroProduccion"] == 0)
                                     return;
 
-                                collect($request->input("dataDetalleRequerimiento")[$key]["productos"])
+                                collect($request["dataDetalleRequerimiento.{$key}.productos"])
                                     ->each(function ($det, $indice) use (&$rules, $key, $prodReq, $value2) {
                                         if ($det["stateProducto"] == 0)
-                                        return;
-                                        $rules["dataDetalleRequerimiento." . $key . ".productos." . $indice . ".cantDetRequerimiento"] = ['required'];
-                                        $rules["dataDetalleRequerimiento." . $key . ".productos." . $indice . ".idDetExistenciaAlmacen"] = ['required'];
+                                            return;
+                                        $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = ['required'];
+                                        $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idDetExistenciaAlmacen"] = ['required'];
+
 
                                         if (!empty ($det["idDetExistenciaAlmacen"])) {
 
@@ -455,9 +457,10 @@ class RequerimientoAlmacenController extends Controller
                                             $cantidadTotal = $cantidadDetalleExistencia - $totalDetalleRequerimiento; // Sumamos
 
 
-                                            $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = [
+                                            $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
                                                 'required',
                                                 'numeric',
+                                                "lte:$cantidadTotal",
                                             ];
                                         }
                                     });
@@ -507,13 +510,13 @@ class RequerimientoAlmacenController extends Controller
                                 if ($prodReq["stateCentroProduccion"] == 0)
                                     return;
 
-                                collect($request->input("dataDetalleRequerimiento." . (string)$key . ".productos"))
+                                collect($request["dataDetalleRequerimiento.{$key}.productos"])
                                     ->each(function ($det, $indice) use (&$rules, $key, $prodReq) {
                                         if ($det["stateProducto"] == 0)
                                             return;
 
-                                        $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = ['required'];
-                                        $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".idDetExistenciaAlmacen"] = ['required'];
+                                        $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = ['required'];
+                                        $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idDetExistenciaAlmacen"] = ['required'];
 
                                         if (!empty ($det["idDetExistenciaAlmacen"])) {
 
@@ -536,9 +539,10 @@ class RequerimientoAlmacenController extends Controller
                                             $cantidadTotal = $cantidadDetalleExistencia - $totalDetalleRequerimiento;
 
 
-                                            $rules["dataDetalleRequerimiento." . (string)$key . ".productos." . (string)$indice . ".cantDetRequerimiento"] = [
+                                            $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
                                                 'required',
                                                 'numeric',
+                                                "lte:$cantidadTotal",
                                             ];
                                         }
                                     });
@@ -615,7 +619,7 @@ class RequerimientoAlmacenController extends Controller
             ];
 
             // Si el estado es "Despachado" (idEstado == 3)
-                if ( $request->idEstado == 3) {
+            if ($request->idEstado == 2 || $request->idEstado == 3) {
                 // Obtener los detalles del requerimiento
                 $detReq = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
                 $existencias = [];
