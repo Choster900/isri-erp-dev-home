@@ -296,7 +296,7 @@ class RecepcionController extends Controller
             $recep = [];
             $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion', 'documento_adquisicion.proceso_compra'])->find($request->detId);
         }
-
+        //VALIDAR LOS ESTADOS DE MARCASSSSSS
         if ($item->estado_det_doc_adquisicion == 0 && $recep != []) {
             $data = [
                 'id_estado_recepcion_pedido'            => 3,
@@ -335,7 +335,8 @@ class RecepcionController extends Controller
                         );
                     }
                 }
-                $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
+                $brands = Marca::select('id_marca as value', 'nombre_marca as label')
+                    ->where('estado_marca', 1)->get();
 
                 return response()->json([
                     'recep'                             => $recep,

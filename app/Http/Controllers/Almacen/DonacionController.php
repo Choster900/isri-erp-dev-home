@@ -82,6 +82,16 @@ class DonacionController extends Controller
                 'proveedor'
             ])->find($idRec);
 
+            $brands = Marca::select('id_marca as value', 'nombre_marca as label')
+                ->where('estado_marca', 1)
+                ->orWhereIn('id_marca', function ($query) use ($idRec) {
+                    $query->select('id_marca')
+                        ->from('detalle_recepcion_pedido')
+                        ->where('estado_det_recepcion_pedido',1)
+                        ->where('id_recepcion_pedido', $idRec);
+                })
+                ->get();
+
             if (!$recep) {
                 return response()->json([
                     'logical_error' => 'Error, no fue posible obtener la recepción consultada. Consulte con el administrador.',
@@ -93,10 +103,12 @@ class DonacionController extends Controller
             $recep = [];
             $suppliers = Proveedor::select('id_proveedor as value', 'razon_social_proveedor as label', 'nit_proveedor', 'dui_proveedor')
                 ->where('estado_proveedor', 1)->get();
+            $brands = Marca::select('id_marca as value', 'nombre_marca as label')
+                ->where('estado_marca', 1)
+                ->get();
         }
 
         $centers = CentroAtencion::selectRaw('id_centro_atencion as value, concat(codigo_centro_atencion," - ",nombre_centro_atencion) as label')->get();
-        $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
         return response()->json([
             'recep'                         => $recep,

@@ -131,7 +131,7 @@ export const useAjusteSalida = (context) => {
             label += ' — Marca: ' + detExistencia.marca.nombre_marca 
         }
         if(detExistencia.fecha_vcto_det_existencia_almacen) {
-            label += ' — Vencimiento: ' + moment(detExistencia.fecha_vcto_det_existencia_almacen).format('d/m/Y') 
+            label += ' — Vencimiento: ' + moment(detExistencia.fecha_vcto_det_existencia_almacen).format('DD/MM/YYYY') 
         }
         return label
     }
