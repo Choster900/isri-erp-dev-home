@@ -21,6 +21,11 @@ class AccessMiddleware
         try {
             $url = $request->path();
             $url2 = "/" . $url;
+
+            if (!$request->user()) {
+                return redirect('dashboard');
+            }
+
             $id_usuario = $request->user()->id_usuario;
             $user = User::find($id_usuario);
 
